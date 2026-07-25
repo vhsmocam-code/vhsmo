@@ -9,8 +9,7 @@ export async function POST(req: Request) {
 
     // Signature header
     const signature = req.headers.get("x-razorpay-signature");
-    console.log("Signature present:", !!signature);
-
+   
     const body = await req.text();
     console.log("Body length:", body.length);
 
@@ -32,24 +31,41 @@ export async function POST(req: Request) {
       throw new Error("RAZORPAY_WEBHOOK_SECRET is not configured");
     }
 
-   const expectedSignature = crypto
-     .createHmac("sha256", secret)
-     .update(body)
-     .digest("hex");
+//    const expectedSignature = crypto
+//      .createHmac("sha256", secret)
+//      .update(body)
+//      .digest("hex");
 
-   const valid =
-     expectedSignature.length === signature.length &&
-     crypto.timingSafeEqual(
-       Buffer.from(expectedSignature),
-       Buffer.from(signature),
-     );
+//    const valid =
+//      expectedSignature.length === signature.length &&
+//      crypto.timingSafeEqual(
+//        Buffer.from(expectedSignature),
+//        Buffer.from(signature),
+//      );
 
-   if (!valid) {
-     return NextResponse.json(
-       { success: false, message: "Invalid signature" },
-       { status: 400 },
-     );
-   }
+  const expectedSignature = crypto
+    .createHmac("sha256", secret)
+    .update(body)
+    .digest("hex");
+
+  console.log("Expected:", expectedSignature);
+  console.log("Received:", signature);
+
+  const valid =
+    expectedSignature.length === signature.length &&
+    crypto.timingSafeEqual(
+      Buffer.from(expectedSignature),
+      Buffer.from(signature),
+    );
+
+  console.log("Signature valid:", valid);
+
+  if (!valid) {
+    return NextResponse.json(
+      { success: false, message: "Invalid signature" },
+      { status: 400 },
+    );
+  }
 
     // Parse the webhook payload
     const event = JSON.parse(body);
