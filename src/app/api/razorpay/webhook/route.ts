@@ -6,11 +6,18 @@ import { finalizeOrder } from "@/lib/orders/finalizeOrder";
 export async function POST(req: Request) {
   try {
     // Razorpay sends the raw body
-    const body = await req.text();
 
     // Signature header
     const signature = req.headers.get("x-razorpay-signature");
+    console.log("Signature present:", !!signature);
 
+    const body = await req.text();
+    console.log("Body length:", body.length);
+
+    console.log(
+      "Webhook secret exists:",
+      !!process.env.RAZORPAY_WEBHOOK_SECRET,
+    );
     if (!signature) {
       return NextResponse.json(
         { success: false, message: "Missing signature" },
