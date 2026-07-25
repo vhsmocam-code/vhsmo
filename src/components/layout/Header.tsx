@@ -53,11 +53,16 @@ export function Header() {
       pathname.startsWith("/legal"));
   const darkText = lightTop && !scrolled;
 
-  // On policy pages the white wordmark is invisible against the light paper
-  // until the header picks up its dark backdrop on scroll, so show the brown
-  // mark at the top and swap to the current white mark once scrolled.
-  const legalTop = !!pathname && pathname.startsWith("/legal") && !scrolled;
-  const logo = legalTop
+  // On light-surface pages (policy pages, the checkout success page) the white
+  // wordmark is invisible against the paper until the header picks up its dark
+  // backdrop on scroll, so show the brown mark at the top and swap to the white
+  // mark once scrolled.
+  const brownLogoTop =
+    !!pathname &&
+    !scrolled &&
+    (pathname.startsWith("/legal") ||
+      pathname.startsWith("/checkout/success"));
+  const logo = brownLogoTop
     ? { src: "/brownTrans.png", width: 748, height: 679 }
     : { src: "/whiteTrans.png", width: 748, height: 679 };
 
