@@ -12,3 +12,9 @@ export const fieldControl =
 
 export const fieldIcon =
   "h-4 w-4 shrink-0 text-darkroom/35 transition-colors group-focus-within:text-bluehour";
+
+/** Inert / locked field: clearly reads as non-editable, not just dimmed. Uses
+ *  important overrides so it wins over the hover + focus states baked into
+ *  `fieldCard`. */
+export const fieldDisabled =
+  "cursor-not-allowed opacity-80 !border-dashed !border-darkroom/15 !bg-darkroom/[0.05] !shadow-none hover:!border-darkroom/15";

@@ -43,7 +43,12 @@ export function CartDrawer() {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[80]" role="dialog" aria-modal="true" aria-label="Shopping cart">
+        <div
+          className="fixed inset-0 z-[80]"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Shopping cart"
+        >
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -66,7 +71,9 @@ export function CartDrawer() {
                 <ShoppingBag className="size-5" />
                 <h2 className="text-lg font-bold text-darkroom">
                   Your cart{" "}
-                  <span className="font-normal text-darkroom/55">({count})</span>
+                  <span className="font-normal text-darkroom/55">
+                    ({count})
+                  </span>
                 </h2>
               </div>
               <button
@@ -84,7 +91,9 @@ export function CartDrawer() {
                 <div className="flex size-16 items-center justify-center rounded-full bg-overexpose">
                   <ShoppingBag className="size-7 text-darkroom/50" />
                 </div>
-                <p className="mt-5 text-lg font-bold text-darkroom">Your cart is empty</p>
+                <p className="mt-5 text-lg font-bold text-darkroom">
+                  Your cart is empty
+                </p>
                 <p className="mt-1.5 text-sm text-darkroom/60">
                   Reserve your VHSMO to lock in the early price.
                 </p>
@@ -111,9 +120,13 @@ export function CartDrawer() {
                     <div className="flex flex-1 flex-col">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <p className="font-semibold leading-snug text-darkroom">{item.name}</p>
+                          <p className="font-semibold leading-snug text-darkroom">
+                            {item.name}
+                          </p>
                           {item.variant && (
-                            <p className="text-xs text-darkroom/55">{item.variant}</p>
+                            <p className="text-xs text-darkroom/55">
+                              {item.variant}
+                            </p>
                           )}
                         </div>
                         <button
@@ -159,7 +172,9 @@ export function CartDrawer() {
                   <div className="my-3 h-px bg-darkroom/12" />
                   <div className="flex items-center justify-between text-base font-bold text-darkroom">
                     <span>Total</span>
-                    <span className="tabular-nums">{formatCurrency(total)}</span>
+                    <span className="tabular-nums">
+                      {formatCurrency(total)}
+                    </span>
                   </div>
                 </div>
 
@@ -170,19 +185,17 @@ export function CartDrawer() {
                   <Link
                     href="/checkout"
                     onClick={(e) => {
-                   track("checkout_clicked", {
-                     source: "cart_drawer",
-                   });
- 
+                      track("checkout_clicked", {
+                        source: "cart_drawer",
+                      });
 
                       closeCart();
-                      }}
+                    }}
                     className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-bluehour px-8 py-4 text-base font-bold tracking-tight text-overexpose transition-all duration-300 ease-[var(--ease-out-expo)] hover:shadow-[0_0_0_5px_rgba(16,147,255,0.25)] active:scale-[0.98]"
                   >
                     <Lock className="size-4" />
                     Secure checkout
                   </Link>
-                  
                 ) : (
                   <>
                     <button
@@ -195,8 +208,8 @@ export function CartDrawer() {
                       Secure checkout
                     </button>
                     <p className="mt-3 text-center text-sm text-darkroom/70">
-                      One VHSMO per order — keep a single unit in one finish to
-                      check out.
+                      Early access is limited to 1 VHSMO per order. Remove extra
+                      items to continue.
                     </p>
                   </>
                 )}

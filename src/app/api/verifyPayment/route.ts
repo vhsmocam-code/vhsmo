@@ -93,8 +93,9 @@ function orderConfirmationEmail({
           <!-- greeting -->
           <tr><td style="padding:34px 32px 0;">
             <div style="font-size:20px;font-weight:700;color:${INK};">Thank you, ${name}!</div>
-            <div style="margin-top:6px;font-size:16px;font-weight:600;color:${INK};">Your VHSMO is officially reserved.</div>
+            <div style="margin-top:6px;font-size:16px;font-weight:600;color:${INK};">Your purchase is officially confirmed.</div>
             <p style="margin:18px 0 0;font-size:14px;line-height:1.7;color:${MUTE};">Thanks for sticking with us and trusting VHSMO with the way you capture your memories.</p>
+            
           </td></tr>
 
           <tr><td style="padding:26px 32px 4px;"><div style="border-top:1px solid ${LINE};"></div></td></tr>

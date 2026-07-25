@@ -17,13 +17,13 @@ export function EmptyCart() {
         Your cart is empty.
       </h1>
       <p className="mt-4 max-w-sm text-base text-darkroom/60">
-        Reserve your VHSMO to lock in the early price, then check out here.
+        Pre Order your VHSMO to lock in the early price, then check out here.
       </p>
       <Link
         href="/#reserve"
         className="mt-8 inline-flex items-center gap-2 rounded-full bg-kodak px-7 py-3.5 text-sm font-bold text-darkroom transition-transform hover:scale-[1.02]"
       >
-        {product ? `Reserve yours - ${formatCurrency(product.price)}` : "Reserve yours"}
+        {product ? `Pre Order Now - ${formatCurrency(product.price)}` : "Pre Order Now"}
       </Link>
     </div>
   );

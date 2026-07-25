@@ -207,7 +207,7 @@ export function PurchasePanel() {
           disabled={adding || soldOut}
           className="flex w-full items-center justify-center gap-2 rounded-full bg-kodak px-8 py-4 text-base font-bold tracking-tight text-darkroom transition-all duration-300 ease-[var(--ease-out-expo)] hover:shadow-[0_0_0_5px_rgba(253,241,0,0.25)] active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-darkroom/15 disabled:text-darkroom/50 disabled:shadow-none"
         >
-          {soldOut ? "Sold out" : adding ? "Adding…" : "Reserve yours"}
+          {soldOut ? "Sold out" : adding ? "Adding…" : "Pre Order Now"}
         </button>
       </div>
 

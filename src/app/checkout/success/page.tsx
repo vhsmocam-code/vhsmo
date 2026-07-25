@@ -368,14 +368,23 @@ function SuccessContent() {
                 </Card>
               )}
 
-              <button
-                type="button"
-                onClick={() => downloadInvoice(order)}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-darkroom px-7 py-4 text-sm font-bold text-halide transition-transform hover:scale-[1.02] active:scale-[0.98]"
-              >
-                <Download className="size-4" />
-                Download invoice
-              </button>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Link
+                  href="/"
+                  className="flex flex-1 items-center justify-center gap-2 rounded-full border-2 border-darkroom/15 bg-overexpose px-7 py-4 text-sm font-bold text-darkroom transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  <Home className="size-4" />
+                  Go to home
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => downloadInvoice(order)}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-full bg-darkroom px-7 py-4 text-sm font-bold text-halide transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  <Download className="size-4" />
+                  Download invoice
+                </button>
+              </div>
             </aside>
           </div>
         )}

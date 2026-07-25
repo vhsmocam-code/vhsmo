@@ -208,7 +208,7 @@ export function ShippingSection({
             <p className="mt-1.5 text-xs text-darkroom/55">
               Outside India?{" "}
               <Link
-                href="/international-order"
+                href="/international-order?from=checkout"
                 className="font-bold text-darkroom underline underline-offset-2 transition-colors hover:text-bluehour"
               >
                 Use the international order form

@@ -5,4 +5,5 @@ export {
   fieldLabel as labelClass,
   fieldControl as controlClass,
   fieldIcon as iconClass,
+  fieldDisabled as disabledClass,
 } from "@/components/address/styles";

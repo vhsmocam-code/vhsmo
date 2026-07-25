@@ -261,7 +261,7 @@ export function OrderSummary({
             button, so the disabled state isn't a dead end. */}
         {!singleUnit && (
           <p className="mt-5 rounded-xl border-l-2 border-kodak bg-kodak/10 px-4 py-3 text-sm text-darkroom/80">
-            One VHSMO per order - keep a single unit in one finish to check out.
+            Early access is limited to 1 VHSMO per order. Remove extra items to continue.
           </p>
         )}
 

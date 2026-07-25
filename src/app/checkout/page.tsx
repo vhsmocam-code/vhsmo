@@ -19,6 +19,7 @@ import { ShippingSection } from "@/components/checkout/ShippingSection";
 import { DeliveryBanner } from "@/components/checkout/DeliveryBanner";
 import { useEmailVerification } from "@/components/checkout/useEmailVerification";
 import { usePincodeServiceability } from "@/components/checkout/usePincodeServiceability";
+import { WaitlistGate } from "@/components/checkout/WaitlistGate";
 
 export default function CheckoutPage() {
   const { items, subtotal, shipping, tax, count, isHydrated, clear } =
@@ -26,6 +27,11 @@ export default function CheckoutPage() {
 
   // Email verification against the waitlist.
   const { email, setEmail, status: emailStatus } = useEmailVerification();
+
+  // The page is locked behind a waitlist gate. A persisted email is only
+  // pre-filled into the gate's field - the checkout stays hidden until the
+  // visitor presses "Unlock checkout" and the email verifies.
+  const [unlocked, setUnlocked] = useState(false);
   const [firstName, setFirstName] = usePersistedState("checkout:firstName", "");
   const [lastName, setLastName] = usePersistedState("checkout:lastName", "");
   const [phone, setPhone] = usePersistedState("checkout:phone", "");
@@ -111,6 +117,16 @@ export default function CheckoutPage() {
   return (
     <div className="paper flex min-h-dvh flex-col">
       <CheckoutHeader />
+
+      {!unlocked && (
+        <WaitlistGate
+          defaultEmail={email}
+          onUnlock={(verifiedEmail) => {
+            setEmail(verifiedEmail);
+            setUnlocked(true);
+          }}
+        />
+      )}
 
       <form
         onSubmit={onSubmit}

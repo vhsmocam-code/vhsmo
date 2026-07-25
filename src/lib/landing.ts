@@ -14,7 +14,7 @@ export const hero = {
   kicker: "Designed to be noticed · Built to last a lifetime",
   headline: "VHSMO",
   sub: "A screen-free pocket camera with the soul of 2000s.",
-  cta: "Reserve yours",
+  cta: "Pre Order Now",
   image: {
     src: "/heroLatest.webp",
     alt: "VHSMO camera in a cinematic scene",
@@ -268,7 +268,7 @@ export const showcase = {
     width: 1536,
     height: 1024,
   },
-  cta: "Reserve yours",
+  cta: "Pre Order Now",
 };
 
 export const faq = {
@@ -316,7 +316,7 @@ export const finalCta = {
   lineTwo: "Stay in the moment.",
   lineThree: "Capture the memory.",
   sub: "First batch - /2026. Reserve yours before it's gone.",
-  cta: "Reserve yours",
+  cta: "Pre Order Now",
   photo: {
     src: "/buyproduct/pinkFront.webp",
     alt: "Someone raising a pink VHSMO to their eye, mid-shot in the sun",

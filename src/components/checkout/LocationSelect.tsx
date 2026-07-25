@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { AlertCircle, Check, ChevronDown, Search } from "lucide-react";
-import { cardClass, controlClass, labelClass } from "./styles";
+import { cardClass, controlClass, disabledClass, labelClass } from "./styles";
 
 export type LocationOption = {
   /** Human-readable name - this is what gets submitted. */
@@ -168,7 +168,7 @@ export function LocationSelect({
         className={
           cardClass +
           " relative block " +
-          (disabled ? "cursor-not-allowed opacity-55 " : "cursor-pointer ") +
+          (disabled ? disabledClass + " " : "cursor-pointer ") +
           (invalid
             ? "!border-red-400/70 focus-within:!border-red-500 focus-within:!shadow-[0_8px_24px_-10px_rgba(239,68,68,0.45)]"
             : "")
