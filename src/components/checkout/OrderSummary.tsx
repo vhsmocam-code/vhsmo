@@ -88,7 +88,29 @@ export function OrderSummary({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: Math.round(total * 100), // Razorpay uses paise
+          amount: Math.round(total * 100),
+
+          customer: {
+            name: fullName,
+            email: customer.email,
+            phone: customer.phone,
+          },
+
+          shipping: shippingInfo,
+
+          items: items.map((item) => ({
+            productId: item.id,
+            name: item.name,
+            variant: item.variant,
+            quantity: item.quantity,
+            price: item.price,
+            total: item.price * item.quantity,
+          })),
+
+          subtotal,
+          shippingCost: shipping,
+          tax,
+          total,
         }),
       });
 
