@@ -12,7 +12,7 @@ import {
   Mail,
   Package,
   PackageX,
-  RotateCcw,
+  ShieldCheck,
   ShoppingBag,
   Truck,
 } from "lucide-react";
@@ -249,13 +249,13 @@ function SuccessContent() {
           />
           <Notice
             icon={Truck}
-            title="Ships in 6–7 weeks"
-            body="Your VHSMO is hand-assembled to order and dispatches within 6–7 weeks."
+            title="Getting your VHSMO ready"
+            body="We're assembling, testing and packing your camera. Shipping begins in 6–7 weeks."
           />
           <Notice
-            icon={RotateCcw}
-            title="Easy returns"
-            body="Changed your mind? Returns are accepted within 7 days of delivery."
+            icon={ShieldCheck}
+            title="Problem caused by us?"
+            body="Manufacturing defects are covered under our 12-month limited warranty. We'll repair or replace your VHSMO for completely free. Just reach out and we'll make it right."
           />
         </div>
 
@@ -436,8 +436,13 @@ function downloadInvoice(order: Order) {
 <style>
   * { box-sizing: border-box; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; color: #1f1a18; margin: 0; padding: 48px; }
-  .top { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #1f1a18; padding-bottom: 24px; }
-  .brand { font-size: 28px; font-weight: 800; letter-spacing: 2px; }
+  .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; border-bottom: 2px solid #1f1a18; padding-bottom: 24px; }
+  .brand { max-width: 320px; }
+  .logobox { display: inline-block; background: #1f1a18; border-radius: 10px; padding: 12px 16px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .logobox img { display: block; width: 130px; height: auto; }
+  .seller { margin-top: 12px; }
+  .seller .seller-name { font-size: 14px; font-weight: 700; color: #1f1a18; }
+  .seller .muted { font-size: 12px; line-height: 1.6; color: #6b6360; margin-top: 4px; }
   .doc { text-align: right; }
   .doc h1 { margin: 0; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; }
   .doc .muted { color: #6b6360; font-size: 13px; margin-top: 4px; }
@@ -460,7 +465,21 @@ function downloadInvoice(order: Order) {
 </head>
 <body>
   <div class="top">
-    <div class="brand">VHSMO</div>
+    <div class="brand">
+      <div class="logobox"><img src="https://res.cloudinary.com/jyejt2p3/image/upload/v1784963870/Frame_58_jtqo1t.png" alt="VHSMO" /></div>
+      <div class="seller">
+        <div class="seller-name">VHSMO LLP</div>
+        <div class="muted">
+          H. No. 20, Nilaya Kapil, Aasmant Society,<br />
+          S. No. 124/3/4, Armament, Sutarwadi,<br />
+          Pune, Maharashtra &ndash; 411021, India
+        </div>
+        <div class="muted">GSTIN: 27ABBFV3675J1ZQ</div>
+                <div class="muted"> LLPIN: ACT-8214</div>
+
+        <div class="muted">team@vhsmo.com &middot; vhsmo.com</div>
+      </div>
+    </div>
     <div class="doc">
       <h1>Invoice</h1>
       <div class="muted">#${shortId}</div>
@@ -472,9 +491,13 @@ function downloadInvoice(order: Order) {
     <div class="col">
       <h3>Billed to</h3>
       <div><strong>${escapeHtml(order.customer.name)}</strong></div>
-      ${addressLines}
       ${order.customer.email ? `<div>${escapeHtml(order.customer.email)}</div>` : ""}
       ${order.customer.phone ? `<div>${escapeHtml(order.customer.phone)}</div>` : ""}
+    </div>
+    <div class="col">
+      <h3>Ship to</h3>
+      <div><strong>${escapeHtml(order.customer.name)}</strong></div>
+      ${addressLines}
     </div>
     <div class="col">
       <h3>Payment</h3>
@@ -500,13 +523,15 @@ function downloadInvoice(order: Order) {
   <div class="totals">
     <div class="line"><span>Subtotal</span><span>${formatCurrency(order.subtotal, order.currency)}</span></div>
     <div class="line"><span>Shipping</span><span>${order.shipping === 0 ? "Free" : formatCurrency(order.shipping, order.currency)}</span></div>
-    ${order.tax > 0 ? `<div class="line"><span>Taxes</span><span>${formatCurrency(order.tax, order.currency)}</span></div>` : ""}
+        <div class="line"><span>Taxes</span><span>${order.tax === 0 ? "Inclusive of all Taxes" : formatCurrency(order.tax, order.currency)}</span></div>
+
     <div class="line grand"><span>Total</span><span>${formatCurrency(order.total, order.currency)}</span></div>
   </div>
 
   <div class="foot">
-    Thank you for your order. Your VHSMO is hand-assembled to order and ships within 6–7 weeks.
-    Returns are accepted within 7 days of delivery. Questions? team@vhsmo.com
+    Thank you for your order. Your VHSMO is hand-assembled to order and ships within 5-6 weeks.
+     Questions? team@vhsmo.com
+  
   </div>
 
   <script>window.onload = function () { window.print(); };</script>
