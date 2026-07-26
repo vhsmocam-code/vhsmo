@@ -9,6 +9,7 @@ import {
   Download,
   Home,
   Loader2,
+  Clock,
   Mail,
   Package,
   PackageX,
@@ -48,6 +49,7 @@ type Order = {
   tax: number;
   total: number;
   currency: string;
+  paymentStatus: string;
 };
 
 /** Map a Supabase orders row into the shape the page renders. */
@@ -85,6 +87,7 @@ function fromApi(row: Record<string, any>): Order {
     tax: Number(row.tax ?? 0),
     total: Number(row.total ?? row.amount ?? 0),
     currency: row.currency ?? "INR",
+    paymentStatus: String(row.payment_status ?? "pending").toLowerCase(),
   };
 }
 
@@ -198,6 +201,70 @@ function SuccessContent() {
       <div className="paper flex min-h-dvh flex-col items-center justify-center gap-3 text-darkroom/50">
         <Loader2 className="size-6 animate-spin" />
         <p className="text-sm">Fetching your order details…</p>
+      </div>
+    );
+  }
+
+  // Payment never completed for this order - the row was created with only the
+  // customer's name, email and shipping details, and payment_status is still
+  // "pending". We don't offer a retry from the site; instead we ask the buyer
+  // to reach out so we can help them complete the purchase.
+  if (order && order.paymentStatus !== "paid") {
+    return (
+      <div className="paper flex min-h-dvh flex-col items-center justify-center px-6 text-center">
+        <span className="flex size-16 items-center justify-center rounded-full border-2 border-darkroom/15 bg-overexpose text-darkroom/60">
+          <Clock className="size-8" />
+        </span>
+
+        <span className="mt-6 inline-flex items-center gap-2 rounded-full border-2 border-darkroom/12 bg-overexpose px-4 py-1.5 text-xs font-bold text-darkroom">
+          <span className="flex size-2 rounded-full bg-darkroom/50" />
+          Payment pending
+        </span>
+
+        <h1 className="display mt-6 text-[clamp(1.75rem,5vw,3rem)] text-darkroom">
+          Your payment didn&apos;t go through
+        </h1>
+        <p className="mt-4 max-w-md text-base leading-relaxed text-darkroom/60">
+          We saved your order details
+          {order.customer.email ? (
+            <>
+              {" "}
+              for{" "}
+              <span className="font-semibold text-darkroom">
+                {order.customer.email}
+              </span>
+            </>
+          ) : null}
+          {shortId ? (
+            <>
+              {" "}
+              <span className="font-mono text-sm font-semibold text-darkroom">
+                (#{shortId})
+              </span>
+            </>
+          ) : null}
+          , but the payment wasn&apos;t completed. Get in touch and we&apos;ll
+          help you finish your order.
+        </p>
+
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <a
+            href={`mailto:team@vhsmo.com?subject=${encodeURIComponent(
+              `Payment help for order ${orderId ?? order.orderId}`,
+            )}`}
+            className="flex items-center justify-center gap-2 rounded-full bg-darkroom px-7 py-4 text-sm font-bold text-halide transition-transform hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <Mail className="size-4" />
+            Contact us
+          </a>
+          <Link
+            href="/"
+            className="flex items-center justify-center gap-2 rounded-full border-2 border-darkroom/15 bg-overexpose px-7 py-4 text-sm font-bold text-darkroom transition-transform hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <Home className="size-4" />
+            Back to home
+          </Link>
+        </div>
       </div>
     );
   }
