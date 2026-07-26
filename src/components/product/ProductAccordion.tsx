@@ -70,8 +70,10 @@ const items: Item[] = [
           are scheduled to ship by 15 September 2026.
         </p>
         <p>
-          If your order has not shipped by that date, you can request a full
-          refund - no questions asked.
+          Since each VHSMO is reserved as part of the first production batch,
+          we’re unable to offer cancellations or refunds once an order is
+          placed. However, if your order hasn’t shipped by 15 September 2026,
+          you’ll still be eligible for a full refund.
         </p>
         <p className="font-semibold text-darkroom">
           Free standard shipping across India.
@@ -91,15 +93,21 @@ const items: Item[] = [
           Every VHSMO comes ready to start shooting straight out of the box.
         </p>
         <div>
-          <p className="font-semibold text-darkroom">Included with every camera:</p>
+          <p className="font-semibold text-darkroom">
+            Included with every camera:
+          </p>
           <ul className="mt-2.5 space-y-2">
             <BoxItem icon={Camera}>VHSMO Camera</BoxItem>
             <BoxItem icon={Cable}>USB-C charging and data cable</BoxItem>
-            <BoxItem icon={MemoryStick}>4GB microSD card, pre-installed</BoxItem>
+            <BoxItem icon={MemoryStick}>
+              4GB microSD card, pre-installed
+            </BoxItem>
           </ul>
         </div>
         <div>
-          <p className="font-semibold text-darkroom">Limited-time pre-order bonus:</p>
+          <p className="font-semibold text-darkroom">
+            Limited-time pre-order bonus:
+          </p>
           <ul className="mt-2.5 space-y-2">
             <BoxItem icon={Gift}>VHSMO lanyard</BoxItem>
             <BoxItem icon={Gift}>Exclusive VHSMO sticker pack</BoxItem>
@@ -139,8 +147,7 @@ const items: Item[] = [
           ))}
         </dl>
         <p className="font-marker text-darkroom">
-          No screen. No filters. Just point, shoot and keep
-          living.
+          No screen. No filters. Just point, shoot and keep living.
         </p>
       </div>
     ),

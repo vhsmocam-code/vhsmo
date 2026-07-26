@@ -495,8 +495,8 @@ export const LEGAL_DOCS: LegalDoc[] = [
         heading: "1. Pre-order refunds",
         body: [
           "VHSMO is currently in production, with reserved units scheduled to ship by late August 2026.",
-          "If your order has not shipped by 15 September 2026, you may request a full refund—no questions asked.",
-          "Once your order has shipped, it cannot be cancelled or refunded for a change of mind.",
+          "Since each VHSMO is reserved as part of the first production batch, orders cannot be cancelled or refunded once placed, including after dispatch or in cases of a change of mind.",
+           "If your order has not shipped by 15 September 2026, you may request a full refund-no questions asked.",
         ],
       },
       {
