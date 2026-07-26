@@ -84,7 +84,7 @@ async function decrementStock(productId: string, quantity: number) {
   return false;
 }
 
-function orderConfirmationEmail({
+export function orderConfirmationEmail({
   name,
   orderId,
   paymentId,

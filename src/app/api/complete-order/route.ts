@@ -5,6 +5,8 @@ import {
   COLOR_TO_PRODUCT_COLOR,
   RECOVERY_QUANTITY,
 } from "@/lib/recovery";
+import { sendEmail } from "@/lib/email";
+import { orderConfirmationEmail } from "@/lib/orders/finalizeOrder";
 
 /**
  * POST /api/complete-order - the write side of the one-time order-recovery
@@ -119,40 +121,62 @@ export async function POST(req: Request) {
   const amount = recovery.amount;
 
   // 5. Insert the real order.
-  const { error: insertError } = await supabase.from("orders").insert({
-    razorpay_order_id: recovery.razorpay_order_id,
-    razorpay_payment_id: recovery.razorpay_payment_id,
-    customer_name: customerName,
-    email: recovery.email,
-    phone,
-    address_line1: addressLine1,
-    address_line2: addressLine2,
-    city,
-    state,
-    country: "India",
-    postal_code: pincode,
-    amount,
-    currency: "INR",
-    items,
-    subtotal: amount,
-    shipping_cost: 0,
-    tax: 0,
-    total: amount,
-    payment_status: "paid",
-  });
+ const { data: order, error: insertError } = await supabase
+   .from("orders")
+   .insert({
+     razorpay_order_id: recovery.razorpay_order_id,
+     razorpay_payment_id: recovery.razorpay_payment_id,
+     customer_name: customerName,
+     email: recovery.email,
+     phone,
+     address_line1: addressLine1,
+     address_line2: addressLine2,
+     city,
+     state,
+     country: "India",
+     postal_code: pincode,
+     amount,
+     currency: "INR",
+     items,
+     subtotal: amount,
+     shipping_cost: 0,
+     tax: 0,
+     total: amount,
+     payment_status: "paid",
+   })
+   .select()
+   .single();
 
-  if (insertError) {
-    // A unique constraint on razorpay_order_id would land here - treat it as an
-    // already-recovered order rather than a hard failure.
-    console.error("complete-order: insert failed", insertError);
-    return NextResponse.json(
-      {
-        success: false,
-        message: "We couldn't save your order. Please try again.",
-      },
-      { status: 500 },
-    );
-  }
+ if (insertError) {
+   console.error(insertError);
+   return NextResponse.json(
+     {
+       success: false,
+       message: "We couldn't save your order. Please try again.",
+     },
+     { status: 500 },
+   );
+ }
+
+ await sendEmail({
+   to: order.email,
+   subject: `Your VHSMO order ${order.razorpay_order_id} is confirmed`,
+   html: orderConfirmationEmail({
+     name: order.customer_name,
+     orderId: order.razorpay_order_id,
+     paymentId: order.razorpay_payment_id,
+     total: order.total,
+     orderUrl: `https://vhsmo.com/checkout/success?order_id=${order.razorpay_order_id}`,
+     shipping: {
+       address1: order.address_line1,
+       address2: order.address_line2,
+       city: order.city,
+       state: order.state,
+       country: order.country,
+       postalCode: order.postal_code,
+     },
+   }),
+ });
 
   // 6. Burn the recovery link. Guarded on `completed=false` so two racing
   //    submissions can't both write an order.
