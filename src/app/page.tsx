@@ -11,26 +11,14 @@ import { ColorProvider } from "@/lib/color-context";
 import { PurchasePanel } from "@/components/product/PurchasePanel";
 import { ProductFeatures } from "@/components/product/ProductFeatures";
 import { ProductAccordion } from "@/components/product/ProductAccordion";
+import AnalyticsTracker from "@/components/layout/AnalyticsTracker";
 
-/**
- * The landing page, read as one story rather than a stack of bands:
- *
- *   1. Hero            - the hook (full-bleed)
- *   2. Story           - why VHSMO exists
- *   3. Showcase        - the object, annotated with its three pillars
- *   4. InstantTransfer - the one feature that sells it: it's already on your phone
- *   5. ShotOn          - proof: real photos off the camera
- *   6. Community       - social proof: people's actual nights
- *   7. Reserve         - the buy (gallery + price + what's included)
- *   8. FAQ             - the last objections
- *   9. FinalCta        - the send-off
- *
- * Every section aligns to the `.shell` container; only the hero backdrop
- * and the gallery strips are allowed to bleed full-width.
- */
+
+
 export default function HomePage() {
   return (
     <>
+    <AnalyticsTracker/>
       <Hero />
       <Story />
       {/* <Showcase /> */}
