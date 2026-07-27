@@ -124,7 +124,6 @@ export default function CheckoutPage() {
             phone={phone}
             onPhoneChange={setPhone}
             onEmailChange={setEmail}
-            emailStatus={emailStatus}
             errors={visibleErrors}
             onBlurField={handleBlur}
           />
