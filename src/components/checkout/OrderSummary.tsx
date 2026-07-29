@@ -391,7 +391,7 @@ export function OrderSummary({
                   <span className="font-bold text-darkroom">₹4,999</span> while
                   first-batch stock lasts. Once pre-orders end, VHSMO will
                   return to its regular retail price of{" "}
-                  <span className="font-semibold text-darkroom/80 line-through decoration-darkroom/40">
+                  <span className="font-semibold text-darkroom">
                     ₹6,999
                   </span>
                   .
