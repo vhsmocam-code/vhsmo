@@ -213,7 +213,25 @@ export function PurchasePanel() {
 
       {/* Refundable note */}
       <p className="mt-4 flex items-start gap-2.5 border-l-2 border-kodak bg-kodak/10 px-4 py-3 text-sm text-darkroom/80">
-        {productCopy.depositNote}
+        <span>
+          Pre-orders ship by{" "}
+          <strong className="font-bold text-darkroom">late August</strong> as
+          part of VHSMO&rsquo;s first production run. To thank our early
+          supporters, you can reserve yours for{" "}
+          <strong className="font-bold text-darkroom">₹4,999</strong> while
+          pre-order stock lasts. Once sold out, the price goes back to{" "}
+          <strong className="font-bold text-darkroom">₹6,999</strong>.
+        </span>
+      </p>
+
+      {/* Reserve CTA line */}
+      <p className="mt-2.5 flex items-start gap-2.5 rounded-xl border-l-2 border-bluehour bg-bluehour/[0.08] px-4 py-3 text-sm font-semibold text-darkroom">
+    
+        <span>
+          Lock in the launch price-
+          <strong className="font-bold">fully refundable</strong> if not shipped
+          by <strong className="font-bold">15th September 2026</strong>.
+        </span>
       </p>
 
       {/* The app, in one breath - pairs with the camera instead of its own section */}

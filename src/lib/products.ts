@@ -126,8 +126,6 @@ export const DEFAULT_PRODUCT_IMAGE = variantAssets["VHSMO-BPK"]!.images[0]!;
 export const productCopy = {
   tagline: "A pocket camera with instant wireless transfer.",
   currency: "INR",
-  depositNote:
-    "Reserve now to lock in the early price. Fully refundable if not shipped by September 15th 2026.",
   estimatedShipping: "First batch · ships 2026",
   highlights: [
     "Real 2000s-style photos. No filters. No overlays.",

@@ -1,11 +1,19 @@
 import { useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Headphones, Loader2, Lock, ShieldCheck } from "lucide-react";
+import {
+  Headphones,
+  Info,
+  Loader2,
+  Lock,
+  ShieldCheck,
+  Truck,
+  X,
+} from "lucide-react";
+import { track } from "@vercel/analytics";
 import { formatCurrency } from "@/lib/utils";
 import type { CartItem } from "@/lib/cart-context";
 import type { Address } from "@/components/address/types";
-import type { EmailStatus } from "./useEmailVerification";
 
 type RazorpayResponse = {
   razorpay_order_id: string;
@@ -15,13 +23,11 @@ type RazorpayResponse = {
 
 type OrderSummaryProps = {
   items: CartItem[];
-  count: number;
   subtotal: number;
   shipping: number;
   tax: number;
   total: number;
-  emailStatus: EmailStatus;
-  /** True when every field is valid and the email is verified. */
+  /** True when every field is valid. */
   canCheckout: boolean;
   /** Reveals validation errors and reports whether checkout may proceed. */
   onAttemptCheckout: () => boolean;
@@ -37,12 +43,10 @@ type OrderSummaryProps = {
 
 export function OrderSummary({
   items,
-  count,
   subtotal,
   shipping,
   tax,
   total,
-  emailStatus,
   canCheckout,
   onAttemptCheckout,
   customer,
@@ -51,14 +55,16 @@ export function OrderSummary({
 }: OrderSummaryProps) {
   const router = useRouter();
   const [processing, setProcessing] = useState(false);
+  const [showCodInfo, setShowCodInfo] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // One VHSMO per order - a cart with more than a single unit (extra
-  // quantity or a second finish) can't be paid for.
-  const singleUnit = count === 1;
-
   const handleCheckout = async () => {
-    if (processing || !singleUnit) return;
+    if (processing) return;
+    track("pay_securely_clicked", {
+      source: "checkout",
+      total,
+      ready: canCheckout,
+    });
     // Reveal any outstanding validation errors before touching Razorpay.
     if (!onAttemptCheckout()) {
       // Scroll the first error into view for the user.
@@ -279,20 +285,12 @@ export function OrderSummary({
           </div>
         </div>
 
-        {/* One-unit guard - explains why checkout is blocked before the
-            button, so the disabled state isn't a dead end. */}
-        {!singleUnit && (
-          <p className="mt-5 rounded-xl border-l-2 border-kodak bg-kodak/10 px-4 py-3 text-sm text-darkroom/80">
-            Early access is limited to 1 VHSMO per order. Remove extra items to continue.
-          </p>
-        )}
-
         {/* Checkout button */}
         <button
           ref={buttonRef}
           type="button"
           onClick={handleCheckout}
-          disabled={processing || emailStatus !== "verified" || !singleUnit}
+          disabled={processing}
           className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-bluehour px-8 py-4 text-base font-bold tracking-tight text-overexpose transition-all duration-300 ease-[var(--ease-out-expo)] hover:shadow-[0_0_0_5px_rgba(16,147,255,0.25)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none disabled:hover:shadow-none disabled:active:scale-100"
         >
           {processing ? (
@@ -303,16 +301,143 @@ export function OrderSummary({
           ) : (
             <>
               <Lock className="size-4" />
-              {!singleUnit
-                ? "One unit per order"
-                : canCheckout
-                  ? "Pay securely"
-                  : emailStatus === "verified"
-                    ? "Continue"
-                    : "Verify email & continue"}
+              {canCheckout ? "Pay securely" : "Continue"}
             </>
           )}
         </button>
+
+        {/* Cash on Delivery - currently unavailable (whole row opens modal) */}
+        <button
+          type="button"
+          onClick={() => {
+            track("cod_clicked", { source: "checkout" });
+            setShowCodInfo(true);
+          }}
+          aria-haspopup="dialog"
+          aria-expanded={showCodInfo}
+          aria-label="Why is Cash on Delivery unavailable?"
+          className="mt-2 flex w-full items-center gap-3 rounded-full border border-darkroom/12 bg-darkroom/[0.03] px-4 py-2.5 text-left transition-colors hover:bg-darkroom/[0.06]"
+        >
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-darkroom/[0.06] text-darkroom/40">
+            <Truck className="size-4" />
+          </span>
+          <span className="flex-1 leading-tight">
+            <span className="block text-sm font-bold text-darkroom/70">
+              Cash on Delivery
+            </span>
+            <span className="block text-xs text-darkroom/45">
+              Currently unavailable
+            </span>
+          </span>
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-full border border-darkroom/12 text-darkroom/45">
+            <Info className="size-4" />
+          </span>
+        </button>
+
+        {/* Cash on Delivery explainer modal */}
+        {showCodInfo && (
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="cod-modal-title"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          >
+            {/* Backdrop */}
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={() => setShowCodInfo(false)}
+              className="absolute inset-0 cursor-default bg-darkroom/60 backdrop-blur-sm"
+            />
+            {/* Panel */}
+            <div className="relative w-full max-w-md rounded-2xl border border-darkroom/10 bg-overexpose p-6 shadow-[0_30px_80px_-24px_rgba(31,26,24,0.6)]">
+              <button
+                type="button"
+                onClick={() => setShowCodInfo(false)}
+                aria-label="Close"
+                className="absolute right-4 top-4 flex size-8 items-center justify-center rounded-full text-darkroom/45 transition-colors hover:bg-darkroom/[0.06] hover:text-darkroom/70"
+              >
+                <X className="size-4" />
+              </button>
+
+              <div className="flex items-center gap-3">
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-darkroom/[0.06] text-darkroom/50">
+                  <Truck className="size-5" />
+                </span>
+                <div>
+                  <h3
+                    id="cod-modal-title"
+                    className="text-base font-bold text-darkroom"
+                  >
+                    Why Cash on Delivery isn&apos;t available
+                  </h3>
+                  <p className="text-xs text-darkroom/50">
+                    A quick note for our early supporters
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-5 space-y-3.5 text-sm leading-relaxed text-darkroom/70">
+                <p>
+                  VHSMO is currently in its first production run, which means we
+                  aren&apos;t shipping from existing inventory in a warehouse.
+                  Every pre-order helps fund manufacturing, quality checks,
+                  certifications, and getting your camera ready to ship.
+                </p>
+                <p>
+                  As a thank you to all our early supporters, we wanted to
+                  justify the wait. We&apos;re offering the exclusive pre-order
+                  price of{" "}
+                  <span className="font-bold text-darkroom">₹4,999</span> while
+                  first-batch stock lasts. Once pre-orders end, VHSMO will
+                  return to its regular retail price of{" "}
+                  <span className="font-semibold text-darkroom/80 line-through decoration-darkroom/40">
+                    ₹6,999
+                  </span>
+                  .
+                </p>
+              </div>
+
+              {/* Refund guarantee */}
+              <div className="mt-4 flex items-start gap-3 rounded-xl bg-bluehour/[0.08] p-4">
+                <ShieldCheck className="mt-0.5 size-5 shrink-0 text-bluehour" />
+                <p className="text-sm leading-relaxed text-darkroom/75">
+                  <span className="font-bold text-darkroom">
+                    No risk attached.
+                  </span>{" "}
+                  If your order isn&apos;t shipped by{" "}
+                  <span className="font-semibold text-darkroom">
+                    15 September 2026
+                  </span>
+                  , you&apos;re eligible for a full refund - no questions asked.
+                </p>
+              </div>
+
+              <div className="mt-5 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    track("cod_back_to_home_clicked", { source: "checkout" });
+                    router.push("/");
+                  }}
+                  className="flex-1 rounded-full border border-darkroom/15 px-6 py-3 text-sm font-bold tracking-tight text-darkroom/70 transition-colors hover:bg-darkroom/[0.06]"
+                >
+                  Back to home
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    track("cod_got_it_clicked", { source: "checkout" });
+                    setShowCodInfo(false);
+                  }}
+                  className="flex-1 rounded-full bg-bluehour px-6 py-3 text-sm font-bold tracking-tight text-overexpose transition-all duration-300 ease-[var(--ease-out-expo)] hover:shadow-[0_0_0_5px_rgba(16,147,255,0.25)] active:scale-[0.98]"
+                >
+                  Got it
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-darkroom/55">
           <Lock className="size-3.5" /> Encrypted &amp; secure. Your data is

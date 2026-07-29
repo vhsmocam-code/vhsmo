@@ -133,6 +133,7 @@ export function ShippingSection({
       <SectionHeader
         title="Shipping address"
         subtitle="Where should we deliver your VHSMO Camera?"
+        secondarySubtitle="Estimated shipping starts late August. Full refund if your order hasn't shipped by 15 September 2026."
       />
       <div className="mt-5 space-y-3.5">
         <div className="grid items-start gap-3.5 sm:grid-cols-2">

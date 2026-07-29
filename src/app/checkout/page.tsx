@@ -21,11 +21,10 @@ import { useEmailVerification } from "@/components/checkout/useEmailVerification
 import { usePincodeServiceability } from "@/components/checkout/usePincodeServiceability";
 
 export default function CheckoutPage() {
-  const { items, subtotal, shipping, tax, count, isHydrated, clear } =
-    useCart();
+  const { items, subtotal, shipping, tax, isHydrated, clear } = useCart();
 
   // Checkout is open to everyone. Email is validated for format only.
-  const { email, setEmail, status: emailStatus } = useEmailVerification();
+  const { email, setEmail } = useEmailVerification();
 
   const [firstName, setFirstName] = usePersistedState("checkout:firstName", "");
   const [lastName, setLastName] = usePersistedState("checkout:lastName", "");
@@ -71,9 +70,7 @@ export default function CheckoutPage() {
   // A PIN Delhivery has explicitly rejected blocks checkout; a check that's
   // still pending or errored out falls back to the format validation alone.
   const canCheckout =
-    Object.keys(errors).length === 0 &&
-    emailStatus === "verified" &&
-    pincodeStatus !== "unserviceable";
+    Object.keys(errors).length === 0 && pincodeStatus !== "unserviceable";
 
   /** Called by the checkout button. Reveals errors and reports readiness. */
   const attemptCheckout = () => {
@@ -144,12 +141,10 @@ export default function CheckoutPage() {
         {/* ---------- Right: order summary ---------- */}
         <OrderSummary
           items={items}
-          count={count}
           subtotal={subtotal}
           shipping={shipping}
           tax={tax}
           total={subtotal + shipping + tax}
-          emailStatus={emailStatus}
           canCheckout={canCheckout}
           onAttemptCheckout={attemptCheckout}
           customer={{ firstName, lastName, email, phone }}
