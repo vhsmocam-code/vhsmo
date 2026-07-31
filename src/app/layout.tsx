@@ -48,10 +48,12 @@ export const metadata: Metadata = {
     "point and shoot",
   ],
   authors: [{ name: "VHSMO" }],
+  // favicon.ico is auto-emitted from app/favicon.ico (file convention); we
+  // add the hi-res PNG for contexts that prefer it. apple-icon.png is likewise
+  // auto-detected, declared here for clarity.
   icons: {
-    icon: "/icon.png",
+    icon: [{ url: "/icon.png", type: "image/png", sizes: "512x512" }],
     apple: "/apple-icon.png",
-    shortcut: "/icon.png",
   },
   openGraph: {
     type: "website",
