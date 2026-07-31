@@ -40,6 +40,8 @@ type OrderSummaryProps = {
   address: Address;
   /** Fired once order creation begins - used to pause the reservation timer. */
   onOrderStart?: () => void;
+  /** Fired if the shopper backs out (dismisses Razorpay / order fails). */
+  onOrderCancelled?: () => void;
   onSuccess: () => void;
 };
 
@@ -54,6 +56,7 @@ export function OrderSummary({
   customer,
   address,
   onOrderStart,
+  onOrderCancelled,
   onSuccess,
 }: OrderSummaryProps) {
   const router = useRouter();
@@ -143,7 +146,13 @@ export function OrderSummary({
           contact: customer.phone,
         },
         theme: { color: "#2A2422" },
-        modal: { ondismiss: () => setProcessing(false) },
+        modal: {
+          ondismiss: () => {
+            setProcessing(false);
+            // Shopper closed Razorpay without paying - resume the countdown.
+            onOrderCancelled?.();
+          },
+        },
         handler: async function (response: RazorpayResponse) {
           try {
             const verifyRes = await fetch("/api/verifyPayment", {
@@ -230,6 +239,8 @@ export function OrderSummary({
     } catch (err) {
       console.error(err);
       setProcessing(false);
+      // Order never got off the ground - resume the countdown.
+      onOrderCancelled?.();
     }
   };
 

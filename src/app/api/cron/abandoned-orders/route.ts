@@ -14,8 +14,8 @@ function abandonedCheckoutEmail({
 <html>
 <body style="font-family: Arial, Helvetica, sans-serif; color:#222; line-height:1.7; font-size:16px;">
 
-<p>Hi ${name || "there"},</p>
-
+  <p>Hi ${name || "there"},</p>
+  
 <p>
 Thank you for your interest in <strong>VHSMO</strong> — we noticed you were close to completing your purchase.
 Just a quick heads-up: once you start checkout, your VHSMO is held for just <strong>10 minutes</strong>.
@@ -32,8 +32,8 @@ Availability is limited, so we'd recommend securing your unit while this offer i
 <p>
 <a href="${checkoutUrl}">
 Complete your preorder
-</a>
-</p>
+    </a>
+  </p>
 
 <p>
 If you have any questions or need help completing your pre-order, feel free to reply to this email—we're happy to assist.
@@ -58,8 +58,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Orders older than 1 hour
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    // Orders older than 20 minutes
+   const twentyMinutesAgo = new Date(Date.now() - 20 * 60 * 1000).toISOString();
 const now = new Date().toISOString();
 
 
@@ -68,7 +68,7 @@ const { data: orders, error } = await supabase
   .select("*")
   .eq("payment_status", "pending")
   .eq("abandoned_email_sent", false)
-  .gte("created_at", oneHourAgo)
+  .gte("created_at", twentyMinutesAgo)
   .lte("created_at", now);
 
 
