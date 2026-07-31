@@ -196,7 +196,7 @@ export default function LaunchPage() {
                 placeholder="you@gmail.com"
                 autoComplete="email"
                 inputMode="email"
-                className="min-w-0 flex-1 bg-transparent text-sm text-overexpose placeholder:text-halide/35 focus:outline-none"
+                className="min-w-0 flex-1 bg-transparent text-base md:text-sm text-overexpose placeholder:text-halide/35 focus:outline-none"
               />
               {status === "checking" && (
                 <Loader2 className="size-4 shrink-0 animate-spin text-halide/50" />

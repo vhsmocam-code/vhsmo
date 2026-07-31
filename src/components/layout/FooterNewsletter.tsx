@@ -55,7 +55,7 @@ export function FooterNewsletter() {
           autoComplete="email"
           inputMode="email"
           aria-label="Email for updates"
-          className="w-full min-w-0 rounded-xl border-2 border-darkroom/15 bg-overexpose px-4 py-3 text-sm text-darkroom outline-none transition-colors placeholder:text-darkroom/35 hover:border-darkroom/30 focus:border-darkroom"
+          className="w-full min-w-0 rounded-xl border-2 border-darkroom/15 bg-overexpose px-4 py-3 text-base md:text-sm text-darkroom outline-none transition-colors placeholder:text-darkroom/35 hover:border-darkroom/30 focus:border-darkroom"
         />
         <button
           type="submit"

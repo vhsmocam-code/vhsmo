@@ -12,7 +12,9 @@ const cardClass =
 const labelClass =
   "block text-[0.62rem] font-bold uppercase tracking-[0.15em] text-darkroom/45 transition-colors group-focus-within:text-bluehour";
 const controlClass =
-  "w-full bg-transparent text-sm text-darkroom outline-none placeholder:text-darkroom/30";
+  // text-base on mobile (16px) stops iOS Safari from auto-zooming on focus;
+  // md:text-sm restores the 14px desktop look.
+  "w-full bg-transparent text-base md:text-sm text-darkroom outline-none placeholder:text-darkroom/30";
 const iconClass =
   "h-4 w-4 shrink-0 text-darkroom/35 transition-colors group-focus-within:text-bluehour";
 

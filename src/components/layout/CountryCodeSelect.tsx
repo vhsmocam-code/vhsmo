@@ -193,7 +193,7 @@ export function CountryCodeSelect({ value, onChange, disabled }: Props) {
               onKeyDown={onKeyDown}
               placeholder="Search country or code…"
               aria-label="Search country or code"
-              className="w-full bg-transparent text-sm text-darkroom outline-none placeholder:text-darkroom/30"
+              className="w-full bg-transparent text-base md:text-sm text-darkroom outline-none placeholder:text-darkroom/30"
             />
           </div>
           <ul

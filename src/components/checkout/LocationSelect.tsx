@@ -227,7 +227,7 @@ export function LocationSelect({
                 onKeyDown={onKeyDown}
                 placeholder={`Search ${label.toLowerCase()}…`}
                 aria-label={`Search ${label.toLowerCase()}`}
-                className="w-full bg-transparent text-sm text-darkroom outline-none placeholder:text-darkroom/30"
+                className="w-full bg-transparent text-base md:text-sm text-darkroom outline-none placeholder:text-darkroom/30"
               />
             </div>
             <ul
