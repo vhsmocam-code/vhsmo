@@ -283,8 +283,8 @@ export const faq = {
       a: "Press the WI-FI button on the camera & connect your VHSMO to the app and transfer your photos wirelessly over a direct local connection. No internet, cloud, or SD card reader needed.\n\nPrefer a cable? Connect the camera to a compatible device using USB-C for wired photo transfer.",
     },
     {
-      q: "Is the camera beginner-friendly?",
-      a: "Extremely. VHSMO handles exposure and white balance automatically, while the fixed-focus lens keeps things simple.\n\nNo settings. No menus. Just point and shoot.",
+      q: "Do I need my phone to use a VHSMO?",
+      a: "No. VHSMO is designed to be used on its own and stores 3,000+ photos, so your phone can stay out of the moment. You only need it when you're ready to view your memories or transfer them from the camera.",
     },
     {
       q: "What is the battery life of a VHSMO?",

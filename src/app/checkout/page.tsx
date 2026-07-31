@@ -19,9 +19,16 @@ import { ShippingSection } from "@/components/checkout/ShippingSection";
 import { DeliveryBanner } from "@/components/checkout/DeliveryBanner";
 import { useEmailVerification } from "@/components/checkout/useEmailVerification";
 import { usePincodeServiceability } from "@/components/checkout/usePincodeServiceability";
+import { useCheckoutReservation } from "@/components/checkout/useCheckoutReservation";
+import { ReservationBanner } from "@/components/checkout/ReservationBanner";
 
 export default function CheckoutPage() {
   const { items, subtotal, shipping, tax, isHydrated, clear } = useCart();
+
+  // Static 10-minute "reservation" countdown to nudge the shopper along. It
+  // runs while the cart has items and redirects home if it lapses; `stop()`
+  // freezes it the moment an order is created.
+  const reservation = useCheckoutReservation(isHydrated && items.length > 0);
 
   // Checkout is open to everyone. Email is validated for format only.
   const { email, setEmail } = useEmailVerification();
@@ -86,6 +93,7 @@ export default function CheckoutPage() {
   // On a completed order, empty the cart and wipe the persisted draft so the
   // next visit starts clean.
   const handleSuccess = () => {
+    reservation.stop();
     clear();
     setEmail("");
     setFirstName("");
@@ -109,6 +117,7 @@ export default function CheckoutPage() {
   return (
     <div className="paper flex min-h-dvh flex-col">
       <CheckoutHeader />
+      <ReservationBanner label={reservation.label} />
 
       <form
         onSubmit={onSubmit}
