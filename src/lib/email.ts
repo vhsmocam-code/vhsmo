@@ -1,27 +1,42 @@
-import { BrevoClient } from "@getbrevo/brevo";
+import { SendEmailCommand } from "@aws-sdk/client-sesv2";
+import { ses } from "./email/ses";
 
-const client = new BrevoClient({
-  apiKey: process.env.BREVO_API_KEY!,
-});
-
-export async function sendEmail({ to, subject, html }: { to: string; subject: string; html: string }) {
+export async function sendEmail({
+  to,
+  subject,
+  html,
+}: {
+  to: string;
+  subject: string;
+  html: string;
+}) {
   try {
-    const response = await client.transactionalEmails.sendTransacEmail({
-      sender: {
-        email: "team@vhsmo.com",
-        name: "VHSMO",
+    const command = new SendEmailCommand({
+      FromEmailAddress: "VHSMO <team@vhsmo.com>",
+      Destination: {
+        ToAddresses: [to],
       },
-      to: [
-        {
-          email: to,
+      Content: {
+        Simple: {
+          Subject: {
+            Data: subject,
+          },
+          Body: {
+            Html: {
+              Data: html,
+            },
+          },
         },
-      ],
-      subject: subject,
-      htmlContent: html,
+      },
     });
 
-    console.log("Success:", response);
+    const response = await ses.send(command);
+
+    console.log("Success:", response.MessageId);
+
+    return response;
   } catch (err) {
-    console.error("Brevo Error:", err);
+    console.error("SES Error:", err);
+    throw err;
   }
 }
