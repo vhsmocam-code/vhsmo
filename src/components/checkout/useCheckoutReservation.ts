@@ -14,17 +14,25 @@ const EXPIRY_REDIRECT = "/";
  *
  * It's purely a pressure device, not a real inventory hold - it starts fresh
  * at 10:00 every time the shopper lands on checkout (leave and come back and
- * it resets). When it hits zero the shopper is sent back to the home page;
- * calling `stop()` (e.g. once an order is created) freezes the timer.
+ * it resets). When it hits zero the shopper is sent back to the home page.
+ *
+ * `stop()` freezes the countdown in place and halts the redirect - call it the
+ * moment an order is being created so the shopper is never bounced home while
+ * their payment is in flight.
  */
 export function useCheckoutReservation(active: boolean) {
   const router = useRouter();
 
   const [remainingMs, setRemainingMs] = useState(RESERVATION_MS);
   const stoppedRef = useRef(false);
+  const intervalRef = useRef<number | null>(null);
 
   const stop = useCallback(() => {
     stoppedRef.current = true;
+    if (intervalRef.current !== null) {
+      window.clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
   }, []);
 
   useEffect(() => {
@@ -35,6 +43,7 @@ export function useCheckoutReservation(active: boolean) {
     setRemainingMs(RESERVATION_MS);
 
     const tick = () => {
+      if (stoppedRef.current) return true;
       const left = deadline - Date.now();
       if (left <= 0) {
         setRemainingMs(0);
@@ -46,10 +55,18 @@ export function useCheckoutReservation(active: boolean) {
       return false;
     };
 
-    const id = window.setInterval(() => {
-      if (tick()) window.clearInterval(id);
+    intervalRef.current = window.setInterval(() => {
+      if (tick() && intervalRef.current !== null) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     }, 1000);
-    return () => window.clearInterval(id);
+    return () => {
+      if (intervalRef.current !== null) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
   }, [active, router, stop]);
 
   const totalSeconds = Math.max(0, Math.ceil(remainingMs / 1000));

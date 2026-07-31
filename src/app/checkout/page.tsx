@@ -158,6 +158,7 @@ export default function CheckoutPage() {
           onAttemptCheckout={attemptCheckout}
           customer={{ firstName, lastName, email, phone }}
           address={address}
+          onOrderStart={reservation.stop}
           onSuccess={handleSuccess}
         />
       </form>

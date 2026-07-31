@@ -38,6 +38,8 @@ type OrderSummaryProps = {
     phone: string;
   };
   address: Address;
+  /** Fired once order creation begins - used to pause the reservation timer. */
+  onOrderStart?: () => void;
   onSuccess: () => void;
 };
 
@@ -51,6 +53,7 @@ export function OrderSummary({
   onAttemptCheckout,
   customer,
   address,
+  onOrderStart,
   onSuccess,
 }: OrderSummaryProps) {
   const router = useRouter();
@@ -76,6 +79,9 @@ export function OrderSummary({
     }
 
     setProcessing(true);
+    // Freeze the reservation countdown - the shopper is committing to pay and
+    // must not be bounced home while Razorpay is open.
+    onOrderStart?.();
 
     const firstName = customer.firstName.trim();
     const lastName = customer.lastName.trim();
