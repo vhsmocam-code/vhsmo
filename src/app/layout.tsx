@@ -120,7 +120,7 @@ export default async function RootLayout({
         />
         <ProductsProvider products={products}>
         <CartProvider>
-          {/* <SmoothScroll /> */}
+          <SmoothScroll />
           <Analytics />
 
           <a
