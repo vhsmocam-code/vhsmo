@@ -84,7 +84,7 @@ export function Header() {
     <>
     <header
       className={cn(
-        "sticky inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-500 ease-[var(--ease-out-expo)]",
+        "fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-500 ease-[var(--ease-out-expo)]",
         // iOS Safari's top rubber-band bounce (worst on first entry from a
         // Google result, which lands mid-page) drags this fixed header down
         // and leaks page content above the marquee. overscroll-behavior is
