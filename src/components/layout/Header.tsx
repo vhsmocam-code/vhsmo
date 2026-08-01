@@ -84,7 +84,7 @@ export function Header() {
     <>
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-all duration-500 ease-[var(--ease-out-expo)]",
+        "fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-500 ease-[var(--ease-out-expo)]",
         // iOS Safari's top rubber-band bounce (worst on first entry from a
         // Google result, which lands mid-page) drags this fixed header down
         // and leaks page content above the marquee. overscroll-behavior is
@@ -92,10 +92,10 @@ export function Header() {
         // colour a full viewport-height up past the top edge: no matter how
         // hard the bounce overshoots, the exposed gap is always yellow, never
         // the page behind it. The filler sits off-screen until a bounce.
-        "before:pointer-events-none before:absolute before:inset-x-0 before:bottom-full before:h-screen before:bg-kodak before:content-['']",
+        // "before:pointer-events-none before:absolute before:inset-x-0 before:bottom-full before:h-screen before:bg-kodak before:content-['']",
         darkText ? "text-darkroom" : "text-halide",
         scrolled
-          ? "border-b border-halide/10 bg-darkroom/85 backdrop-blur-xl"
+          ? "border-b border-halide/10 bg-darkroom/85"
           : "border-b border-transparent bg-transparent",
       )}
     >
