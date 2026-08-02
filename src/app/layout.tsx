@@ -99,7 +99,7 @@ const productJsonLd = {
     availability: "https://schema.org/PreOrder",
     url: `${SITE_URL}/product`,
     priceCurrency: "INR",
-    price: "4999",
+    price: "5999",
   },
 };
 

@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
+  BadgeCheck,
   Headphones,
   Info,
   Loader2,
@@ -14,6 +15,7 @@ import { track } from "@vercel/analytics";
 import { formatCurrency } from "@/lib/utils";
 import type { CartItem } from "@/lib/cart-context";
 import type { Address } from "@/components/address/types";
+import { CouponInput } from "./CouponInput";
 
 type RazorpayResponse = {
   razorpay_order_id: string;
@@ -63,6 +65,14 @@ export function OrderSummary({
   const [processing, setProcessing] = useState(false);
   const [showCodInfo, setShowCodInfo] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const [coupon, setCoupon] = useState<{
+    code: string;
+    discount: number;
+  } | null>(null);
+
+  const [couponLoading, setCouponLoading] = useState(false);
+
+  const [couponError, setCouponError] = useState("");
 
   const handleCheckout = async () => {
     if (processing) return;
@@ -102,30 +112,21 @@ export function OrderSummary({
       const res = await fetch("/api/createOrder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        // Send only what the backend trusts. Pricing (amount, subtotal,
+        // shipping, tax, total, discount) is computed server-side, so there is
+        // nothing for DevTools to tamper with here.
         body: JSON.stringify({
-          amount: Math.round(total * 100),
-
           customer: {
             name: fullName,
             email: customer.email,
             phone: customer.phone,
           },
-
           shipping: shippingInfo,
-
           items: items.map((item) => ({
             productId: item.id,
-            name: item.name,
-            variant: item.variant,
             quantity: item.quantity,
-            price: item.price,
-            total: item.price * item.quantity,
           })),
-
-          subtotal,
-          shippingCost: shipping,
-          tax,
-          total,
+          couponCode: coupon?.code ?? null,
         }),
       });
 
@@ -155,6 +156,9 @@ export function OrderSummary({
         },
         handler: async function (response: RazorpayResponse) {
           try {
+            // Only the payment response is sent. The backend reads the order
+            // (customer, items, pricing, coupon) from Supabase - the browser
+            // has no say in any of it after payment.
             const verifyRes = await fetch("/api/verifyPayment", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -164,24 +168,6 @@ export function OrderSummary({
                   razorpay_payment_id: response.razorpay_payment_id,
                   razorpay_signature: response.razorpay_signature,
                 },
-                customer: {
-                  name: fullName,
-                  email: customer.email,
-                  phone: customer.phone,
-                },
-                shipping: shippingInfo,
-                items: items.map((item) => ({
-                  productId: item.id,
-                  name: item.name,
-                  variant: item.variant,
-                  quantity: item.quantity,
-                  price: item.price,
-                  total: item.price * item.quantity,
-                })),
-                subtotal,
-                shippingCost: shipping,
-                tax,
-                total,
               }),
             });
 
@@ -214,8 +200,10 @@ export function OrderSummary({
                     subtotal,
                     shipping,
                     tax,
-                    total: subtotal + shipping + tax,
-                  }),
+                    discount: coupon?.discount ?? 0,
+                    couponCode: coupon?.code ?? null,
+                    total: finalTotal,
+                                    }),
                 );
               } catch {
                 // sessionStorage unavailable - page falls back to IDs only.
@@ -244,11 +232,44 @@ export function OrderSummary({
     }
   };
 
+  const applyCoupon = async (code: string) => {
+    try {
+      setCouponLoading(true);
+      setCouponError("");
+
+      const res = await fetch("/api/coupon/validate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          code,
+          subtotal,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!data.valid) {
+        setCoupon(null);
+        setCouponError(data.message);
+        return;
+      }
+
+      setCoupon({
+        code: data.code,
+        discount: data.discount,
+      });
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+  const finalTotal = total - (coupon?.discount ?? 0);
+
   return (
     <aside className="space-y-4 lg:sticky lg:top-8 lg:h-fit">
       <div className="rounded-2xl border-2 border-darkroom/12 bg-overexpose p-6 shadow-[0_10px_40px_-24px_rgba(31,26,24,0.4)]">
         <h2 className="text-lg font-bold text-darkroom">Order summary</h2>
-
         {/* Items */}
         <ul className="mt-4 divide-y divide-darkroom/10 border-y border-darkroom/10">
           {items.map((item) => (
@@ -280,10 +301,48 @@ export function OrderSummary({
             </li>
           ))}
         </ul>
-
+        {coupon ? (
+          <div className="mt-4 flex items-center gap-3 rounded-xl border-2 border-green-600/25 bg-green-600/[0.06] p-3.5">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-green-600/15 text-green-700">
+              <BadgeCheck className="size-5" />
+            </span>
+            <div className="flex-1 leading-tight">
+              <p className="text-sm font-bold text-darkroom">
+                {coupon.code} applied
+              </p>
+              <p className="text-xs text-darkroom/55">
+                You saved {formatCurrency(coupon.discount)}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setCoupon(null);
+                setCouponError("");
+              }}
+              aria-label="Remove coupon"
+              className="flex size-8 shrink-0 items-center justify-center rounded-full text-darkroom/45 transition-colors hover:bg-darkroom/[0.06] hover:text-darkroom/70"
+            >
+              <X className="size-4" />
+            </button>
+          </div>
+        ) : (
+          <CouponInput
+            loading={couponLoading}
+            onApply={applyCoupon}
+            error={couponError}
+          />
+        )}
         {/* Totals */}
         <div className="space-y-2.5 pt-4 text-sm">
           <Row label="Subtotal" value={formatCurrency(subtotal)} />
+
+          {coupon && (
+            <Row
+              label={`Coupon (${coupon.code})`}
+              value={`- ${formatCurrency(coupon.discount)}`}
+            />
+          )}
           <Row
             label="Shipping"
             value={shipping === 0 ? "Free" : formatCurrency(shipping)}
@@ -297,11 +356,10 @@ export function OrderSummary({
               </p>
             </div>
             <span className="text-2xl font-bold tabular-nums">
-              {formatCurrency(total)}
+              {formatCurrency(finalTotal)}
             </span>
           </div>
         </div>
-
         {/* Checkout button */}
         <button
           ref={buttonRef}
@@ -322,7 +380,6 @@ export function OrderSummary({
             </>
           )}
         </button>
-
         {/* Cash on Delivery - currently unavailable (whole row opens modal) */}
         <button
           type="button"
@@ -350,7 +407,6 @@ export function OrderSummary({
             <Info className="size-4" />
           </span>
         </button>
-
         {/* Cash on Delivery explainer modal */}
         {showCodInfo && (
           <div
@@ -405,13 +461,10 @@ export function OrderSummary({
                   As a thank you to all our early supporters, we wanted to
                   justify the wait. We&apos;re offering the exclusive pre-order
                   price of{" "}
-                  <span className="font-bold text-darkroom">₹4,999</span> while
+                  <span className="font-bold text-darkroom">₹5,999</span> while
                   first-batch stock lasts. Once pre-orders end, VHSMO will
                   return to its regular retail price of{" "}
-                  <span className="font-semibold text-darkroom">
-                    ₹6,999
-                  </span>
-                  .
+                  <span className="font-semibold text-darkroom">₹6,999</span>.
                 </p>
               </div>
 
@@ -449,18 +502,16 @@ export function OrderSummary({
                   }}
                   className="flex-1 rounded-full bg-bluehour px-6 py-3 text-sm font-bold tracking-tight text-overexpose transition-all duration-300 ease-[var(--ease-out-expo)] hover:shadow-[0_0_0_5px_rgba(16,147,255,0.25)] active:scale-[0.98]"
                 >
-                  Got it
+                  Proceed to Checkout
                 </button>
               </div>
             </div>
           </div>
         )}
-
         <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-darkroom/55">
           <Lock className="size-3.5" /> Encrypted &amp; secure. Your data is
           safe with us.
         </p>
-
         {/* Secure & Safe banner */}
         <div className="mt-5 flex items-start gap-3 rounded-xl bg-bluehour/[0.08] p-4">
           <ShieldCheck className="mt-0.5 size-5 shrink-0 text-bluehour" />

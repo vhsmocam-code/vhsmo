@@ -1,25 +1,19 @@
-import { NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
-import crypto from "crypto";
 import { supabase } from "@/lib/supabase";
 import { sendEmail } from "@/lib/email";
+import { redeemCoupon } from "@/lib/coupons/redeemCoupon";
 
-interface OrderItem {
-  productId: string;
-  name: string;
-  variant?: string;
-  quantity: number;
-  price: number;
-  total: number;
+/** Thrown when no order exists for a verified payment - lets the route map it
+ *  to a 404 rather than a generic 500. */
+export class OrderNotFoundError extends Error {
+  constructor(razorpayOrderId: string) {
+    super(`Order not found: ${razorpayOrderId}`);
+    this.name = "OrderNotFoundError";
+  }
 }
 
-interface ProductRow {
-  id: string;
-  name: string;
-  color: string;
-  selling_price: number;
-  stock: number | null;
-}
+const UUID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const money = (n: number) =>
   `₹${Number(n ?? 0).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
@@ -33,35 +27,6 @@ const INK = "#2a2422"; // brand darkroom
 const ACCENT = "#1093ff"; // brand blue (bluehour) — the CTA
 const MUTE = "#6e6862"; // brand muted
 const LINE = "#e3e3e1"; // brand halide — divider hairlines
-
-function canonicalise(
-  items: OrderItem[],
-  rows: ProductRow[],
-): { stored: OrderItem[]; resolved: { row: ProductRow; quantity: number }[] } {
-  const byId = new Map(rows.map((r) => [r.id, r]));
-  const stored: OrderItem[] = [];
-  const resolved: { row: ProductRow; quantity: number }[] = [];
-
-  for (const item of items) {
-    const row = byId.get(item.productId);
-    const quantity = Math.max(1, Math.floor(item.quantity ?? 1));
-    if (!row) {
-      stored.push({ ...item, quantity });
-      continue;
-    }
-    stored.push({
-      productId: row.id,
-      name: row.name.trim(),
-      variant: row.color,
-      quantity,
-      price: row.selling_price,
-      total: row.selling_price * quantity,
-    });
-    resolved.push({ row, quantity });
-  }
-
-  return { stored, resolved };
-}
 
 async function decrementStock(productId: string, quantity: number) {
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -195,24 +160,31 @@ export function orderConfirmationEmail({
   </div>`;
 }
 
+interface StoredOrderItem {
+  productId?: string;
+  quantity?: number;
+}
+
+/**
+ * Finalizes a paid order. The Razorpay ids are the only inputs; every piece of
+ * order data (customer, shipping, items, pricing, coupon) is read back from the
+ * pending order row in Supabase, which is the single source of truth. Nothing
+ * the browser sent after payment is trusted here.
+ *
+ * Side effects (coupon redemption, stock, email) run exactly once, gated on the
+ * pending -> paid transition, so retries and webhook duplicates are safe.
+ */
 export async function finalizeOrder({
   razorpayOrderId,
   razorpayPaymentId,
-  customer,
-  shipping,
-  items,
-  total,
   req,
 }: {
   razorpayOrderId: string;
   razorpayPaymentId: string;
-  customer: any;
-  shipping: any;
-  items: any[];
-  total: number;
   req: Request;
 }) {
-  // 1. Check if order exists
+ 
+  // 1. Load the pending order - the single source of truth.
   const { data: order, error } = await supabase
     .from("orders")
     .select("*")
@@ -220,65 +192,52 @@ export async function finalizeOrder({
     .maybeSingle();
 
   if (error) throw error;
+  if (!order) throw new OrderNotFoundError(razorpayOrderId);
 
-  if (!order) {
-    throw new Error("Order not found");
-  }
 
-  // Already processed
-  if (order.payment_status === "paid") {
-    return;
-  }
+  // 2. Idempotency - already processed by an earlier call or the webhook.
+  if (order.payment_status === "paid") return;
 
-  // 2. Load products
-  const UUID =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-  const cartItems: OrderItem[] = Array.isArray(items) ? items : [];
-
-  const ids = [
-    ...new Set(
-      cartItems.map((i) => i.productId).filter((id) => UUID.test(id ?? "")),
-    ),
-  ];
-
-  let rows: ProductRow[] = [];
-
-  if (ids.length) {
-    const { data } = await supabase
-      .from("products")
-      .select("id,name,color,selling_price,stock")
-      .in("id", ids);
-
-    rows = (data as ProductRow[]) ?? [];
-  }
-
-  // 3. Canonicalise
-  const { resolved } = canonicalise(cartItems, rows);
-
-  // 4. Mark paid
-  const { error: updateError } = await supabase
+  // 3. Claim the order: flip pending -> paid atomically. Only the caller that
+  //    wins this compare-and-swap runs the side effects below, so concurrent
+  //    verify + webhook calls can't double-process.
+  const { data: claimed, error: claimError } = await supabase
     .from("orders")
     .update({
       payment_status: "paid",
       razorpay_payment_id: razorpayPaymentId,
-      amount: total,
-      currency: "INR",
+      paid_at: new Date().toISOString(),
+      amount: order.total,
+      currency: order.currency ?? "INR",
     })
     .eq("razorpay_order_id", razorpayOrderId)
-    .eq("payment_status", "pending");
+    .eq("payment_status", "pending")
+    .select("id");
 
-  if (updateError) throw updateError;
-
-  // 5. Reduce stock
-  for (const { row, quantity } of resolved) {
-    await decrementStock(row.id, quantity);
+  if (claimError) throw claimError;
+  if (!claimed?.length) {
+    // Another call finalized between our read and write - nothing left to do.
+    return;
   }
 
-  // 6. Refresh cache
+  // 4. Reduce stock for each purchased line (from the stored, backend-priced
+  //    items - not from anything the client just sent).
+  const items: StoredOrderItem[] = Array.isArray(order.items)
+    ? order.items
+    : [];
+  for (const item of items) {
+    const productId = item?.productId;
+    if (typeof productId === "string" && UUID.test(productId)) {
+      await decrementStock(productId, Math.max(1, Math.floor(item.quantity ?? 1)));
+    }
+  }
+
+  // 5. Refresh cached product data (stock changed).
   revalidateTag("products");
 
-  // 7. Send email
+  // 6. Confirmation email - built entirely from stored values. Best-effort: the
+  //    order is already paid, so a mail failure must not surface as an error
+  //    (which would strand the paid order and never retry the email anyway).
   const origin =
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
     new URL(req.url).origin;
@@ -287,16 +246,42 @@ export async function finalizeOrder({
     razorpayOrderId,
   )}&payment=${encodeURIComponent(razorpayPaymentId)}`;
 
-  await sendEmail({
-    to: customer.email,
-    subject: `Your VHSMO order ${razorpayOrderId} is confirmed`,
-    html: orderConfirmationEmail({
-      name: customer.name,
-      orderId: razorpayOrderId,
-      paymentId: razorpayPaymentId,
-      total,
-      orderUrl,
-      shipping,
-    }),
-  });
+  try {
+    await sendEmail({
+      to: order.email,
+      subject: `Your VHSMO order ${razorpayOrderId} is confirmed`,
+      html: orderConfirmationEmail({
+        name: order.customer_name,
+        orderId: razorpayOrderId,
+        paymentId: razorpayPaymentId,
+        total: order.total,
+        orderUrl,
+        shipping: {
+          address1: order.address_line1,
+          address2: order.address_line2,
+          city: order.city,
+          state: order.state,
+          country: order.country,
+          postalCode: order.postal_code,
+        },
+      }),
+    });
+  } catch (mailError) {
+    console.error(
+      `Confirmation email failed for order ${razorpayOrderId}:`,
+      mailError,
+    );
+  }
+
+  // 7. Bump the coupon's used_count (never in createOrder). This runs last -
+  //    payment already succeeded and the confirmation email is out - so a
+  //    limit-reached / lookup problem is logged but must not fail the order.
+  if (order.coupon_code) {
+    const result = await redeemCoupon(order.coupon_code);
+    if (!result.redeemed) {
+      console.error(
+        `Coupon ${order.coupon_code} used_count not incremented for order ${razorpayOrderId}: ${result.reason}`,
+      );
+    }
+  }
 }

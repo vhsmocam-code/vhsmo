@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
-import { supabase } from "@/lib/supabase";
-import { finalizeOrder } from "@/lib/orders/finalizeOrder";
+import { finalizeOrder, OrderNotFoundError } from "@/lib/orders/finalizeOrder";
 
 export async function POST(req: Request) {
   try {
@@ -93,43 +92,19 @@ export async function POST(req: Request) {
       );
     }
 
-    const { data: order, error } = await supabase
-      .from("orders")
-      .select("*")
-      .eq("razorpay_order_id", razorpayOrderId)
-      .maybeSingle();
-
-    if (error) throw error;
-
-  if (!order) {
-    console.warn("Order not found:", razorpayOrderId);
-    return NextResponse.json({ success: true });
-  }
-    if (order.payment_status === "paid") {
-      return NextResponse.json({ success: true });
+    // finalizeOrder loads the order, enforces idempotency, and reads all order
+    // data from Supabase itself - a missing order or an already-paid one is
+    // handled inside and simply results in a no-op here.
+    try {
+      await finalizeOrder({ razorpayOrderId, razorpayPaymentId, req });
+    } catch (err) {
+      if (err instanceof OrderNotFoundError) {
+        // Webhooks retry on non-2xx; there's nothing to finalize, so ack it.
+        console.warn("Order not found for webhook:", razorpayOrderId);
+        return NextResponse.json({ success: true });
+      }
+      throw err;
     }
-await finalizeOrder({
-  razorpayOrderId,
-  razorpayPaymentId,
-  customer: {
-    name: order.customer_name,
-    email: order.email,
-  },
-  shipping: {
-    address1: order.address_line1,
-    address2: order.address_line2,
-    city: order.city,
-    state: order.state,
-    country: order.country,
-    postalCode: order.postal_code,
-  },
-  items: order.items,
-  total: order.total,
-  req,
-});
-
- 
-
 
     return NextResponse.json({ success: true });
   } catch (err) {
