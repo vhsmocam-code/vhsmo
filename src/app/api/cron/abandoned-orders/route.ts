@@ -24,7 +24,7 @@ Beyond that window, the unit may be released and assigned to another buyer.
 
 <p>
 As part of our limited pre-order batch, we're currently offering a
-<strong>one-time launch price of ₹4,999</strong>.
+<strong>one-time launch price of ₹5,999</strong>.
 Once pre-orders close, the price will revert to <strong>₹6,999</strong>.
 Availability is limited, so we'd recommend securing your unit while this offer is live.
 </p>

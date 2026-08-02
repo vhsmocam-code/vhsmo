@@ -218,7 +218,7 @@ export function PurchasePanel() {
           <strong className="font-bold text-darkroom">late August</strong> as
           part of VHSMO&rsquo;s first production run. To thank our early
           supporters, you can reserve yours for{" "}
-          <strong className="font-bold text-darkroom">₹4,999</strong> while
+          <strong className="font-bold text-darkroom">₹5,999</strong> while
           pre-order stock lasts. Once sold out, the price goes back to{" "}
           <strong className="font-bold text-darkroom">₹6,999</strong>.
         </span>

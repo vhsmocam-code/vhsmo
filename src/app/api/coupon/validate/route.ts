@@ -1,12 +1,17 @@
 import { calculateDiscount } from "@/lib/coupons/calculateDiscount";
 import { getCoupon } from "@/lib/coupons/getCoupon";
 import { validateCoupon } from "@/lib/coupons/validateCoupon";
+import { supabase } from "@/lib/supabase";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const { code, subtotal } = await req.json();
+    const { code, subtotal, email } = await req.json();
 
+await supabase.from("coupon_inputs").insert({
+  code: code.trim().toUpperCase(),
+    email: email,
+});
     if (!code) {
       return NextResponse.json(
         { valid: false, message: "Enter a coupon code" },

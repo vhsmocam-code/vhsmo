@@ -245,6 +245,7 @@ export function OrderSummary({
         body: JSON.stringify({
           code,
           subtotal,
+          email: customer.email,
         }),
       });
 

@@ -64,6 +64,19 @@ export function CouponInput({ onApply, loading, error }: Props) {
           {error}
         </p>
       )}
+
+      <p className="text-xs text-darkroom/55">
+        Were you promised a lower price? DM us{" "}
+        <a
+          href="https://instagram.com/vhsmo.cam_"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-semibold text-darkroom underline underline-offset-2 hover:text-bluehour"
+        >
+          @vhsmo.cam_
+        </a>{" "}
+        on Insta.
+      </p>
     </div>
   );
 }
