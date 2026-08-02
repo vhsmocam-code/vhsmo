@@ -74,8 +74,7 @@ export function CouponInput({ onApply, loading, error }: Props) {
           className="font-semibold text-darkroom underline underline-offset-2 hover:text-bluehour"
         >
           @vhsmo.cam_
-        </a>{" "}
-        on Insta.
+        </a>
       </p>
     </div>
   );
