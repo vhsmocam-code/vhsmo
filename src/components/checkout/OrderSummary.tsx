@@ -233,6 +233,15 @@ export function OrderSummary({
   };
 
   const applyCoupon = async (code: string) => {
+    // Require a valid email before any coupon can be applied - coupons are
+    // tied to the shopper's email, so we can't validate one without it.
+    const email = customer.email.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setCoupon(null);
+      setCouponError("Enter your email above before applying a coupon.");
+      return;
+    }
+
     try {
       setCouponLoading(true);
       setCouponError("");
