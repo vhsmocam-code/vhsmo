@@ -47,6 +47,8 @@ type Order = {
   subtotal: number;
   shipping: number;
   tax: number;
+  discount: number;
+  couponCode: string | null;
   total: number;
   currency: string;
   paymentStatus: string;
@@ -85,6 +87,8 @@ function fromApi(row: Record<string, any>): Order {
     subtotal: Number(row.subtotal ?? 0),
     shipping: Number(row.shipping_cost ?? 0),
     tax: Number(row.tax ?? 0),
+    discount: Number(row.discount ?? 0),
+    couponCode: row.coupon_code ?? null,
     total: Number(row.total ?? row.amount ?? 0),
     currency: row.currency ?? "INR",
     paymentStatus: String(row.payment_status ?? "pending").toLowerCase(),
@@ -489,6 +493,13 @@ function downloadInvoice(order: Order) {
     .map((l) => `<div>${escapeHtml(String(l))}</div>`)
     .join("");
 
+  // Invoice values are GST-inclusive at 18% (intra-state). Break the total
+  // into taxable value + GST so the invoice matches the GST breakdown table.
+  const GST_RATE = 0.18;
+  const isInr = (order.currency ?? "INR").toUpperCase() === "INR";
+  const taxableValue = order.total / (1 + GST_RATE);
+  const gstValue = order.total - taxableValue;
+
   const rows = order.items
     .map(
       (it) => `
@@ -598,8 +609,18 @@ function downloadInvoice(order: Order) {
 
   <div class="totals">
     <div class="line"><span>Subtotal</span><span>${formatCurrency(order.subtotal, order.currency)}</span></div>
+    ${
+      order.discount > 0
+        ? `<div class="line"><span>Discount${order.couponCode ? ` (${escapeHtml(order.couponCode)})` : ""}</span><span>&minus;${formatCurrency(order.discount, order.currency)}</span></div>`
+        : ""
+    }
     <div class="line"><span>Shipping</span><span>${order.shipping === 0 ? "Free" : formatCurrency(order.shipping, order.currency)}</span></div>
-        <div class="line"><span>Taxes</span><span>${order.tax === 0 ? "Inclusive of all Taxes" : formatCurrency(order.tax, order.currency)}</span></div>
+    ${
+      isInr
+        ? `<div class="line"><span>Taxable value</span><span>${formatCurrency(taxableValue, order.currency)}</span></div>
+    <div class="line"><span>GST (18%)</span><span>${formatCurrency(gstValue, order.currency)}</span></div>`
+        : `<div class="line"><span>Taxes</span><span>${order.tax === 0 ? "Inclusive of all Taxes" : formatCurrency(order.tax, order.currency)}</span></div>`
+    }
 
     <div class="line grand"><span>Total</span><span>${formatCurrency(order.total, order.currency)}</span></div>
   </div>

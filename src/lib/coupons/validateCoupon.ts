@@ -14,7 +14,7 @@ export function validateCoupon(coupon: Coupon, subtotal: number) {
   if (!coupon.active) {
     return {
       valid: false,
-      message: "Coupon is inactive",
+      message: "Coupon has expired",
     };
   }
 
