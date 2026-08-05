@@ -1,8 +1,9 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   BadgeCheck,
+  Clock,
   Headphones,
   Info,
   Loader2,
@@ -68,6 +69,7 @@ export function OrderSummary({
   const [coupon, setCoupon] = useState<{
     code: string;
     discount: number;
+    expiresAt: string | null;
   } | null>(null);
 
   const [couponLoading, setCouponLoading] = useState(false);
@@ -269,6 +271,7 @@ export function OrderSummary({
       setCoupon({
         code: data.code,
         discount: data.discount,
+        expiresAt: data.expiresAt ?? null,
       });
     } finally {
       setCouponLoading(false);
@@ -342,6 +345,9 @@ export function OrderSummary({
             onApply={applyCoupon}
             error={couponError}
           />
+        )}
+        {coupon && (
+          <CouponCountdown expiresAt={coupon.expiresAt} />
         )}
         {/* Totals */}
         <div className="space-y-2.5 pt-4 text-sm">
@@ -552,6 +558,55 @@ export function OrderSummary({
         </div>
       </div>
     </aside>
+  );
+}
+
+/**
+ * Live warning banner that ticks down to a coupon's `expires_at`, one second at
+ * a time. Renders nothing when there is no expiry, the date is unparseable, or
+ * the offer has already lapsed.
+ */
+function CouponCountdown({ expiresAt }: { expiresAt: string | null }) {
+  const expiryMs = expiresAt ? new Date(expiresAt).getTime() : NaN;
+  const valid = !Number.isNaN(expiryMs);
+
+  // Re-render every second while the offer is still live.
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!valid) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [valid, expiryMs]);
+
+  if (!valid) return null;
+
+  const remaining = expiryMs - now;
+  if (remaining <= 0) return null;
+
+  const totalSeconds = Math.floor(remaining / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const pad = (n: number) => String(n).padStart(2, "0");
+
+  const clock =
+    days > 0
+      ? `${days}d ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
+      : `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+
+  return (
+    <div
+      role="status"
+      aria-live="off"
+      className="mt-3 flex items-center gap-2.5 rounded-xl border-2 border-amber-500/30 bg-amber-500/[0.08] p-3 text-amber-900"
+    >
+      <Clock className="size-4 shrink-0 text-amber-600" />
+      <p className="text-xs font-semibold leading-tight">
+        Hurry — this coupon expires in{" "}
+        <span className="font-bold tabular-nums">{clock}</span>
+      </p>
+    </div>
   );
 }
 

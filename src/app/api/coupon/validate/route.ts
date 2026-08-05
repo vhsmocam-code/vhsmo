@@ -41,6 +41,7 @@ await supabase.from("coupon_inputs").insert({
       code: coupon.code,
       discount,
       total: subtotal - discount,
+      expiresAt: coupon.expires_at,
     });
   } catch (error) {
     console.error("coupon validate failed:", error);
