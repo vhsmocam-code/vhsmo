@@ -582,6 +582,9 @@ function CouponCountdown({ expiresAt }: { expiresAt: string | null }) {
 
   const remaining = expiryMs - now;
   if (remaining <= 0) return null;
+  // Only nudge on genuinely near-term expiries - no timer for coupons that
+  // have more than 10 days left to run.
+  if (remaining > 10 * 86400 * 1000) return null;
 
   const totalSeconds = Math.floor(remaining / 1000);
   const days = Math.floor(totalSeconds / 86400);
