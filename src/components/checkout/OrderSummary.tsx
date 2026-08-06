@@ -78,11 +78,7 @@ export function OrderSummary({
 
   const handleCheckout = async () => {
     if (processing) return;
-    track("pay_securely_clicked", {
-      source: "checkout",
-      total,
-      ready: canCheckout,
-    });
+    
     // Reveal any outstanding validation errors before touching Razorpay.
     if (!onAttemptCheckout()) {
       // Scroll the first error into view for the user.
@@ -133,7 +129,11 @@ export function OrderSummary({
       });
 
       if (!res.ok) throw new Error("Failed to create order");
-
+track("pay_securely_clicked", {
+      source: "checkout",
+      total,
+      ready: canCheckout,
+    });
       const order = await res.json();
 
       const options = {
