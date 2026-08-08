@@ -24,7 +24,7 @@ export default function HomePage() {
       {/* <Showcase /> */}
       {/* <InstantTransfer /> */}
       <ShotOn />
-      {/* <Community /> */}
+      <Community />
 
       {/* Reserve - the object itself (photos or the 3D model, same stage) +
           price, then the feature strip */}
