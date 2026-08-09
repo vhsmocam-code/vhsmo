@@ -19,13 +19,12 @@ import { CouponPopup } from "@/components/promo/CouponPopup";
 export default function HomePage() {
   return (
     <>
-    <AnalyticsTracker/>
+      <AnalyticsTracker />
       <Hero />
       <Story />
       {/* <Showcase /> */}
       {/* <InstantTransfer /> */}
       <ShotOn />
-      <Community />
 
       {/* Reserve - the object itself (photos or the 3D model, same stage) +
           price, then the feature strip */}
@@ -57,6 +56,7 @@ export default function HomePage() {
         </section>
         <ProductFeatures />
       </div>
+      <Community />
 
       <LandingFaq />
       <FinalCta />
