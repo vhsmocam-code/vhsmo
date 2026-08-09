@@ -12,6 +12,7 @@ import { PurchasePanel } from "@/components/product/PurchasePanel";
 import { ProductFeatures } from "@/components/product/ProductFeatures";
 import { ProductAccordion } from "@/components/product/ProductAccordion";
 import AnalyticsTracker from "@/components/layout/AnalyticsTracker";
+import { CouponPopup } from "@/components/promo/CouponPopup";
 
 
 
@@ -59,6 +60,9 @@ export default function HomePage() {
 
       <LandingFaq />
       <FinalCta />
+
+      {/* Promo popup + side tab — landing page only */}
+      <CouponPopup />
     </>
   );
 }

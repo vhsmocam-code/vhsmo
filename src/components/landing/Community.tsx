@@ -43,16 +43,21 @@ const notes: Note[] = [
   { src: "/community-notes/IMG_6459.PNG", ih: 909, rot: -1.6 },
   { src: "/community-notes/IMG_9257.jpg", ih: 571, rot: 1.4 },
   { src: "/community-notes/IMG_5878.PNG", ih: 207, rot: 2 },
-  { src: "/community-notes/IMG_9249.jpg", ih: 488, rot: 1.7 },
-  { src: "/community-notes/IMG_6460.PNG", ih: 2532, rot: 1 },
+  { src: "/community-notes/IMG_9255.jpg", ih: 488, rot: 1.7 },
+
+  // { src: "/community-notes/image.png", ih: 488, rot: 1.7 },
+  { src: "/community-notes/IMG_6460Part1.PNG", ih: 2532, rot: 1 },
+  { src: "/community-notes/IMG_6460Part2.PNG", ih: 2532, rot: 1 },
   { src: "/community-notes/IMG_9252.jpg", ih: 637, rot: 1.5 },
   { src: "/community-notes/IMG_5886.PNG", ih: 217, rot: 1.3 },
-  { src: "/community-notes/IMG_9255.jpg", ih: 524, rot: -1.3 },
+  // { src: "/community-notes/IMG_9255.jpg", ih: 524, rot: -1.3 },
+  { src: "/community-notes/image.png", ih: 524, rot: -1.3 },
+
   { src: "/community-notes/IMG_6454.PNG", ih: 277, rot: 1.2 },
   { src: "/community-notes/IMG_5879.PNG", ih: 315, rot: 2 },
   { src: "/community-notes/IMG_9250.jpg", ih: 472, rot: -1.8 },
   { src: "/community-notes/IMG_5883.PNG", ih: 212, rot: -1.4 },
-  { src: "/community-notes/IMG_6455.PNG", ih: 256, rot: -2 },
+  { src: "/community-notes/IMG_5849.PNG", ih: 256, rot: -2 },
   { src: "/community-notes/IMG_5877.PNG", ih: 319, rot: -1.6 },
   { src: "/community-notes/IMG_7793.jpg", ih: 425, rot: 1.5 },
   { src: "/community-notes/IMG_6458.PNG", ih: 399, rot: -2 },
@@ -114,21 +119,20 @@ export function Community() {
         <div className="flex items-start justify-between gap-6">
           <Reveal className="min-w-0">
             <h2 className="display text-[clamp(2.3rem,5.6vw,4.75rem)] leading-[0.92] text-darkroom">
-              Fuelled by{" "}
+              Built by us.{" "}
               <span className="font-marker inline-block -rotate-2 bg-kodak px-3 leading-none text-darkroom shadow-[0.15rem_0.25rem_0_rgba(31,26,24,0.25)]">
-                hype
-              </span>{" "}
-              &amp; culture.
+                Backed by you.
+              </span>
             </h2>
 
             <div className="font-marker mt-8 text-[clamp(1.05rem,1.8vw,1.4rem)] leading-relaxed text-darkroom/80">
               <p>
-                Every screenshot below is real — the DMs, comments and emails you
-                keep sending us. No filters, no scripts.
+                Every screenshot below is real — your DMs, comments, emails and
+                orders. No scripts.
               </p>
               <p className="mt-2">
                 <span className="inline-block -rotate-1 bg-kodak px-2 text-darkroom">
-                  Just people who get it.
+                  Just people who genuinely get what VHSMO is about.
                 </span>
               </p>
             </div>
