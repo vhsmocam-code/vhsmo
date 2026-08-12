@@ -16,17 +16,17 @@ import { formatCurrency } from "@/lib/utils";
 
 // Straight from the coupons table. `value`/`minimum_order` arrive as strings.
 const COUPON = {
-  code: "3ZY41B",
+  code: "NK7X4Y",
   type: "fixed" as "fixed" | "percent",
   value: 1000,
   minimumOrder: 4999,
   // 10  Aug 2026, 12:00 AM (local midnight).
-  expiresAt: "2026-08-12 01:00:00",
+  expiresAt: "2026-08-15 01:00:00",
 };
 
 // Persisted across sessions so the modal auto-opens only on the very first
 // visit. After that it stays collapsed as the tab until the user re-opens it.
-const SEEN_KEY = "vhsmo-coupon-3ZY41B-seen";
+const SEEN_KEY = "vhsmo-coupon-NK7X4Y-seen";
 const REVEAL_DELAY = 2000; // ms before it opens on first visit
 
 type TimeLeft = {
