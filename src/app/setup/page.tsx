@@ -86,14 +86,7 @@ export default function SetupPage() {
     <div className="relative overflow-hidden bg-darkroom text-halide">
       <div className="container-px mx-auto max-w-3xl pt-28 pb-24 sm:pt-32">
         {/* Back link */}
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-halide/70 transition-colors hover:text-halide"
-        >
-          <ArrowLeft className="size-4" />
-          Back to home
-        </Link>
-
+    
         {/* ---------- Header ---------- */}
         <header className="mt-8 text-center">
           <Reveal>
