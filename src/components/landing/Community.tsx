@@ -57,7 +57,7 @@ const notes: Note[] = [
   { src: "/community-notes/IMG_5879.PNG", ih: 315, rot: 2 },
   { src: "/community-notes/IMG_9250.jpg", ih: 472, rot: -1.8 },
   { src: "/community-notes/IMG_5883.PNG", ih: 212, rot: -1.4 },
-  { src: "/community-notes/IMG_5849.PNG", ih: 256, rot: -2 },
+  { src: "/community-notes/IMG_5849.png", ih: 256, rot: -2 },
   { src: "/community-notes/IMG_5877.PNG", ih: 319, rot: -1.6 },
   { src: "/community-notes/IMG_7793.jpg", ih: 425, rot: 1.5 },
   { src: "/community-notes/IMG_6458.PNG", ih: 399, rot: -2 },
