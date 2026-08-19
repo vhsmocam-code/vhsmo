@@ -65,7 +65,7 @@ async function handle(params: {
   try {
     const res = await sendEmail({
       to,
-      subject: `[TEST] Your VHSMO order ${orderId} is confirmed`,
+      subject: `Your VHSMO order ${orderId} is confirmed`,
       html: orderConfirmationEmail({
         name,
         orderId,

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useCart } from "@/lib/cart-context";
+import { useProducts } from "@/lib/products-context";
 import { usePersistedState } from "@/components/checkout/usePersistedState";
 import { emptyAddress, type Address } from "@/components/address/types";
 import {
@@ -25,10 +26,28 @@ import { ReservationBanner } from "@/components/checkout/ReservationBanner";
 export default function CheckoutPage() {
   const { items, subtotal, shipping, tax, isHydrated, clear } = useCart();
 
+  // Live Supabase stock, keyed by product row id. A cart line whose backend
+  // stock is 0 (or the row is gone) can't be checked out - the order summary
+  // flags it and the pay button is blocked until it's removed.
+  const products = useProducts();
+  const soldOutIds = useMemo(() => {
+    const stockById = new Map(products.map((p) => [p.id, p.stock]));
+    const out = new Set<string>();
+    for (const item of items) {
+      const stock = stockById.get(item.id);
+      if (stock !== undefined && stock <= 0) out.add(item.id);
+    }
+    return out;
+  }, [products, items]);
+  const hasSoldOut = soldOutIds.size > 0;
+
   // Static 10-minute "reservation" countdown to nudge the shopper along. It
   // runs while the cart has items and redirects home if it lapses; `stop()`
-  // freezes it the moment an order is created.
-  const reservation = useCheckoutReservation(isHydrated && items.length > 0);
+  // freezes it the moment an order is created. Suppressed while a line is out
+  // of stock - there's nothing to reserve, and the redirect would be perverse.
+  const reservation = useCheckoutReservation(
+    isHydrated && items.length > 0 && !hasSoldOut,
+  );
 
   // Checkout is open to everyone. Email is validated for format only.
   const { email, setEmail } = useEmailVerification();
@@ -77,7 +96,9 @@ export default function CheckoutPage() {
   // A PIN Delhivery has explicitly rejected blocks checkout; a check that's
   // still pending or errored out falls back to the format validation alone.
   const canCheckout =
-    Object.keys(errors).length === 0 && pincodeStatus !== "unserviceable";
+    Object.keys(errors).length === 0 &&
+    pincodeStatus !== "unserviceable" &&
+    !hasSoldOut;
 
   /** Called by the checkout button. Reveals errors and reports readiness. */
   const attemptCheckout = () => {
@@ -117,7 +138,7 @@ export default function CheckoutPage() {
   return (
     <div className="paper flex min-h-dvh flex-col">
       <CheckoutHeader />
-      <ReservationBanner label={reservation.label} />
+      {!hasSoldOut && <ReservationBanner label={reservation.label} />}
 
       <form
         onSubmit={onSubmit}
@@ -158,6 +179,7 @@ export default function CheckoutPage() {
           onAttemptCheckout={attemptCheckout}
           customer={{ firstName, lastName, email, phone }}
           address={address}
+          soldOutIds={soldOutIds}
           onOrderStart={reservation.pause}
           onOrderCancelled={reservation.resume}
           onSuccess={handleSuccess}

@@ -8,6 +8,7 @@ import {
   Info,
   Loader2,
   Lock,
+  PackageX,
   ShieldCheck,
   Truck,
   X,
@@ -41,6 +42,9 @@ type OrderSummaryProps = {
     phone: string;
   };
   address: Address;
+  /** Cart-line product ids whose live backend stock is 0 - checkout is blocked
+   *  until they're removed from the cart. */
+  soldOutIds: Set<string>;
   /** Fired once order creation begins - used to pause the reservation timer. */
   onOrderStart?: () => void;
   /** Fired if the shopper backs out (dismisses Razorpay / order fails). */
@@ -58,10 +62,12 @@ export function OrderSummary({
   onAttemptCheckout,
   customer,
   address,
+  soldOutIds,
   onOrderStart,
   onOrderCancelled,
   onSuccess,
 }: OrderSummaryProps) {
+  const hasSoldOut = soldOutIds.size > 0;
   const router = useRouter();
   const [processing, setProcessing] = useState(false);
   const [showCodInfo, setShowCodInfo] = useState(false);
@@ -78,7 +84,11 @@ export function OrderSummary({
 
   const handleCheckout = async () => {
     if (processing) return;
-    
+
+    // A cart line that's out of stock on the backend can't be ordered - the
+    // shopper has to drop it before we hit Razorpay.
+    if (hasSoldOut) return;
+
     // Reveal any outstanding validation errors before touching Razorpay.
     if (!onAttemptCheckout()) {
       // Scroll the first error into view for the user.
@@ -285,7 +295,9 @@ track("pay_securely_clicked", {
         <h2 className="text-lg font-bold text-darkroom">Order summary</h2>
         {/* Items */}
         <ul className="mt-4 divide-y divide-darkroom/10 border-y border-darkroom/10">
-          {items.map((item) => (
+          {items.map((item) => {
+            const soldOut = soldOutIds.has(item.id);
+            return (
             <li
               key={`${item.id}-${item.variant ?? ""}`}
               className="flex gap-3.5 py-4"
@@ -296,7 +308,9 @@ track("pay_securely_clicked", {
                   alt={item.name}
                   fill
                   sizes="64px"
-                  className="object-cover"
+                  className={`object-cover transition ${
+                    soldOut ? "opacity-40 grayscale" : ""
+                  }`}
                 />
               </div>
               <div className="flex flex-1 flex-col justify-center">
@@ -307,12 +321,23 @@ track("pay_securely_clicked", {
                   <p className="text-xs text-darkroom/55">{item.variant}</p>
                 )}
                 <p className="text-xs text-darkroom/45">Qty: {item.quantity}</p>
+                {soldOut && (
+                  <span className="mt-1.5 inline-flex w-fit items-center gap-1 rounded-full bg-red-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-red-600 ring-1 ring-inset ring-red-500/25">
+                    <PackageX className="size-3" />
+                    Out of stock
+                  </span>
+                )}
               </div>
-              <span className="self-center text-sm font-semibold tabular-nums text-darkroom">
+              <span
+                className={`self-center text-sm font-semibold tabular-nums ${
+                  soldOut ? "text-darkroom/40" : "text-darkroom"
+                }`}
+              >
                 {formatCurrency(item.price * item.quantity)}
               </span>
             </li>
-          ))}
+            );
+          })}
         </ul>
         {coupon ? (
           <div className="mt-4 flex items-center gap-3 rounded-xl border-2 border-green-600/25 bg-green-600/[0.06] p-3.5">
@@ -376,19 +401,44 @@ track("pay_securely_clicked", {
             </span>
           </div>
         </div>
+        {/* Out-of-stock notice - blocks checkout until the item is removed. */}
+        {hasSoldOut && (
+          <div
+            role="alert"
+            className="mt-5 flex items-start gap-3 rounded-xl border-2 border-red-500/30 bg-red-500/[0.06] p-3.5 text-red-700"
+          >
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-red-500/15">
+              <PackageX className="size-4" />
+            </span>
+            <div className="leading-tight">
+              <p className="text-sm font-bold text-red-700">
+                Item out of stock
+              </p>
+              <p className="mt-0.5 text-xs font-medium text-red-700/80">
+                Remove the flagged item from your cart to place your order.
+              </p>
+            </div>
+          </div>
+        )}
         {/* Checkout button */}
         <button
           ref={buttonRef}
           type="button"
           onClick={handleCheckout}
-          disabled={processing}
-          className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-bluehour px-8 py-4 text-base font-bold tracking-tight text-overexpose transition-all duration-300 ease-[var(--ease-out-expo)] hover:shadow-[0_0_0_5px_rgba(16,147,255,0.25)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none disabled:hover:shadow-none disabled:active:scale-100"
+          disabled={processing || hasSoldOut}
+          className={`mt-5 flex w-full items-center justify-center gap-2 rounded-full px-8 py-4 text-base font-bold tracking-tight transition-all duration-300 ease-[var(--ease-out-expo)] disabled:cursor-not-allowed ${
+            hasSoldOut
+              ? "bg-darkroom/15 text-darkroom/45"
+              : "bg-bluehour text-overexpose hover:shadow-[0_0_0_5px_rgba(16,147,255,0.25)] active:scale-[0.98] disabled:opacity-60 disabled:shadow-none disabled:hover:shadow-none disabled:active:scale-100"
+          }`}
         >
           {processing ? (
             <>
               <Loader2 className="size-4 animate-spin" />
               Processing…
             </>
+          ) : hasSoldOut ? (
+            "Item unavailable"
           ) : (
             <>
               <Lock className="size-4" />

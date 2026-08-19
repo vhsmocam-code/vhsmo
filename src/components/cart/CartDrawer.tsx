@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { Lock, ShoppingBag, Trash2, Truck, X } from "lucide-react";
+import { Lock, PackageX, ShoppingBag, Trash2, Truck, X } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
+import { useProducts } from "@/lib/products-context";
 import { formatCurrency } from "@/lib/utils";
 import { QuantityStepper } from "@/components/common/QuantityStepper";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,20 @@ export function CartDrawer() {
     total,
     count,
   } = useCart();
+
+  // Live Supabase stock, keyed by product row id. Any cart line whose backend
+  // stock is 0 (or whose row is gone) blocks checkout until it's removed.
+  const products = useProducts();
+  const soldOutIds = useMemo(() => {
+    const stockById = new Map(products.map((p) => [p.id, p.stock]));
+    const out = new Set<string>();
+    for (const item of items) {
+      const stock = stockById.get(item.id);
+      if (stock !== undefined && stock <= 0) out.add(item.id);
+    }
+    return out;
+  }, [products, items]);
+  const hasSoldOut = soldOutIds.size > 0;
 
   // Body scroll lock + escape to close.
   useEffect(() => {
@@ -103,7 +118,9 @@ export function CartDrawer() {
               </div>
             ) : (
               <ul className="flex-1 divide-y divide-darkroom/10 overflow-y-auto px-6 [scrollbar-width:thin]">
-                {items.map((item) => (
+                {items.map((item) => {
+                  const soldOut = soldOutIds.has(item.id);
+                  return (
                   <li
                     key={`${item.id}-${item.variant ?? ""}`}
                     className="flex gap-4 py-5"
@@ -114,7 +131,9 @@ export function CartDrawer() {
                         alt={item.name}
                         fill
                         sizes="80px"
-                        className="object-cover"
+                        className={`object-cover transition ${
+                          soldOut ? "opacity-40 grayscale" : ""
+                        }`}
                       />
                     </div>
                     <div className="flex flex-1 flex-col">
@@ -127,6 +146,12 @@ export function CartDrawer() {
                             <p className="text-xs text-darkroom/55">
                               {item.variant}
                             </p>
+                          )}
+                          {soldOut && (
+                            <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-red-600 ring-1 ring-inset ring-red-500/25">
+                              <PackageX className="size-3" />
+                              Out of stock
+                            </span>
                           )}
                         </div>
                         <button
@@ -145,13 +170,18 @@ export function CartDrawer() {
                             setQuantity(item.id, q, item.variant)
                           }
                         />
-                        <span className="font-semibold tabular-nums text-darkroom">
+                        <span
+                          className={`font-semibold tabular-nums ${
+                            soldOut ? "text-darkroom/40" : "text-darkroom"
+                          }`}
+                        >
                           {formatCurrency(item.price * item.quantity)}
                         </span>
                       </div>
                     </div>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             )}
 
@@ -178,20 +208,40 @@ export function CartDrawer() {
                   </div>
                 </div>
 
-                <Link
-                  href="/checkout"
-                  onClick={() => {
-                    track("checkout_clicked", {
-                      source: "cart_drawer",
-                    });
+                {hasSoldOut ? (
+                  <>
+                    <div className="mt-5 flex items-start gap-2.5 rounded-xl border border-red-500/25 bg-red-500/[0.06] p-3">
+                      <PackageX className="mt-0.5 size-4 shrink-0 text-red-600" />
+                      <p className="text-xs font-semibold leading-snug text-red-700">
+                        An item in your cart is out of stock. Remove it to
+                        continue to checkout.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      disabled
+                      className="mt-3 flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-full bg-darkroom/15 px-8 py-4 text-base font-bold tracking-tight text-darkroom/45"
+                    >
+                      <Lock className="size-4" />
+                      Secure checkout
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    href="/checkout"
+                    onClick={() => {
+                      track("checkout_clicked", {
+                        source: "cart_drawer",
+                      });
 
-                    closeCart();
-                  }}
-                  className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-bluehour px-8 py-4 text-base font-bold tracking-tight text-overexpose transition-all duration-300 ease-[var(--ease-out-expo)] hover:shadow-[0_0_0_5px_rgba(16,147,255,0.25)] active:scale-[0.98]"
-                >
-                  <Lock className="size-4" />
-                  Secure checkout
-                </Link>
+                      closeCart();
+                    }}
+                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-bluehour px-8 py-4 text-base font-bold tracking-tight text-overexpose transition-all duration-300 ease-[var(--ease-out-expo)] hover:shadow-[0_0_0_5px_rgba(16,147,255,0.25)] active:scale-[0.98]"
+                  >
+                    <Lock className="size-4" />
+                    Secure checkout
+                  </Link>
+                )}
 
                 <div className="mt-3 flex items-center justify-center gap-4 text-xs text-darkroom/55">
                   <span className="flex items-center gap-1.5">
