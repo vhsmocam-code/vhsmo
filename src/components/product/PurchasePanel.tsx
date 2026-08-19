@@ -151,46 +151,63 @@ export function PurchasePanel() {
           <span className="font-normal text-darkroom/60">{variant.color}</span>
         </p>
         <div className="mt-3 flex gap-3">
-          {variants.map((c) => (
-            <button
-              key={c.id}
-              onClick={() => setColor(c.id)}
-              aria-pressed={color === c.id}
-              aria-label={
-                c.stock > 0 ? c.color : `${c.color} - out of stock`
-              }
-              title={c.stock > 0 ? c.color : `${c.color} - out of stock`}
-              className={`relative flex size-10 items-center justify-center rounded-full border-2 transition-all ${
-                color === c.id ? "border-darkroom" : "border-darkroom/20"
-              } ${c.stock > 0 ? "" : "opacity-45"}`}
-            >
-              <span
-                className="size-6 rounded-full ring-1 ring-darkroom/10"
-                style={{ background: c.swatch }}
-              />
-              {/* Sold-out finishes stay pickable - the panel explains why */}
-              {c.stock <= 0 && (
-                <span className="pointer-events-none absolute h-px w-7 rotate-45 bg-darkroom/70" />
-              )}
-            </button>
-          ))}
+          {variants.map((c) => {
+            const isActive = color === c.id;
+            const cSoldOut = c.stock <= 0;
+            return (
+              <button
+                key={c.id}
+                onClick={() => setColor(c.id)}
+                aria-pressed={isActive}
+                aria-label={cSoldOut ? `${c.color} - out of stock` : c.color}
+                title={cSoldOut ? `${c.color} - out of stock` : c.color}
+                className={`relative flex size-11 items-center justify-center rounded-full border-2 p-1 transition-all duration-200 ${
+                  isActive
+                    ? "border-darkroom scale-105"
+                    : "border-transparent hover:border-darkroom/25"
+                } ${cSoldOut ? "opacity-50" : ""}`}
+              >
+                <span
+                  className="size-full rounded-full ring-1 ring-inset ring-darkroom/10"
+                  style={{ background: c.swatch }}
+                />
+                {/* Sold-out finishes stay pickable - the panel explains why */}
+                {cSoldOut && (
+                  <span className="pointer-events-none absolute h-px w-8 rotate-45 bg-darkroom/70" />
+                )}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Stock, straight off the row */}
-        <p className="mt-3 text-sm">
+        {/* Stock status - a live-dot indicator, no exact counts */}
+        <div className="mt-4 flex items-center gap-2 text-sm">
           {soldOut ? (
-            <span className="font-semibold text-darkroom/60">
-              {variant.color} is sold out - pick another finish.
-            </span>
+            <>
+              <span className="size-2.5 shrink-0 rounded-full bg-darkroom/40" />
+              <span className="font-semibold text-darkroom/60">
+                {variant.color} is sold out — pick another finish.
+              </span>
+            </>
           ) : lowStock ? (
-            <span className="font-semibold text-darkroom">
-              Only {variant.stock} left in {variant.color}.
-            </span>
+            <>
+              <span className="relative flex size-2.5 shrink-0">
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-amber-500/70" />
+                <span className="relative inline-flex size-2.5 rounded-full bg-amber-500" />
+              </span>
+              <span className="font-semibold text-amber-700">
+                Selling fast — only a few left in {variant.color}.
+              </span>
+            </>
           ) : (
-            <span className="text-darkroom/60">
-            </span>
+            <>
+              <span className="size-2.5 shrink-0 rounded-full bg-green-600" />
+              <span className="font-medium text-darkroom/70">
+                In stock — ready to reserve.
+              </span>
+            </>
           )}
-        </p>
+        </div>
       </div>
 
       {/* Actions */}
