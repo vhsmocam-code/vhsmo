@@ -196,7 +196,7 @@ export function PurchasePanel() {
                 <span className="relative inline-flex size-2.5 rounded-full bg-amber-500" />
               </span>
               <span className="font-semibold text-amber-700">
-                Selling fast — only a few left in {variant.color}.
+                Selling fast - only a few left in {variant.color}.
               </span>
             </>
           ) : (
