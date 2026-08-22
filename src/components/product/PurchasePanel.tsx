@@ -180,7 +180,7 @@ export function PurchasePanel() {
           })}
         </div>
 
-        {/* Stock status - a live-dot indicator, no exact counts */}
+        {/* Stock status - backed by the Supabase product row. */}
         <div className="mt-4 flex items-center gap-2 text-sm">
           {soldOut ? (
             <>
@@ -196,7 +196,9 @@ export function PurchasePanel() {
                 <span className="relative inline-flex size-2.5 rounded-full bg-amber-500" />
               </span>
               <span className="font-semibold text-amber-700">
-                Selling fast - only a few left in {variant.color}.
+                Selling fast - only {variant.stock}{" "}
+                {variant.stock === 1 ? "unit" : "units"} left in{" "}
+                {variant.color}.
               </span>
             </>
           ) : (
