@@ -21,7 +21,7 @@ const COUPON = {
   value: 1000,
   minimumOrder: 4999,
   // 23  Aug 2026, 12:00 AM (local midnight).
-  expiresAt: "2026-08-23 01:00:00",
+  expiresAt: "2026-08-23 06:00:00",
 };
 
 // Persisted across sessions so the modal auto-opens only on the very first
