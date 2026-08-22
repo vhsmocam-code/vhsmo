@@ -19,8 +19,9 @@ const COUPON = {
   code: "QC3R8Y",
   type: "fixed" as "fixed" | "percent",
   value: 1000,
-  minimumOrder: 4999,
+  minimumOrder: 5999,
   // 23  Aug 2026, 12:00 AM (local midnight).
+  expiry : "false",
   expiresAt: "2026-08-23 06:00:00",
 };
 
@@ -222,7 +223,9 @@ export function CouponPopup() {
                 </div>
 
                 {/* Countdown */}
-                <div className="mt-4">
+                {
+false ? (
+               <div className="mt-4">
                   <p className="mb-2 flex items-center justify-center gap-1.5 text-center text-[0.7rem] uppercase tracking-[0.18em] text-darkroom/50">
                     <Clock className="size-3.5" strokeWidth={2.25} />
                     Ends in
@@ -236,7 +239,14 @@ export function CouponPopup() {
                     <Colon />
                     <TimeCell value={time.seconds} label="sec" />
                   </div>
-                </div>
+                </div>) :( <div className="mt-4">
+                  <p className="mb-2 flex items-center justify-center gap-1.5 text-center text-[0.7rem] uppercase tracking-[0.18em] text-darkroom/50">
+                    <Clock className="size-3.5" strokeWidth={2.25} />
+                   Till the stock lasts
+                  </p>
+</div>)
+
+                }
               </div>
             </motion.div>
           </div>
