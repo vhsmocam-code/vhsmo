@@ -16,12 +16,12 @@ import { formatCurrency } from "@/lib/utils";
 
 // Straight from the coupons table. `value`/`minimum_order` arrive as strings.
 const COUPON = {
-  code: "B4B9Z7",
+  code: "QC3R8Y",
   type: "fixed" as "fixed" | "percent",
   value: 1000,
   minimumOrder: 4999,
-  // 19  Aug 2026, 12:00 AM (local midnight).
-  expiresAt: "2026-08-19 01:00:00",
+  // 23  Aug 2026, 12:00 AM (local midnight).
+  expiresAt: "2026-08-23 01:00:00",
 };
 
 // Persisted across sessions so the modal auto-opens only on the very first
