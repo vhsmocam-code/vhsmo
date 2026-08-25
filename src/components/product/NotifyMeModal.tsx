@@ -4,6 +4,11 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Bell, Check, Loader2, X } from "lucide-react";
 import type { ProductVariant } from "@/lib/products";
+import {
+  CountryCodeSelect,
+  DEFAULT_COUNTRY,
+  type CountryCode,
+} from "@/components/layout/CountryCodeSelect";
 
 type Status = "idle" | "sending" | "done" | "error";
 
@@ -34,6 +39,7 @@ export function NotifyMeModal({
   onClose: () => void;
 }) {
   const [values, setValues] = useState(EMPTY);
+  const [dialCode, setDialCode] = useState<CountryCode>(DEFAULT_COUNTRY);
   const [status, setStatus] = useState<Status>("idle");
 
   const sending = status === "sending";
@@ -42,6 +48,7 @@ export function NotifyMeModal({
   useEffect(() => {
     if (open) {
       setValues(EMPTY);
+      setDialCode(DEFAULT_COUNTRY);
       setStatus("idle");
     }
   }, [open]);
@@ -82,7 +89,7 @@ export function NotifyMeModal({
         body: JSON.stringify({
           name: values.name.trim(),
           email: values.email.trim(),
-          phone: values.phone.trim(),
+          phone: `+${dialCode.dial} ${values.phone.trim()}`,
           sku: variant.sku,
           variant: variant.color,
         }),
@@ -158,7 +165,7 @@ export function NotifyMeModal({
                   </span>
                   <div>
                     <h2 className="display text-2xl text-darkroom">
-                      Notify me
+                      Notify me when in stock
                     </h2>
                     <p className="text-sm text-darkroom/65">
                       {variant.color} is sold out - we&apos;ll let you know when
@@ -183,24 +190,37 @@ export function NotifyMeModal({
                     />
                   </label>
 
-                  <label className="flex flex-col gap-1.5">
-                    <span className={LABEL_CLASS}>Phone number</span>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={values.phone}
-                      onChange={(e) =>
-                        set("phone", e.target.value.replace(/[^\d\s+-]/g, ""))
-                      }
-                      disabled={sending}
-                      required
-                      placeholder="+91 98765 43210"
-                      autoComplete="tel"
-                      inputMode="tel"
-                      maxLength={16}
-                      className={INPUT_CLASS}
-                    />
-                  </label>
+                  {/* Not a <label>: it wraps two controls (picker + input). */}
+                  <div className="flex flex-col gap-1.5">
+                    <span id="notify-phone-label" className={LABEL_CLASS}>
+                      Phone number
+                    </span>
+                    <div className="flex items-start gap-2">
+                      <CountryCodeSelect
+                        value={dialCode}
+                        onChange={setDialCode}
+                        disabled={sending}
+                      />
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={values.phone}
+                        onChange={(e) =>
+                          // Digits and the usual separators only - the dial code
+                          // comes from the picker beside it.
+                          set("phone", e.target.value.replace(/[^\d\s-]/g, ""))
+                        }
+                        disabled={sending}
+                        required
+                        placeholder="98765 43210"
+                        autoComplete="tel-national"
+                        inputMode="tel"
+                        maxLength={16}
+                        aria-labelledby="notify-phone-label"
+                        className={INPUT_CLASS}
+                      />
+                    </div>
+                  </div>
 
                   <label className="flex flex-col gap-1.5">
                     <span className={LABEL_CLASS}>Email</span>
@@ -226,7 +246,7 @@ export function NotifyMeModal({
                     {sending && (
                       <Loader2 className="size-4 animate-spin" aria-hidden />
                     )}
-                    {sending ? "Sending..." : "Notify me on restock"}
+                    {sending ? "Sending..." : "Notify me when in stock"}
                   </button>
 
                   {status === "error" && (
