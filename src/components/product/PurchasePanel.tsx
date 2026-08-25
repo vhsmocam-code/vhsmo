@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Check, ShieldCheck, Truck } from "lucide-react";
+import { Bell, Check, ShieldCheck, Truck } from "lucide-react";
 import { productCopy } from "@/lib/products";
 import { useColor } from "@/lib/color-context";
 import { formatCurrency } from "@/lib/utils";
 import { useCart } from "@/lib/cart-context";
 import { flyToCart } from "@/lib/fly-to-cart";
 import { Scribble } from "@/components/brand/Scribble";
+import { NotifyMeModal } from "@/components/product/NotifyMeModal";
 import { instantTransfer } from "@/lib/landing";
 import { track } from "@vercel/analytics";
 
@@ -36,6 +37,7 @@ export function PurchasePanel() {
   const { addItem } = useCart();
   const { color, setColor, variants, variant } = useColor();
   const [adding, setAdding] = useState(false);
+  const [notifyOpen, setNotifyOpen] = useState(false);
 
   // Nothing active in the products table - say so rather than render a
   // buy button that can't be honoured.
@@ -214,21 +216,48 @@ export function PurchasePanel() {
 
       {/* Actions */}
       <div className="mt-7">
-        <button
+        {soldOut ? (
+          <div className="flex flex-col gap-3">
+            <button
+              disabled
+              className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-full bg-darkroom/15 px-8 py-4 text-base font-bold tracking-tight text-darkroom/50"
+            >
+              Sold out
+            </button>
+            <button
+              onClick={() => {
+                track("notify_me_clicked", { source: "product_page" });
+                setNotifyOpen(true);
+              }}
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-darkroom px-8 py-4 text-base font-bold tracking-tight text-overexpose transition-all duration-300 ease-[var(--ease-out-expo)] hover:shadow-[0_0_0_5px_rgba(31,26,24,0.18)] active:scale-[0.98]"
+            >
+              <Bell className="size-5" />
+              Notify me
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={(e) => {
+              track("reserve_clicked", {
+                source: "product_page",
+              });
 
-      onClick={(e) => {
-  track("reserve_clicked", {
-    source: "product_page",
-  });
-
-  void reserve(e.currentTarget);
-}}
-          disabled={adding || soldOut}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-kodak px-8 py-4 text-base font-bold tracking-tight text-darkroom transition-all duration-300 ease-[var(--ease-out-expo)] hover:shadow-[0_0_0_5px_rgba(253,241,0,0.25)] active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-darkroom/15 disabled:text-darkroom/50 disabled:shadow-none"
-        >
-          {soldOut ? "Sold out" : adding ? "Adding…" : "Pre Order Now"}
-        </button>
+              void reserve(e.currentTarget);
+            }}
+            disabled={adding}
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-kodak px-8 py-4 text-base font-bold tracking-tight text-darkroom transition-all duration-300 ease-[var(--ease-out-expo)] hover:shadow-[0_0_0_5px_rgba(253,241,0,0.25)] active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-darkroom/15 disabled:text-darkroom/50 disabled:shadow-none"
+          >
+            {adding ? "Adding…" : "Pre Order Now"}
+          </button>
+        )}
       </div>
+
+      {/* Restock signup - only meaningful for the sold-out finish */}
+      <NotifyMeModal
+        variant={variant}
+        open={notifyOpen}
+        onClose={() => setNotifyOpen(false)}
+      />
 
       {/* Refundable note */}
       <p className="mt-4 flex items-start gap-2.5 border-l-2 border-kodak bg-kodak/10 px-4 py-3 text-sm text-darkroom/80">
