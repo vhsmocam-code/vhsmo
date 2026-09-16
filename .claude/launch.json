@@ -4,7 +4,10 @@
     {
       "name": "aperture",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "port": 3000,
       "autoPort": true
     },
@@ -17,6 +20,15 @@
       ],
       "port": 3100,
       "autoPort": true
+    },
+    {
+      "name": "app-store",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "websites/app-store/serve.py",
+        "4321"
+      ],
+      "port": 4321
     }
   ]
 }

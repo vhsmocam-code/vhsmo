@@ -1,0 +1,377 @@
+/* ==================================================================
+   VHSMO — App Store campaign · reusable components
+   Everything here is artboard-space: 1px === 1 exported pixel.
+   ================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ------------------------------------------------------------------
+   THE ARTBOARD
+   The <section> is the OUTPUT box — 1290 × 2796 by default, 1242 × 2688
+   under [data-size="p1242"]. Inside it, .artboard__canvas is always the
+   1290 × 2796 design space, scaled to fill. Every composition is authored
+   against the canvas, so switching output size changes nothing but the
+   number of pixels it lands on. Nothing may escape either box.
+   ------------------------------------------------------------------ */
+.artboard {
+  position: relative;
+  width: var(--out-w);
+  height: var(--out-h);
+  overflow: hidden;
+  isolation: isolate;
+  font-family: var(--font-body);
+  color: var(--vhsmo-black);
+  background: var(--vhsmo-cream);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+}
+
+.artboard__canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--board-w);
+  height: var(--board-h);
+  transform-origin: top left;
+  transform: scale(var(--out-sx), var(--out-sy));
+}
+
+/* Film grain — the site ships a grain overlay (FilmGrain.tsx); the
+   campaign carries the same texture so the artwork reads as one brand. */
+.artboard::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  background-image: url("../assets/texture/grain.png");
+  background-size: 220px 220px;
+  opacity: 0.055;
+  mix-blend-mode: overlay;
+}
+.artboard--dark::after { opacity: 0.09; }
+
+/* Grounds ---------------------------------------------------------- */
+.ground        { position: absolute; inset: 0; z-index: 0; }
+.ground--cream { background: var(--vhsmo-cream); }
+.ground--dark  { background: var(--vhsmo-black-deep); }
+.ground--yellow{ background: var(--vhsmo-yellow); }
+
+/* A soft colour bloom used to keep flat grounds from going dead. */
+.bloom { position: absolute; z-index: 0; pointer-events: none; border-radius: 50%; filter: blur(120px); }
+
+/* Everything an artboard composes sits on this layer. */
+.layer { position: absolute; z-index: 10; }
+/* .phone sets position:relative for its own hardware, and is declared
+   later in this file, so a phone dropped onto the layer has to reclaim
+   absolute placement or its right/top offsets resolve against nothing. */
+.layer.phone { position: absolute; }
+
+/* ------------------------------------------------------------------
+   TYPOGRAPHY
+   ------------------------------------------------------------------ */
+.headline {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 236px;
+  line-height: 0.845;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+  margin: 0;
+  text-wrap: nowrap;
+}
+.headline--tight  { letter-spacing: -0.052em; }
+.headline--yellow { color: var(--vhsmo-yellow); }
+.headline--white  { color: var(--vhsmo-white); }
+.headline--cream  { color: var(--vhsmo-cream-light); }
+
+/* A line that steps down out of the main size — editorial contrast. */
+.headline__step {
+  display: block;
+  font-size: 0.36em;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  padding-top: 0.26em;
+}
+
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin: 0;
+}
+.eyebrow--yellow { color: var(--vhsmo-yellow); }
+.eyebrow--white  { color: var(--vhsmo-white); }
+.eyebrow--muted  { color: color-mix(in srgb, var(--vhsmo-black) 52%, transparent); }
+
+.supporting {
+  font-family: var(--font-body);
+  font-size: 48px;
+  font-weight: 500;
+  line-height: 1.16;
+  letter-spacing: -0.018em;
+  margin: 0;
+  max-width: 860px;
+}
+.supporting--white { color: var(--vhsmo-white); }
+.supporting--halide{ color: var(--vhsmo-halide); }
+.supporting--muted { color: color-mix(in srgb, var(--vhsmo-black) 68%, transparent); }
+
+/* Kids Word — the licensed brand marker. Stickers and asides only. */
+.note {
+  font-family: var(--font-marker);
+  font-size: 62px;
+  line-height: 0.95;
+  letter-spacing: 0.005em;
+  margin: 0;
+}
+.note--yellow { color: var(--vhsmo-yellow); }
+.note--black  { color: var(--vhsmo-black); }
+.note--pink   { color: var(--vhsmo-pink); }
+
+/* Running heads, frame numbers, "SHOT ON VHSMO" — annotation scale. */
+.brand-label {
+  font-family: var(--font-body);
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  margin: 0;
+  opacity: 0.62;
+}
+.brand-label--boxed {
+  opacity: 1;
+  border: 2px solid currentColor;
+  border-radius: 999px;
+  padding: 11px 22px 9px;
+}
+.brand-label--solid {
+  opacity: 1;
+  background: var(--vhsmo-black);
+  color: var(--vhsmo-yellow);
+  border-radius: 999px;
+  padding: 13px 26px 11px;
+}
+
+/* Live pill, matching the app's own LIVE badge. */
+.live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--vhsmo-red);
+  color: var(--vhsmo-white);
+  border-radius: 999px;
+  padding: 15px 30px 13px;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+.live-pill::before {
+  content: "";
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--vhsmo-white);
+}
+
+/* ------------------------------------------------------------------
+   THE IPHONE
+   Proportions are the iPhone 16 Pro's: 402 × 874 pt display, ~62pt
+   body corner, ~1.2mm bezel, 125 × 36.7pt Dynamic Island. The frame
+   is a brushed-titanium gradient, not a chrome mirror — one diagonal
+   sweep, no glow, no fake studio reflections.
+   ------------------------------------------------------------------ */
+.phone {
+  --pw: 780px;                               /* device body width */
+  --bezel: calc(var(--pw) * 0.0212);
+  --r-outer: calc(var(--pw) * 0.152);
+  position: relative;
+  width: var(--pw);
+  flex: none;
+}
+
+.phone__body {
+  position: relative;
+  padding: var(--bezel);
+  border-radius: var(--r-outer);
+  background: linear-gradient(
+    143deg,
+    #2f2a27  0%,
+    #7d766e  4.5%,
+    #cfc7bc  8%,
+    #837b73  12%,
+    #3b3532  22%,
+    #262120  40%,
+    #221d1b  55%,
+    #2f2a27  68%,
+    #7f7870  80%,
+    #c8c0b5  85%,
+    #6d665f  90%,
+    #292421 100%
+  );
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    inset 0 2px 1px rgba(255, 255, 255, 0.22),
+    inset 0 -2px 1px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(0, 0, 0, 0.4);
+}
+
+/* Contact + cast shadow, kept off the frame so it never tints metal. */
+.phone::before {
+  content: "";
+  position: absolute;
+  inset: 2.5% 3% -1.5%;
+  border-radius: var(--r-outer);
+  background: rgba(24, 18, 15, 0.5);
+  filter: blur(60px);
+  transform: translateY(4%) scale(0.97);
+  z-index: -1;
+}
+.phone--lift::before  { inset: 4% 5% -3%; filter: blur(90px); background: rgba(24, 18, 15, 0.62); }
+.phone--onDark::before{ background: rgba(0, 0, 0, 0.85); filter: blur(80px); }
+
+.phone__screen {
+  position: relative;
+  aspect-ratio: 1206 / 2622;
+  border-radius: calc(var(--r-outer) - var(--bezel) * 0.92);
+  overflow: hidden;
+  background: #0a0908;
+  box-shadow: 0 0 0 calc(var(--pw) * 0.004) #0b0a09;
+}
+
+.phone__shot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+/* The glass. One low, wide diagonal sweep — the amount of sheen you
+   get from a softbox, not a mirror. */
+.phone__screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    114deg,
+    rgba(255, 255, 255, 0.115) 0%,
+    rgba(255, 255, 255, 0.045) 15%,
+    rgba(255, 255, 255, 0) 33%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+.phone__island {
+  position: absolute;
+  left: 50%;
+  top: 1.26%;
+  transform: translateX(-50%);
+  width: 31.1%;
+  aspect-ratio: 125 / 36.7;
+  border-radius: 999px;
+  background: #000;
+  z-index: 3;
+}
+
+/* Side hardware. Percentages are of the device body. */
+.phone__btn {
+  position: absolute;
+  width: calc(var(--pw) * 0.0105);
+  border-radius: calc(var(--pw) * 0.0025);
+  background: linear-gradient(180deg, #6a635c, #38322f 35%, #8d867d 72%, #3c3633);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+.phone__btn--action { left: calc(var(--pw) * -0.0068); top: 14.6%; height: 3.1%; }
+.phone__btn--volUp  { left: calc(var(--pw) * -0.0068); top: 19.8%; height: 5.3%; }
+.phone__btn--volDn  { left: calc(var(--pw) * -0.0068); top: 26.4%; height: 5.3%; }
+.phone__btn--power  { right: calc(var(--pw) * -0.0068); top: 20.6%; height: 7.5%; }
+.phone__btn--camera {
+  right: calc(var(--pw) * -0.0058);
+  top: 32.4%; height: 3.4%;
+  background: linear-gradient(180deg, #8f8880, #4a4340 40%, #b3aca2 78%, #4a4340);
+}
+
+/* ------------------------------------------------------------------
+   PHOTOGRAPHY AS A PHYSICAL OBJECT
+   A print is white stock with a heavier bottom margin, a hard contact
+   shadow and a soft cast one. Photographs are never colour-graded:
+   the flash, grain, blur and bad exposure are the point.
+   ------------------------------------------------------------------ */
+.photo-print {
+  --pad: 20px;
+  position: relative;
+  background: var(--vhsmo-paper);
+  padding: var(--pad) var(--pad) calc(var(--pad) * 3.1);
+  box-shadow:
+    0 1px 2px rgba(31, 26, 24, 0.16),
+    0 34px 46px -30px rgba(31, 26, 24, 0.62);
+}
+.photo-print > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: var(--vhsmo-black-deep);
+}
+.photo-print__no {
+  position: absolute;
+  left: var(--pad);
+  right: var(--pad);
+  bottom: calc(var(--pad) * 0.95);
+  display: flex;
+  justify-content: space-between;
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: #a79f97;
+}
+/* A borderless frame — a contact-sheet cell rather than a print. */
+.photo-print--bleed { --pad: 0px; padding: 0; }
+.photo-print--dark  { background: #17130f; }
+.photo-print--dark .photo-print__no { color: #6d655d; }
+
+/* Masking tape, same clip-path as the site's .tape utility. */
+.tape {
+  position: absolute;
+  width: 190px;
+  height: 52px;
+  background: rgba(240, 235, 210, 0.82);
+  box-shadow: 0 2px 8px rgba(31, 26, 24, 0.28);
+  clip-path: polygon(2% 0%, 98% 4%, 100% 30%, 97% 55%, 100% 80%, 98% 100%,
+                     3% 96%, 0% 70%, 2% 45%, 0% 20%);
+}
+.tape--yellow { background: rgba(253, 241, 0, 0.9); }
+
+/* The VHSMO four-point star, used as the campaign's flash burst. */
+.flash-shape {
+  position: absolute;
+  width: 200px;
+  aspect-ratio: 1;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+.flash-shape--yellow { background-image: url("../assets/brand/star-yellow.png"); }
+.flash-shape--white  { background-image: url("../assets/brand/star-white.png"); }
+.flash-shape--black  { background-image: url("../assets/brand/star-black.png"); }
+
+/* Wordmark — the real VHSMO logo art, recoloured, never re-lettered. */
+.wordmark { display: block; height: auto; }
+
+/* Objects ---------------------------------------------------------- */
+.camera-object {
+  display: block;
+  filter: drop-shadow(0 46px 44px rgba(31, 26, 24, 0.4));
+}
+.camera-object--onDark { filter: drop-shadow(0 46px 54px rgba(0, 0, 0, 0.72)); }
+
+/* Utility ---------------------------------------------------------- */
+.stack > * + * { margin-top: var(--gap, 34px); }
+.rule { height: 3px; background: currentColor; opacity: 0.22; }

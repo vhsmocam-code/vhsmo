@@ -1,0 +1,85 @@
+/* ==================================================================
+   VHSMO — App Store campaign · design tokens
+   ------------------------------------------------------------------
+   Every value here is lifted from the shipping VHSMO website, not
+   invented for this campaign:
+
+     palette      src/app/globals.css  (@theme block)
+     pink / red   src/lib/products.ts  (variantAssets swatch + body)
+     brown wash   src/components/landing/Hero.tsx  (#5A4332)
+     typefaces    src/app/layout.tsx   (Inter Tight stand-in for the
+                  commercial Sequel Sans; Kids Word is the licensed
+                  brand marker face, copied from src/app/fonts)
+
+   The one token with no literal source in the repo is --vhsmo-cream:
+   it is sampled off the VHSMO iOS app's own background, which is a
+   warmer greige than the site's cool --color-halide (#e3e3e1). Cream
+   is the campaign's paper; halide stays available for UI-ish greys.
+   ================================================================== */
+
+@font-face {
+  font-family: "Inter Tight";
+  src: url("../assets/fonts/inter-tight-var.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Kids Word";
+  src: url("../assets/fonts/KidsWord.otf") format("opentype");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: block;
+}
+
+:root {
+  /* ---- brand palette ------------------------------------------- */
+  --vhsmo-black:        #2a2422;   /* darkroom       */
+  --vhsmo-black-deep:   #1f1a18;   /* darkroom-deep  */
+  --vhsmo-yellow:       #fdf100;   /* kodak          */
+  --vhsmo-blue:         #1093ff;   /* bluehour       */
+  --vhsmo-white:        #ffffff;   /* overexpose     */
+  --vhsmo-halide:       #e3e3e1;   /* silver halide  */
+  --vhsmo-pink:         #ffc9d2;   /* baby pink shell */
+  --vhsmo-pink-deep:    #f2a8bd;   /* pink swatch     */
+  --vhsmo-red:          #c02b25;
+  --vhsmo-brown:        #5a4332;   /* hero wash       */
+
+  /* ---- campaign paper ------------------------------------------ */
+  --vhsmo-cream:        #e2d7cd;
+  --vhsmo-cream-light:  #f1e9e1;
+  --vhsmo-cream-deep:   #cdbfb2;
+  --vhsmo-paper:        #fdfbf6;   /* photo-print stock */
+
+  /* ---- type ------------------------------------------------------ */
+  --font-display: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+  --font-body:    "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+  --font-marker:  "Kids Word", "Comic Sans MS", cursive;
+
+  /* ---- artboard geometry ------------------------------------------
+     --board-* is the DESIGN space every composition is drawn in and
+     never changes. --out-* is the EXPORT size; when it differs, the
+     design canvas is scaled by --out-s* to fit. Both presets are within
+     0.15% of the same aspect, so the scale is effectively uniform and
+     nothing in the artwork shifts between them.
+        App Store  6.9" / 6.7"   1290 x 2796   (default)
+        1242 x 2688              Apple's 6.5" size, also the Play upload
+     ------------------------------------------------------------------ */
+  --board-w: 1290px;
+  --board-h: 2796px;
+  --margin:  96px;          /* outer gutter; content measure = 1098px */
+
+  --out-w:  1290px;
+  --out-h:  2796px;
+  --out-sx: 1;
+  --out-sy: 1;
+}
+
+/* 1242 x 2688 — 1242/1290 wide, 2688/2796 tall. */
+[data-size="p1242"] {
+  --out-w:  1242px;
+  --out-h:  2688px;
+  --out-sx: 0.96279070;
+  --out-sy: 0.96137339;
+}

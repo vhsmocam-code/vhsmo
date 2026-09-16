@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VHSMO · App Store campaign — Vol. 1</title>
+<!-- ?v= is a cache key. serve.py already sends no-store, so you only
+     need to bump it if you serve this folder some other way and a CSS
+     or JS edit appears not to take effect. -->
+<link rel="stylesheet" href="css/tokens.css?v=3">
+<link rel="stylesheet" href="css/artboard.css?v=3">
+<link rel="stylesheet" href="css/campaign.css?v=3">
+<link rel="stylesheet" href="css/preview.css?v=3">
+</head>
+<body class="preview" data-mode="contact">
+
+<!-- ================================================================
+     PREVIEW CHROME — development only.
+     Nothing in <header> or <figcaption> is part of the artwork; the
+     exporter screenshots the .artboard elements alone.
+     ================================================================ -->
+<header class="pv-bar">
+  <span class="pv-brand">VHSMO · APP STORE · VOL.&nbsp;1</span>
+  <div class="pv-group" role="group" aria-label="View mode">
+    <button type="button" data-mode-btn="contact" class="is-on">Contact sheet</button>
+    <button type="button" data-mode-btn="single">One at a time</button>
+  </div>
+  <div class="pv-group" role="group" aria-label="Export size">
+    <button type="button" data-size-btn="a1290" class="is-on">1290 × 2796</button>
+    <button type="button" data-size-btn="p1242">1242 × 2688</button>
+  </div>
+  <button type="button" class="pv-dl-all" data-dl-all>⤓ Download all 8</button>
+  <div class="pv-group" role="group" aria-label="Zoom">
+    <button type="button" data-zoom="-">–</button>
+    <output id="pv-zoom">24%</output>
+    <button type="button" data-zoom="+">+</button>
+  </div>
+  <nav class="pv-jump" aria-label="Jump to artwork"></nav>
+</header>
+
+<main class="pv-stage">
+
+<!-- ================================================================
+     01 — HERO                                        cream · pink · yellow
+     Type owns the top third, the camera cuts in from the left edge and
+     the phone bleeds off the bottom, so the frame reads as a crop out of
+     something bigger rather than a slide.
+     ================================================================ -->
+<figure class="pv-slot">
+<figcaption><b>01</b> Hero <span>cream · pink · yellow</span></figcaption>
+<section data-slug="01-hero" class="artboard board-01" aria-label="VHSMO — Point. Shoot. Share.">
+  <div class="artboard__canvas">
+    <div class="ground ground--cream"></div>
+    <div class="bloom b01-bloom"></div>
+
+    <img class="b01-camera camera-object" src="assets/brand/camera-pink.png" alt="">
+
+    <div class="layer b01-type">
+      <p class="eyebrow">VHSMO &nbsp;·&nbsp; VOL. 1</p>
+      <h1 class="headline b01-headline">Point.<br>Shoot.<br>Share.</h1>
+      <p class="supporting b01-sub">Your camera roll,<br>without the phone.</p>
+    </div>
+
+    <span class="flash-shape flash-shape--yellow b01-star" aria-hidden="true"></span>
+
+    <figure class="photo-print b01-print">
+      <img src="assets/photos/twelve.jpg" alt="">
+      <figcaption class="photo-print__no"><span>992</span><span>Shot on VHSMO</span></figcaption>
+    </figure>
+    <p class="brand-label brand-label--solid layer b01-badge">Shot on VHSMO</p>
+
+    <div class="phone phone--lift layer b01-phone">
+      <div class="phone__btn phone__btn--action"></div>
+      <div class="phone__btn phone__btn--volUp"></div>
+      <div class="phone__btn phone__btn--volDn"></div>
+      <div class="phone__btn phone__btn--power"></div>
+      <div class="phone__btn phone__btn--camera"></div>
+      <div class="phone__body">
+        <div class="phone__screen">
+          <img class="phone__shot" src="assets/screens/01-home.png" alt="VHSMO app home screen">
+          <div class="phone__island"></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="brand-label layer b01-frame">Frame 001</p>
+  </div>
+</section>
+</figure>
+
+<!-- ================================================================
+     02 — OFFLOAD                                          black · yellow
+     A yellow transfer beam cuts the black board on a 20° diagonal.
+     Camera sits at its head, the phone at its tail, and the shots
+     ride the beam between them, shrinking as they travel.
+     ================================================================ -->
+<figure class="pv-slot">
+<figcaption><b>02</b> Offload <span>black · yellow</span></figcaption>
+<section data-slug="02-offload" class="artboard artboard--dark board-02" aria-label="From camera to camera roll">
+  <div class="artboard__canvas">
+    <div class="ground ground--dark"></div>
+
+    <div class="b02-beam" aria-hidden="true">
+      <span class="b02-beam__core"></span>
+      <span class="b02-beam__line b02-beam__line--a"></span>
+      <span class="b02-beam__line b02-beam__line--b"></span>
+      <span class="b02-beam__line b02-beam__line--c"></span>
+    </div>
+
+    <div class="layer b02-type">
+      <p class="eyebrow eyebrow--yellow">Wireless &nbsp;·&nbsp; Offline &nbsp;·&nbsp; Seconds</p>
+      <h2 class="headline headline--yellow b02-headline">From<br>camera<br>to camera<br>roll.</h2>
+      <p class="supporting supporting--halide b02-sub">Offload your shots wirelessly in seconds.</p>
+    </div>
+
+    <img class="b02-camera camera-object camera-object--onDark" src="assets/brand/camera-pink.png" alt="">
+
+    <figure class="photo-print b02-fly b02-fly--1"><img src="assets/photos/eleven.jpg" alt=""><figcaption class="photo-print__no"><span>994</span><span>VHSMO</span></figcaption></figure>
+    <figure class="photo-print b02-fly b02-fly--2"><img src="assets/photos/twentyfour.jpg" alt=""><figcaption class="photo-print__no"><span>995</span><span>VHSMO</span></figcaption></figure>
+    <figure class="photo-print b02-fly b02-fly--3"><img src="assets/photos/sixteen.jpg" alt=""><figcaption class="photo-print__no"><span>996</span><span>VHSMO</span></figcaption></figure>
+
+    <p class="note note--yellow b02-note">straight to your roll.</p>
+
+    <div class="phone phone--onDark layer b02-phone">
+      <div class="phone__btn phone__btn--action"></div>
+      <div class="phone__btn phone__btn--volUp"></div>
+      <div class="phone__btn phone__btn--volDn"></div>
+      <div class="phone__btn phone__btn--power"></div>
+      <div class="phone__btn phone__btn--camera"></div>
+      <div class="phone__body">
+        <div class="phone__screen">
+          <img class="phone__shot" src="assets/screens/01-home.png" alt="VHSMO app home screen, Offload media">
+          <div class="phone__island"></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="brand-label layer b02-frame" style="color:var(--vhsmo-yellow)">Frame 002</p>
+  </div>
+</section>
+</figure>
+
+<!-- ================================================================
+     03 — LIVE GALLERY                                   night photography
+     The board is a photograph. Prints tear past the phone at speed,
+     cropped hard by both edges, so the gallery reads as still filling up.
+     ================================================================ -->
+<figure class="pv-slot">
+<figcaption><b>03</b> Live gallery <span>purple · flash · night</span></figcaption>
+<section data-slug="03-live-gallery" class="artboard artboard--dark board-03" aria-label="Watch the memories roll in">
+  <div class="artboard__canvas">
+    <img class="b03-bg" src="assets/photos/twentyfour.jpg" alt="">
+    <div class="b03-veil" aria-hidden="true"></div>
+
+    <div class="layer b03-type">
+      <span class="live-pill">Live</span>
+      <h2 class="headline headline--white b03-headline">Watch the<br>memories<br>roll in.</h2>
+      <p class="supporting supporting--white b03-sub">Shots land here as you shoot.</p>
+    </div>
+
+    <figure class="photo-print b03-fly b03-fly--l1"><img src="assets/photos/twentyfive.jpg" alt=""><figcaption class="photo-print__no"><span>998</span><span>Live</span></figcaption></figure>
+    <figure class="photo-print b03-fly b03-fly--l2"><img src="assets/photos/thirteen.jpg" alt=""><figcaption class="photo-print__no"><span>997</span><span>Live</span></figcaption></figure>
+    <figure class="photo-print b03-fly b03-fly--r1"><img src="assets/photos/eleven.jpg" alt=""><figcaption class="photo-print__no"><span>999</span><span>Live</span></figcaption></figure>
+    <figure class="photo-print b03-fly b03-fly--r2"><img src="assets/photos/seven.jpg" alt=""><figcaption class="photo-print__no"><span>996</span><span>Live</span></figcaption></figure>
+
+    <div class="phone phone--onDark layer b03-phone">
+      <div class="phone__btn phone__btn--action"></div>
+      <div class="phone__btn phone__btn--volUp"></div>
+      <div class="phone__btn phone__btn--volDn"></div>
+      <div class="phone__btn phone__btn--power"></div>
+      <div class="phone__btn phone__btn--camera"></div>
+      <div class="phone__body">
+        <div class="phone__screen">
+          <img class="phone__shot" src="assets/screens/03-live-gallery.png" alt="VHSMO app live gallery">
+          <div class="phone__island"></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="note note--yellow b03-note">now rolling.</p>
+    <p class="brand-label layer b03-frame" style="color:var(--vhsmo-white)">Frame 003</p>
+  </div>
+</section>
+</figure>
+
+<!-- ================================================================
+     04 — REAL MOMENTS                                    cream · collage
+     Photography first. Real prints, real sizes, real rotations — a
+     table of pictures with the phone dropped into the pile.
+     ================================================================ -->
+<figure class="pv-slot">
+<figcaption><b>04</b> Real moments <span>cream · photo collage</span></figcaption>
+<section data-slug="04-real-moments" class="artboard board-04" aria-label="Real moments. No filters.">
+  <div class="artboard__canvas">
+    <div class="ground ground--cream"></div>
+
+    <div class="layer b04-type">
+      <p class="eyebrow eyebrow--muted">Shot on VHSMO &nbsp;·&nbsp; Untouched</p>
+      <h2 class="headline b04-headline">Real<br>moments.<br>No filters.</h2>
+      <p class="supporting supporting--muted b04-sub">Blurry. Flashy. Imperfect. Yours.</p>
+    </div>
+
+    <figure class="photo-print b04-p b04-p--1"><img src="assets/photos/eight.jpg" alt=""><figcaption class="photo-print__no"><span>991</span><span>Flash</span></figcaption></figure>
+    <figure class="photo-print b04-p b04-p--2"><img src="assets/photos/twentysix.jpg" alt=""><figcaption class="photo-print__no"><span>992</span><span>Holi</span></figcaption></figure>
+    <figure class="photo-print b04-p b04-p--3"><img src="assets/photos/nine.jpg" alt=""><figcaption class="photo-print__no"><span>993</span><span>Noon</span></figcaption></figure>
+    <figure class="photo-print b04-p b04-p--4"><img src="assets/photos/twentytwo.jpg" alt=""><figcaption class="photo-print__no"><span>994</span><span>Indoors</span></figcaption></figure>
+    <figure class="photo-print b04-p b04-p--5"><img src="assets/photos/ten.jpg" alt=""><figcaption class="photo-print__no"><span>995</span><span>2:14 AM</span></figcaption></figure>
+    <figure class="photo-print b04-p b04-p--6"><img src="assets/photos/eighteen.jpg" alt=""><figcaption class="photo-print__no"><span>996</span><span>Flash</span></figcaption></figure>
+
+    <span class="tape b04-tape" aria-hidden="true"></span>
+    <p class="note note--black b04-note">no retakes.</p>
+
+    <div class="phone phone--lift layer b04-phone">
+      <div class="phone__btn phone__btn--action"></div>
+      <div class="phone__btn phone__btn--volUp"></div>
+      <div class="phone__btn phone__btn--volDn"></div>
+      <div class="phone__btn phone__btn--power"></div>
+      <div class="phone__btn phone__btn--camera"></div>
+      <div class="phone__body">
+        <div class="phone__screen">
+          <img class="phone__shot" src="assets/screens/04-album-grid.png" alt="VHSMO app album grid">
+          <div class="phone__island"></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="brand-label layer b04-frame">Frame 004</p>
+  </div>
+</section>
+</figure>
+
+<!-- ================================================================
+     05 — MEMORIES                                        cream · pink
+     A pink album page. Contact-sheet cells fill it edge to edge and
+     the phone lands dead centre, square to the grid — the calmest,
+     most ordered board in the run.
+     ================================================================ -->
+<figure class="pv-slot">
+<figcaption><b>05</b> Memories <span>cream · pink · yellow</span></figcaption>
+<section data-slug="05-memories" class="artboard board-05" aria-label="Your moments, in one place.">
+  <div class="artboard__canvas">
+    <div class="ground ground--cream"></div>
+
+    <div class="layer b05-type">
+      <p class="eyebrow eyebrow--muted">Album &nbsp;·&nbsp; Vol. 1</p>
+      <h2 class="headline b05-headline">Your moments,<br>in one place.</h2>
+      <p class="supporting supporting--muted b05-sub">Keep the shots you actually want to remember.</p>
+    </div>
+
+    <div class="b05-page">
+      <span class="b05-tab">Vhsmo-2026-09-10</span>
+        <span class="flash-shape flash-shape--yellow b05-star" aria-hidden="true"></span>
+      <div class="b05-grid">
+        <figure class="photo-print photo-print--bleed"><img src="assets/photos/fourteen.jpg" alt=""></figure>
+        <figure class="photo-print photo-print--bleed"><img src="assets/photos/twelve.jpg" alt=""></figure>
+        <figure class="photo-print photo-print--bleed"><img src="assets/photos/fifteen.jpg" alt=""></figure>
+        <figure class="photo-print photo-print--bleed"><img src="assets/photos/sixteen.jpg" alt=""></figure>
+        <figure class="photo-print photo-print--bleed"><img src="assets/photos/three.jpg" alt=""></figure>
+        <figure class="photo-print photo-print--bleed"><img src="assets/photos/nineteen.jpg" alt=""></figure>
+        <figure class="photo-print photo-print--bleed"><img src="assets/photos/twentyone.jpg" alt=""></figure>
+        <figure class="photo-print photo-print--bleed"><img src="assets/photos/twentysix.jpg" alt=""></figure>
+      </div>
+    </div>
+
+    <div class="phone phone--lift layer b05-phone">
+      <div class="phone__btn phone__btn--action"></div>
+      <div class="phone__btn phone__btn--volUp"></div>
+      <div class="phone__btn phone__btn--volDn"></div>
+      <div class="phone__btn phone__btn--power"></div>
+      <div class="phone__btn phone__btn--camera"></div>
+      <div class="phone__body">
+        <div class="phone__screen">
+          <img class="phone__shot" src="assets/screens/05-gallery-timeline.png" alt="VHSMO app gallery timeline">
+          <div class="phone__island"></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="brand-label layer b05-frame">Frame 005</p>
+  </div>
+</section>
+</figure>
+
+<!-- ================================================================
+     06 — FAVOURITES                                       dark · flash
+     One photograph, given the whole top of the board, falling into
+     black. The quietest composition in the campaign.
+     ================================================================ -->
+<figure class="pv-slot">
+<figcaption><b>06</b> Favourites <span>dark · flash</span></figcaption>
+<section data-slug="06-favourites" class="artboard artboard--dark board-06" aria-label="Pick a favourite. Keep it forever.">
+  <div class="artboard__canvas">
+    <div class="ground ground--dark"></div>
+    <img class="b06-hero" src="assets/photos/twentyfive.jpg" alt="">
+    <div class="b06-fade" aria-hidden="true"></div>
+
+    <div class="layer b06-type">
+      <p class="eyebrow eyebrow--yellow">Favourites</p>
+      <h2 class="headline headline--white b06-headline">Pick a<br>favourite.</h2>
+      <p class="supporting b06-keep">Keep it forever.</p>
+      <p class="supporting supporting--halide b06-sub">Save, favourite and share your favourite frames.</p>
+    </div>
+
+    <div class="phone phone--onDark layer b06-phone">
+      <div class="phone__btn phone__btn--action"></div>
+      <div class="phone__btn phone__btn--volUp"></div>
+      <div class="phone__btn phone__btn--volDn"></div>
+      <div class="phone__btn phone__btn--power"></div>
+      <div class="phone__btn phone__btn--camera"></div>
+      <div class="phone__body">
+        <div class="phone__screen">
+          <img class="phone__shot" src="assets/screens/06-photo-detail.png" alt="VHSMO app photo detail">
+          <div class="phone__island"></div>
+        </div>
+      </div>
+    </div>
+
+    <span class="flash-shape flash-shape--yellow b06-star" aria-hidden="true"></span>
+    <p class="note note--yellow b06-note">keep this one.</p>
+    <p class="brand-label layer b06-frame" style="color:var(--vhsmo-halide)">Frame 006</p>
+  </div>
+</section>
+</figure>
+
+<!-- ================================================================
+     07 — PHILOSOPHY                                      yellow · black
+     The brand statement. Type at poster scale fills the top half of
+     the board; everything else defers to it.
+     ================================================================ -->
+<figure class="pv-slot">
+<figcaption><b>07</b> Philosophy <span>kodak yellow · black</span></figcaption>
+<section data-slug="07-philosophy" class="artboard board-07" aria-label="Don't check. Just shoot.">
+  <div class="artboard__canvas">
+    <div class="ground ground--yellow"></div>
+
+    <div class="layer b07-type">
+      <p class="eyebrow">A screen-free camera</p>
+      <h2 class="headline headline--tight b07-headline">Don't<br>check.<br>Just<br>shoot.</h2>
+    </div>
+
+    <p class="supporting b07-sub">VHSMO keeps you in the moment.</p>
+    <p class="note note--black b07-note">no screen.<br>on purpose.</p>
+
+    <figure class="photo-print b07-print">
+      <img src="assets/photos/eight.jpg" alt="">
+      <figcaption class="photo-print__no"><span>991</span><span>Shot on VHSMO</span></figcaption>
+    </figure>
+    <span class="tape b07-tape" aria-hidden="true"></span>
+
+    <div class="phone phone--lift layer b07-phone">
+      <div class="phone__btn phone__btn--action"></div>
+      <div class="phone__btn phone__btn--volUp"></div>
+      <div class="phone__btn phone__btn--volDn"></div>
+      <div class="phone__btn phone__btn--power"></div>
+      <div class="phone__btn phone__btn--camera"></div>
+      <div class="phone__body">
+        <div class="phone__screen">
+          <img class="phone__shot" src="assets/screens/06-photo-detail.png" alt="A VHSMO photograph in the app">
+          <div class="phone__island"></div>
+        </div>
+      </div>
+    </div>
+
+    <span class="flash-shape flash-shape--black b07-star" aria-hidden="true"></span>
+    <p class="brand-label layer b07-frame">Frame 007</p>
+  </div>
+</section>
+</figure>
+
+<!-- ================================================================
+     08 — CLOSING                                    cream · pink · black
+     The end card. Symmetrical, unhurried, one object in the middle
+     of the frame — the only board in the run that is centred.
+     ================================================================ -->
+<figure class="pv-slot">
+<figcaption><b>08</b> Closing <span>cream · pink · black</span></figcaption>
+<section data-slug="08-closing" class="artboard board-08" aria-label="VHSMO — Point. Shoot. Share.">
+  <div class="artboard__canvas">
+    <div class="ground ground--cream"></div>
+    <div class="bloom b08-bloom"></div>
+
+    <div class="layer b08-type">
+      <img class="wordmark b08-wordmark" src="assets/brand/wordmark-black.png" alt="VHSMO" width="2258" height="589">
+      <h2 class="headline b08-headline">Point.<br>Shoot.<br>Share.</h2>
+    </div>
+
+    <img class="b08-camera camera-object" src="assets/brand/camera-pink.png" alt="">
+
+    <div class="phone phone--lift layer b08-phone">
+      <div class="phone__btn phone__btn--action"></div>
+      <div class="phone__btn phone__btn--volUp"></div>
+      <div class="phone__btn phone__btn--volDn"></div>
+      <div class="phone__btn phone__btn--power"></div>
+      <div class="phone__btn phone__btn--camera"></div>
+      <div class="phone__body">
+        <div class="phone__screen">
+          <img class="phone__shot" src="assets/screens/01-home.png" alt="VHSMO app home screen">
+          <div class="phone__island"></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="supporting b08-sub">Make memories.<br>Not perfect pictures.</p>
+    <p class="brand-label layer b08-frame">VHSMO &nbsp;·&nbsp; Vol. 1 &nbsp;·&nbsp; Frame 008</p>
+  </div>
+</section>
+</figure>
+
+</main>
+<script src="preview.js?v=3"></script>
+</body>
+</html>

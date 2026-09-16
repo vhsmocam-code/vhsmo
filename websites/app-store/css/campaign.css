@@ -1,0 +1,303 @@
+/* ==================================================================
+   VHSMO — App Store campaign · the eight compositions
+   ------------------------------------------------------------------
+   One artboard per block. Coordinates are absolute in 1290 × 2796
+   artboard space; the 96px gutter (--margin) is the only shared grid.
+
+   Two rules hold the run together:
+
+   1. Colour rhythm — no two neighbours share a ground:
+        01 cream/pink   02 black/yellow   03 night photo  04 cream collage
+        05 cream/pink   06 dark/flash     07 kodak yellow 08 cream/clean
+
+   2. Phone scale — the device is the product shot, so it is never
+      cropped below ~88% of its body. Five boards show it whole; the
+      three collage boards (02, 04, 07) let it run off the bottom edge
+      by a tenth at most, which reads as a crop rather than a mistake.
+   ================================================================== */
+
+/* ==================================================================
+   01 — HERO
+   Type owns the top third. Down the left edge: a print, the tagline
+   badge, then the camera itself — whole, not cropped, because this is
+   the one board where the object has to be recognisable at a glance.
+   ================================================================== */
+.b01-bloom {
+  width: 1560px; height: 1300px;
+  left: -400px; top: 1420px;
+  background: var(--vhsmo-pink);
+  opacity: 0.88;
+}
+.b01-type { left: var(--margin); top: 148px; z-index: 30; }
+.b01-headline { margin-top: 44px; font-size: 268px; }
+.b01-sub { margin-top: 54px; font-size: 52px; max-width: 620px; }
+
+.b01-star { width: 176px; right: 104px; top: 132px; transform: rotate(-13deg); z-index: 30; }
+
+.b01-print {
+  position: absolute; z-index: 22;
+  left: 26px; top: 1122px; width: 430px;
+  transform: rotate(-6.5deg);
+}
+.b01-print > img { aspect-ratio: 4 / 3; }
+
+.b01-badge { left: var(--margin); top: 1664px; z-index: 32; transform: rotate(-2deg); }
+.b01-camera { position: absolute; z-index: 24; width: 632px; left: 44px; top: 1988px; transform: rotate(-9deg); }
+
+.b01-phone { --pw: 764px; right: 34px; top: 1082px; transform: rotate(3.5deg); z-index: 28; }
+.b01-frame { position: absolute; left: var(--margin); bottom: 62px; z-index: 40; }
+
+/* ==================================================================
+   02 — OFFLOAD
+   Camera at the head of a yellow transfer beam, phone at its tail,
+   the shots riding it and shrinking as they travel. The beam is a
+   hard-edged band with chevrons, not a soft glow — it has to read as
+   direction, not decoration.
+   ================================================================== */
+.b02-beam {
+  position: absolute; z-index: 6;
+  left: 26%; top: 1968px;
+  width: 2400px; height: 760px;
+  transform: translate(-50%, -50%) rotate(31deg);
+}
+.b02-beam__core {
+  position: absolute; left: 0; top: 50%; width: 100%; height: 296px;
+  transform: translateY(-50%);
+  background:
+    repeating-linear-gradient(115deg,
+      rgba(31, 26, 24, 0.16) 0 12px, rgba(31, 26, 24, 0) 12px 96px),
+    linear-gradient(90deg,
+      rgba(253, 241, 0, 0) 0%,
+      rgba(253, 241, 0, 1) 20%,
+      var(--vhsmo-yellow) 44%,
+      var(--vhsmo-yellow) 72%,
+      rgba(253, 241, 0, 0) 97%);
+}
+.b02-beam__line {
+  position: absolute; left: 6%; width: 88%; height: 8px;
+  background: linear-gradient(90deg, rgba(253,241,0,0) 0%, var(--vhsmo-yellow) 28%, var(--vhsmo-yellow) 70%, rgba(253,241,0,0) 100%);
+}
+.b02-beam__line--a { top: calc(50% - 216px); opacity: 0.95; }
+.b02-beam__line--b { top: calc(50% - 178px); opacity: 0.4; left: 18%; width: 62%; }
+.b02-beam__line--c { top: calc(50% + 208px); opacity: 0.75; left: 12%; width: 74%; }
+
+.b02-type { left: var(--margin); top: 142px; z-index: 30; }
+.b02-headline { margin-top: 46px; font-size: 198px; }
+.b02-sub { margin-top: 54px; font-size: 46px; max-width: 660px; }
+
+.b02-camera { position: absolute; z-index: 20; width: 486px; left: 46px; top: 1128px; transform: rotate(-12deg); }
+
+.b02-fly { position: absolute; }
+.b02-fly > img { aspect-ratio: 4 / 3; }
+.b02-fly--1 { z-index: 18; left: 104px; top: 1554px; width: 302px; transform: rotate(29deg); }
+.b02-fly--2 { z-index: 18; left: 236px; top: 1890px; width: 254px; transform: rotate(31deg); }
+.b02-fly--3 { z-index: 30; left: 352px; top: 2196px; width: 210px; transform: rotate(33deg); }
+
+.b02-note { position: absolute; z-index: 34; left: 88px; top: 2536px; transform: rotate(-4deg); font-size: 64px; }
+.b02-phone { --pw: 706px; right: 20px; top: 1462px; transform: rotate(-6deg); z-index: 26; }
+.b02-frame { left: var(--margin); top: 2686px; z-index: 40; }
+
+/* ==================================================================
+   03 — LIVE GALLERY
+   The board is a photograph. Prints tear past the phone at speed,
+   cropped hard by both edges, so the gallery reads as still filling up.
+   ================================================================== */
+.b03-bg {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: 52% 42%;
+  transform: scale(1.08);
+}
+.b03-veil {
+  position: absolute; inset: 0; z-index: 1;
+  background:
+    linear-gradient(180deg,
+      rgba(14, 6, 26, 0.82) 0%,
+      rgba(14, 6, 26, 0.42) 26%,
+      rgba(10, 4, 20, 0.24) 48%,
+      rgba(8, 3, 17, 0.72) 80%,
+      rgba(6, 3, 14, 0.96) 100%),
+    radial-gradient(78% 40% at 50% 44%, rgba(150, 40, 220, 0.26), transparent 72%);
+}
+
+.b03-type { left: var(--margin); top: 150px; z-index: 30; }
+.b03-headline { margin-top: 48px; font-size: 200px; text-shadow: 0 22px 54px rgba(0,0,0,0.55); }
+.b03-sub { margin-top: 48px; font-size: 50px; text-shadow: 0 10px 30px rgba(0,0,0,0.6); }
+
+.b03-fly { position: absolute; }
+.b03-fly > img { aspect-ratio: 4 / 3; }
+.b03-fly--l1 { z-index: 14; left: -142px; top: 1088px; width: 384px; transform: rotate(-11deg); }
+.b03-fly--l2 { z-index: 34; left: -58px;  top: 1846px; width: 356px; transform: rotate(8.5deg); }
+.b03-fly--r1 { z-index: 14; right: -152px; top: 1178px; width: 404px; transform: rotate(12deg); }
+.b03-fly--r2 { z-index: 34; right: -96px;  top: 1968px; width: 344px; transform: rotate(-8deg); }
+
+.b03-phone { --pw: 772px; left: 259px; top: 1006px; transform: rotate(-2.5deg); z-index: 24; }
+.b03-note { position: absolute; z-index: 40; left: 106px; top: 2668px; transform: rotate(-6deg); font-size: 78px; }
+.b03-frame { position: absolute; right: 96px; bottom: 62px; z-index: 40; opacity: 0.8; }
+
+/* ==================================================================
+   04 — REAL MOMENTS
+   Photography first: real prints at real sizes, cascading down the
+   left of the board with the phone dropped into the pile at the right.
+   ================================================================== */
+.b04-type { left: var(--margin); top: 146px; z-index: 30; }
+.b04-headline { margin-top: 44px; font-size: 202px; }
+.b04-sub { margin-top: 46px; font-size: 46px; }
+
+.b04-p { position: absolute; }
+.b04-p > img { aspect-ratio: 4 / 3; }
+.b04-p--1 { z-index: 16; left: 18px;  top: 856px;  width: 496px; transform: rotate(-6deg); }
+.b04-p--2 { z-index: 15; left: 552px; top: 892px;  width: 466px; transform: rotate(7deg); }
+.b04-p--3 { z-index: 18; left: 54px;  top: 1432px; width: 476px; transform: rotate(4.5deg); }
+.b04-p--4 { z-index: 12; left: 528px; top: 1420px; width: 318px; transform: rotate(-11deg); }
+.b04-p--5 { z-index: 17; left: 26px;  top: 2016px; width: 498px; transform: rotate(-5deg); }
+.b04-p--6 { z-index: 30; left: 452px; top: 2352px; width: 384px; transform: rotate(9deg); }
+
+.b04-tape { left: 168px; top: 818px; transform: rotate(-9deg); z-index: 24; }
+.b04-note { position: absolute; z-index: 34; left: 96px; top: 2596px; transform: rotate(-4deg); }
+.b04-phone { --pw: 676px; right: -36px; top: 1486px; transform: rotate(7deg); z-index: 22; }
+.b04-frame { left: var(--margin); top: 2726px; z-index: 40; }
+
+/* ==================================================================
+   05 — MEMORIES
+   A pink album page. The contact sheet runs edge to edge behind the
+   phone, which lands dead centre and square — the most ordered board
+   in the run, and the counterweight to 04's pile.
+   ================================================================== */
+.b05-type { left: var(--margin); top: 138px; z-index: 30; }
+.b05-headline { margin-top: 42px; font-size: 152px; }
+.b05-sub { margin-top: 44px; font-size: 46px; max-width: 820px; }
+
+.b05-page {
+  position: absolute; z-index: 10;
+  left: 48px; right: 48px; top: 700px; bottom: -80px;
+  background: var(--vhsmo-pink);
+  border-radius: 68px;
+  box-shadow: 0 40px 70px -46px rgba(31, 26, 24, 0.55);
+  overflow: hidden;
+}
+.b05-tab {
+  position: absolute; z-index: 3; left: 46px; top: 40px;
+  background: var(--vhsmo-yellow);
+  color: var(--vhsmo-black);
+  border-radius: 999px;
+  padding: 15px 32px 13px;
+  font-size: 24px; font-weight: 800;
+  letter-spacing: 0.2em; text-transform: uppercase;
+}
+.b05-star { width: 132px; right: 44px; top: 30px; transform: rotate(16deg); z-index: 4; }
+
+.b05-grid {
+  position: absolute; left: 44px; right: 44px; top: 136px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 26px;
+}
+.b05-grid .photo-print {
+  aspect-ratio: 4 / 3;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 10px 18px -12px rgba(31, 26, 24, 0.5);
+}
+
+/* An extra pool of shadow so the device separates cleanly from the
+   sheet it is lying on, instead of merging into it. */
+.b05-phone {
+  --pw: 712px; left: 289px; top: 1204px; z-index: 26;
+  filter: drop-shadow(0 52px 46px rgba(31, 26, 24, 0.34));
+}
+.b05-frame { left: var(--margin); top: 2732px; z-index: 40; opacity: 0.55; }
+
+/* ==================================================================
+   06 — FAVOURITES
+   One photograph given the whole top of the board, falling into black.
+   The quietest composition in the campaign — nothing rotated, nothing
+   flying, one device standing straight.
+   ================================================================== */
+.b06-hero {
+  position: absolute; z-index: 1;
+  left: 0; top: 0; width: 1290px; height: 1520px;
+  object-fit: cover; object-position: 50% 38%;
+}
+.b06-fade {
+  position: absolute; z-index: 2; left: 0; top: 0; width: 100%; height: 1720px;
+  background: linear-gradient(180deg,
+    rgba(31, 26, 24, 0.74) 0%,
+    rgba(31, 26, 24, 0.5) 18%,
+    rgba(31, 26, 24, 0.12) 34%,
+    rgba(31, 26, 24, 0.6) 56%,
+    rgba(31, 26, 24, 0.95) 82%,
+    var(--vhsmo-black-deep) 100%);
+}
+
+.b06-type { left: var(--margin); top: 176px; z-index: 30; }
+.b06-headline { margin-top: 44px; font-size: 202px; text-shadow: 0 20px 48px rgba(0,0,0,0.55); }
+.b06-keep {
+  margin-top: 40px;
+  font-size: 78px; font-weight: 800; letter-spacing: -0.03em;
+  color: var(--vhsmo-yellow);
+  text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+.b06-sub { margin-top: 34px; font-size: 42px; max-width: 760px; }
+
+.b06-phone { --pw: 724px; left: 283px; top: 1064px; z-index: 24; }
+.b06-star { width: 124px; right: 214px; top: 1006px; transform: rotate(14deg); z-index: 30; }
+.b06-note { position: absolute; z-index: 34; left: 92px; top: 2640px; transform: rotate(-6deg); }
+.b06-frame { position: absolute; right: 96px; bottom: 62px; z-index: 40; opacity: 0.7; }
+
+/* ==================================================================
+   07 — PHILOSOPHY
+   The brand statement. Type at poster scale takes the top 46% and
+   everything else defers to it: one taped print, one marker aside,
+   one brand coin, one phone rising out of the bottom-right corner.
+   ================================================================== */
+.b07-type { left: var(--margin); top: 188px; z-index: 30; }
+.b07-headline { margin-top: 46px; font-size: 306px; }
+
+.b07-sub { position: absolute; z-index: 30; left: var(--margin); top: 1372px; font-size: 50px; font-weight: 600; }
+
+.b07-print { position: absolute; z-index: 20; left: 40px; top: 1566px; width: 470px; transform: rotate(-7deg); }
+.b07-print > img { aspect-ratio: 4 / 3; }
+.b07-tape { left: 176px; top: 1524px; transform: rotate(-10deg); z-index: 26; }
+
+.b07-note { position: absolute; z-index: 30; left: 108px; top: 2106px; transform: rotate(-3.5deg); line-height: 0.9; }
+.b07-star { width: 178px; left: var(--margin); top: 2404px; transform: rotate(-9deg); z-index: 24; }
+.b07-phone { --pw: 712px; right: -12px; top: 1466px; transform: rotate(8deg); z-index: 22; }
+.b07-frame { left: var(--margin); top: 2686px; z-index: 40; }
+
+/* ==================================================================
+   08 — CLOSING
+   The end card, and the only centred board in the run. One object in
+   the middle of the frame, the camera resting against it, air above
+   and below. Nothing is cropped here.
+   ================================================================== */
+.b08-bloom {
+  width: 1180px; height: 1180px;
+  left: 55px; top: 1360px;
+  background: var(--vhsmo-pink);
+  opacity: 0.78;
+}
+.b08-type {
+  left: 0; right: 0; top: 186px;
+  z-index: 30;
+  display: flex; flex-direction: column; align-items: center;
+}
+.b08-wordmark { width: 616px; }
+.b08-headline { margin-top: 54px; font-size: 236px; text-align: center; }
+
+.b08-sub {
+  position: absolute; z-index: 30;
+  left: 0; right: 0; top: 2586px;
+  max-width: none;
+  text-align: center;
+  font-size: 50px; font-weight: 600;
+  color: color-mix(in srgb, var(--vhsmo-black) 84%, transparent);
+}
+
+.b08-phone { --pw: 700px; left: 295px; top: 1050px; z-index: 24; }
+.b08-camera { position: absolute; z-index: 28; width: 440px; left: 26px; top: 2160px; transform: rotate(-13deg); }
+.b08-frame {
+  position: absolute; z-index: 40;
+  left: 0; right: 0; bottom: 40px;
+  text-align: center;
+}

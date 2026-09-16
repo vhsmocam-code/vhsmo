@@ -1,0 +1,118 @@
+/* ==================================================================
+   PREVIEW CHROME — development only.
+   Never touches .artboard internals, so what you see scaled here is
+   pixel-for-pixel what export.mjs writes out at 1290 × 2796.
+   ================================================================== */
+
+html { background: #141414; }
+body.preview {
+  --scale: 0.24;
+  margin: 0;
+  /* padding-top is re-measured from the bar by preview.js */
+  padding: 128px 40px 120px;
+  background: #141414;
+  color: #cfcac4;
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+/* --- bar ---------------------------------------------------------- */
+.pv-bar {
+  position: fixed; inset: 0 0 auto 0; z-index: 500;
+  display: flex; align-items: center; gap: 10px 18px; flex-wrap: wrap;
+  padding: 12px 20px;
+  background: rgba(12, 12, 12, 0.92);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid #262626;
+  font-size: 13px;
+}
+.pv-brand { font-weight: 800; letter-spacing: 0.22em; color: var(--vhsmo-yellow); }
+.pv-group { display: flex; align-items: center; gap: 6px; }
+.pv-group button, .pv-jump a {
+  appearance: none; cursor: pointer;
+  border: 1px solid #333; background: #1c1c1c; color: #cfcac4;
+  border-radius: 999px; padding: 7px 15px;
+  font: inherit; font-weight: 600; letter-spacing: 0.04em;
+  text-decoration: none;
+}
+.pv-group button:hover, .pv-jump a:hover { background: #272727; color: #fff; }
+.pv-group button.is-on { background: var(--vhsmo-yellow); border-color: var(--vhsmo-yellow); color: #111; }
+#pv-zoom { min-width: 52px; text-align: center; font-variant-numeric: tabular-nums; }
+.pv-jump { display: flex; gap: 5px; margin-left: auto; flex-wrap: wrap; }
+.pv-jump a { padding: 7px 12px; font-variant-numeric: tabular-nums; }
+.pv-jump a.is-on { border-color: var(--vhsmo-yellow); color: var(--vhsmo-yellow); }
+
+/* --- stage -------------------------------------------------------- */
+.pv-stage {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: 72px 56px;
+}
+.pv-slot { margin: 0; }
+.pv-slot figcaption {
+  display: flex; align-items: baseline; gap: 10px;
+  padding-bottom: 14px;
+  font-size: 13px; font-weight: 600; letter-spacing: 0.06em; color: #8f8983;
+}
+.pv-slot figcaption b { color: var(--vhsmo-yellow); font-weight: 800; }
+.pv-slot figcaption span { margin-left: auto; font-weight: 500; color: #6b6560; letter-spacing: 0.12em; text-transform: uppercase; font-size: 11px; }
+
+/* The slot reserves the scaled footprint; the artboard itself stays
+   1290 × 2796 and is only transformed. */
+.pv-slot .artboard {
+  transform: scale(var(--scale));
+  transform-origin: top left;
+  box-shadow: 0 30px 70px -30px rgba(0, 0, 0, 0.9);
+}
+.pv-frame {
+  width: calc(var(--out-w) * var(--scale));
+  height: calc(var(--out-h) * var(--scale));
+  overflow: hidden;
+}
+
+/* --- one at a time ------------------------------------------------ */
+body.preview[data-mode="single"] { --scale: 0.46; }
+body.preview[data-mode="single"] .pv-stage { display: block; }
+body.preview[data-mode="single"] .pv-slot { display: none; }
+body.preview[data-mode="single"] .pv-slot.is-current { display: block; margin: 0 auto; width: max-content; }
+
+/* --- print / export safety ---------------------------------------- */
+@media print { .pv-bar, .pv-slot figcaption { display: none !important; } }
+
+/* --- export mode: the artboard, alone, at 1:1 ---------------------- */
+html:has(body.export), body.export { margin: 0; padding: 0; background: #000; overflow: hidden; }
+body.export .pv-stage, body.export .pv-slot { display: block; margin: 0; padding: 0; }
+body.export .artboard { transform: none; box-shadow: none; }
+
+/* --- download affordances ----------------------------------------- */
+.pv-dl-all {
+  appearance: none; cursor: pointer;
+  border: 1px solid var(--vhsmo-yellow);
+  background: var(--vhsmo-yellow); color: #111;
+  border-radius: 999px; padding: 7px 16px;
+  font: inherit; font-weight: 700; letter-spacing: 0.04em;
+}
+.pv-dl-all:hover { filter: brightness(1.08); }
+.pv-dl-all[data-busy] { opacity: 0.55; pointer-events: none; }
+
+.pv-dl {
+  margin-left: 10px;
+  border: 1px solid #3a3a3a; border-radius: 999px;
+  padding: 3px 11px 4px;
+  color: #cfcac4; text-decoration: none;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+}
+.pv-dl:hover { background: var(--vhsmo-yellow); border-color: var(--vhsmo-yellow); color: #111; }
+
+/* Shown only when the PNG for the current size has not been rendered. */
+.pv-hint {
+  position: fixed; z-index: 600; left: 50%; bottom: 26px;
+  transform: translateX(-50%);
+  max-width: 660px;
+  background: #1c1c1c; border: 1px solid #3a3a3a; border-left: 3px solid var(--vhsmo-yellow);
+  border-radius: 10px; padding: 13px 18px;
+  font-size: 13px; line-height: 1.5; color: #cfcac4;
+}
+.pv-hint code { color: var(--vhsmo-yellow); font-family: ui-monospace, monospace; }
+.pv-hint button {
+  appearance: none; cursor: pointer; margin-left: 12px;
+  border: 0; background: none; color: #8f8983; font: inherit;
+}
