@@ -18,6 +18,20 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion"],
   },
+  // Marketing links shared as /src=<source> (e.g. Instagram DMs) are malformed:
+  // the browser treats `src=...` as a path segment, which 404s. Rewrite it into
+  // a real `?src=` query param so analytics can read it. The `#reserve` fragment
+  // is reapplied by the browser across the redirect, so the page still scrolls
+  // to the reserve section.
+  async redirects() {
+    return [
+      {
+        source: "/src=:source",
+        destination: "/?src=:source",
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
