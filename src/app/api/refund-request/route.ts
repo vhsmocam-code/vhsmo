@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { REFUND_REQUESTS_OPEN } from "@/lib/refund-status";
 import {
   NOTES_MAX,
   REFUND_FIELDS,
@@ -25,6 +26,16 @@ import {
  * into a friendly "already received" rather than a duplicate row.
  */
 export async function POST(req: Request) {
+  if (!REFUND_REQUESTS_OPEN) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Refund requests are now closed.",
+      },
+      { status: 410 },
+    );
+  }
+
   try {
     const body = await req.json();
 
