@@ -10,7 +10,7 @@ import {
 /**
  * /refund-request form - the on-site replacement for the Google Form sent to
  * pre-order customers during the shipping delay. Rows land in the Supabase
- * `refund_requests` table.
+ * `final_refunds` table.
  *
  * Validation runs off the same `lib/refund-validation` rules the form uses, so
  * the two can't drift and a crafted POST can't bypass the client checks. A
@@ -71,7 +71,7 @@ export async function POST(req: Request) {
       .eq("razorpay_order_id", cleanOrderId)
       .maybeSingle();
 
-    const { error } = await supabase.from("refund_requests_phase_2").insert({
+    const { error } = await supabase.from("final_refunds").insert({
       order_id: cleanOrderId,
       name: cleanName,
       email: cleanEmail,

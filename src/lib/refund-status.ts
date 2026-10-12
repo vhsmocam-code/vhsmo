@@ -1,2 +1,2 @@
-/** New pre-order refund requests are no longer being accepted. */
-export const REFUND_REQUESTS_OPEN = false;
+/** Customers can submit pre-order refund requests through the public form. */
+export const REFUND_REQUESTS_OPEN = true;

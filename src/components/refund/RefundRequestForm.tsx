@@ -69,7 +69,7 @@ function FieldError({ id, message }: { id: string; message: string }) {
  *
  * A refund is final, so the submit button is gated on an explicit
  * acknowledgement checkbox. Posts to /api/refund-request, which soft-matches
- * the order ID against `orders` and stores the row in `refund_requests`.
+ * the order ID against `orders` and stores the row in `final_refunds`.
  */
 export function RefundRequestForm() {
   const [values, setValues] = useState(EMPTY);
