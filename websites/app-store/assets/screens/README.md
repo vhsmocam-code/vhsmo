@@ -1,12 +1,14 @@
 # App screenshots
 
-These five files are the **real VHSMO iOS captures** and they are the
-source of truth for every phone in the campaign. Nothing in the artwork
-redraws the app UI — the screenshots are dropped into the mockup as-is.
+These files are the source of truth for the phone UI in the campaign.
+The original VHSMO iOS captures are used as-is except for the board 02
+variant, where only the product image is updated to Cosmic Black.
 
 | File                      | Screen                                                       | Source (`../appScreenshots/`)            |
 | ------------------------- | ------------------------------------------------------------ | ---------------------------------------- |
 | `01-home.png`             | VHSMO **Vol. 1** home — pink camera, *System Ready / Offload media*, Recent transfers | `…11.09.02.jpeg`      |
+| `01-home-cosmic-black.png` | `01-home` with only the product image replaced by Cosmic Black | Derived from `01-home.png` |
+| `01-home-cherry-red.png` | `01-home` with only the product image replaced by Cherry Red | Derived from `01-home.png` |
 | `03-live-gallery.png`     | **LIVE Gallery** — *"now rolling. shots land here as you shoot"* | `…11.09.03.jpeg`                       |
 | `04-album-grid.png`       | **Album** `Vhsmo-2026-09-…` — the 991–998 grid                | `…11.09.02 (1).jpeg`                     |
 | `05-gallery-timeline.png` | **GALLERY / VHSMO** — Featured collection "Fav" + Offload timeline | `…11.09.02 (2).jpeg`                 |
@@ -14,7 +16,7 @@ redraws the app UI — the screenshots are dropped into the mockup as-is.
 
 Which artboard uses which:
 
-* 01 Hero, 02 Offload, 08 Closing → `01-home`
+* 01 Hero → `01-home-cherry-red`; 02 Offload → `01-home-cosmic-black`; 08 Closing → `01-home`
 * 03 Live gallery → `03-live-gallery`
 * 04 Real moments → `04-album-grid`
 * 05 Memories → `05-gallery-timeline`

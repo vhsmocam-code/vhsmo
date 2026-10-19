@@ -7,8 +7,8 @@
    Two rules hold the run together:
 
    1. Colour rhythm — no two neighbours share a ground:
-        01 cream/pink   02 black/yellow   03 night photo  04 cream collage
-        05 cream/pink   06 dark/flash     07 kodak yellow 08 cream/clean
+        01 cream/hero pink   02 black/hero pink    03 night photo  04 cream collage
+        05 cream/pink        06 dark/flash         07 kodak yellow 08 cream/cosmic black
 
    2. Phone scale — the device is the product shot, so it is never
       cropped below ~88% of its body. Five boards show it whole; the
@@ -42,7 +42,7 @@
 .b01-print > img { aspect-ratio: 4 / 3; }
 
 .b01-badge { left: var(--margin); top: 1664px; z-index: 32; transform: rotate(-2deg); }
-.b01-camera { position: absolute; z-index: 24; width: 632px; left: 44px; top: 1988px; transform: rotate(-9deg); }
+.b01-camera { position: absolute; z-index: 24; width: 718px; left: -2px; top: 1938px; transform: rotate(-9deg); }
 
 .b01-phone { --pw: 764px; right: 34px; top: 1082px; transform: rotate(3.5deg); z-index: 28; }
 .b01-frame { position: absolute; left: var(--margin); bottom: 62px; z-index: 40; }
@@ -85,7 +85,7 @@
 .b02-headline { margin-top: 46px; font-size: 198px; }
 .b02-sub { margin-top: 54px; font-size: 46px; max-width: 660px; }
 
-.b02-camera { position: absolute; z-index: 20; width: 486px; left: 46px; top: 1128px; transform: rotate(-12deg); }
+.b02-camera { position: absolute; z-index: 20; width: 560px; left: 4px; top: 1092px; transform: rotate(-12deg); }
 
 .b02-fly { position: absolute; }
 .b02-fly > img { aspect-ratio: 4 / 3; }
@@ -274,8 +274,8 @@
 .b08-bloom {
   width: 1180px; height: 1180px;
   left: 55px; top: 1360px;
-  background: var(--vhsmo-pink);
-  opacity: 0.78;
+  background: #75646a;
+  opacity: 0.55;
 }
 .b08-type {
   left: 0; right: 0; top: 186px;

@@ -126,7 +126,7 @@ websites/app-store/
 | Pink          | `src/lib/products.ts` — the Baby Pink shell, `#ffc9d2` / `#f2a8bd`     |
 | Typefaces     | `src/app/layout.tsx` — Inter Tight (the site's own stand-in for the commercial Sequel Sans) and the licensed **Kids Word** marker, copied from `src/app/fonts` |
 | Wordmark, star| `/public/yellowLogoTrim.png`, `/public/yellowLogoIcon.png`, recoloured — never re-lettered |
-| Camera        | `/public/camera.webp`, already cut out                                |
+| Cameras       | Hero Pink, Cherry Red, and Cosmic Black product imagery in `assets/brand/` |
 | Photography   | `/public/vhsmoclicks/*` — the real shots, resized only                |
 | Voice         | `src/lib/landing.ts` — "Point. Shoot. Share.", *cameras got smarter, photos got emptier* |
 | App UI        | the five real screenshots. No screen is redrawn anywhere.             |
@@ -141,14 +141,14 @@ cool `--color-halide`.
 
 | #  | Ground                | Headline                        | Screen used         |
 | -- | --------------------- | ------------------------------- | ------------------- |
-| 01 | cream · pink · yellow | Point. Shoot. Share.            | Home / Vol. 1       |
-| 02 | black · yellow        | From camera to camera roll.     | Home / Offload      |
+| 01 | cream · hero pink · yellow | Point. Shoot. Share.       | Home / Vol. 1       |
+| 02 | black · hero pink · yellow | From camera to camera roll. | Home / Offload      |
 | 03 | night photograph      | Watch the memories roll in.     | Live gallery        |
 | 04 | cream · collage       | Real moments. No filters.       | Album grid          |
 | 05 | cream · pink          | Your moments, in one place.     | Gallery timeline    |
 | 06 | dark · flash          | Pick a favourite.               | Photo detail        |
 | 07 | kodak yellow          | Don't check. Just shoot.        | Photo detail        |
-| 08 | cream · pink · black  | Point. Shoot. Share.            | Home / Vol. 1       |
+| 08 | cream · cosmic black  | Point. Shoot. Share.            | Home / Vol. 1       |
 
 Two rules hold the run together. **Colour** — no two neighbours share a
 ground, so scrolling the eight is a sequence rather than a stack.
