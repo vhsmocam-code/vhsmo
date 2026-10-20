@@ -26,7 +26,7 @@ The preview page has a dev-only control bar:
 | --------------------------- | ------------------------------------------------------- |
 | **Contact sheet**           | all eight artboards side by side (default, 24%)          |
 | **One at a time**           | a single artboard at 46%; `←` / `→` to move between them |
-| **1290 × 2796 / 1242 × 2688** | switch output size — the artboards resize live          |
+| **1179 × 2556 / 1206 × 2622** | switch to either current App Store iPhone size          |
 | **⤓ Download all 8**        | downloads all eight PNGs at the selected size            |
 | **⤓ PNG** (per artboard)    | downloads just that one at the selected size             |
 | **– / +**                   | zoom, 12% → 100%                                         |
@@ -56,13 +56,15 @@ Writes both sizes, sixteen PNGs, driving the copy of Chrome already
 installed on the machine — nothing to `npm install`:
 
 ```
-export/appstore-1290x2796/vhsmo-01-hero.png …   1290 × 2796
+export/appstore-1179x2556/vhsmo-01-hero.png …   1179 × 2556
+export/appstore-1206x2622/vhsmo-01-hero.png …   1206 × 2622
 export/play-1242x2688/vhsmo-01-hero.png …       1242 × 2688
 ```
 
 ```bash
 node export.mjs --size play       # just 1242 × 2688
-node export.mjs --size appstore   # just 1290 × 2796
+node export.mjs --size appstore   # just 1179 × 2556 (App Store 6.1")
+node export.mjs --size appstore63 # just 1206 × 2622 (App Store 6.3")
 node export.mjs --only 3,7        # just those artboards
 node export.mjs --port 8080       # if the folder is served elsewhere
 node export.mjs --scale 2         # 2x master to downsample yourself
@@ -82,7 +84,8 @@ the 1242 PNGs are natively rendered rather than downsampled.
 
 | Preset        | Pixels      | For                                              |
 | ------------- | ----------- | ------------------------------------------------ |
-| `appstore`    | 1290 × 2796 | App Store Connect, 6.9" and 6.7" iPhone slots     |
+| `appstore`    | 1179 × 2556 | App Store Connect 6.1" iPhone screenshot slot       |
+| `appstore63`  | 1206 × 2622 | App Store Connect 6.3" iPhone screenshot slot       |
 | `play`        | 1242 × 2688 | Apple's 6.5" slot, and the Play upload            |
 
 **One caveat on Play.** 1242 × 2688 is an Apple size. Google Play caps

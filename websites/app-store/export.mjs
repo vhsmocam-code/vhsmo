@@ -4,12 +4,13 @@
  *
  * Renders each artboard to a flat PNG at one or both output sizes:
  *
- *   appstore   1290 x 2796   App Store Connect 6.9" / 6.7" iPhone
+ *   appstore   1179 x 2556   App Store Connect 6.1" iPhone
+ *   appstore63 1206 x 2622   App Store Connect 6.3" iPhone
  *   play       1242 x 2688   Apple's 6.5" size, and the Play upload
  *
  *   1. serve this folder:   python3 -m http.server 4321 --directory .
  *   2. export:              node export.mjs
- *   3. output:              ./export/appstore-1290x2796/vhsmo-01-hero.png
+ *   3. output:              ./export/appstore-1179x2556/vhsmo-01-hero.png
  *                           ./export/play-1242x2688/vhsmo-01-hero.png
  *
  * Flags:
@@ -42,8 +43,9 @@ const BOARDS = [
 /* `key` is what preview.js passes as ?size=, `dir` is where the PNGs
    land — both files must agree, so keep them in step. */
 const SIZES = {
-  appstore: { key: "a1290", w: 1290, h: 2796, dir: "appstore-1290x2796" },
-  play:     { key: "p1242", w: 1242, h: 2688, dir: "play-1242x2688" },
+  appstore:   { key: "a1179", w: 1179, h: 2556, dir: "appstore-1179x2556" },
+  appstore63: { key: "a1206", w: 1206, h: 2622, dir: "appstore-1206x2622" },
+  play:       { key: "p1242", w: 1242, h: 2688, dir: "play-1242x2688" },
 };
 
 const CHROME = [
@@ -69,7 +71,7 @@ const want = arg("size", "both");
 const sizes = want === "both" ? Object.keys(SIZES) : [want];
 for (const s of sizes) {
   if (!SIZES[s]) {
-    console.error(`Unknown --size "${s}". Use: appstore, play, or both.`);
+    console.error(`Unknown --size "${s}". Use: appstore, appstore63, play, or both.`);
     process.exit(1);
   }
 }

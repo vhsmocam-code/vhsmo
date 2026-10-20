@@ -63,17 +63,26 @@
      design canvas is scaled by --out-s* to fit. Both presets are within
      0.15% of the same aspect, so the scale is effectively uniform and
      nothing in the artwork shifts between them.
-        App Store  6.9" / 6.7"   1290 x 2796   (default)
+        App Store  6.1"           1179 x 2556   (default)
+        App Store  6.3"           1206 x 2622
         1242 x 2688              Apple's 6.5" size, also the Play upload
      ------------------------------------------------------------------ */
   --board-w: 1290px;
   --board-h: 2796px;
   --margin:  96px;          /* outer gutter; content measure = 1098px */
 
-  --out-w:  1290px;
-  --out-h:  2796px;
-  --out-sx: 1;
-  --out-sy: 1;
+  --out-w:  1179px;
+  --out-h:  2556px;
+  --out-sx: 0.91317829;
+  --out-sy: 0.91416309;
+}
+
+/* 1206 x 2622 — current App Store 6.3" iPhone screenshot size. */
+[data-size="a1206"] {
+  --out-w:  1206px;
+  --out-h:  2622px;
+  --out-sx: 0.93488372;
+  --out-sy: 0.93776824;
 }
 
 /* 1242 x 2688 — 1242/1290 wide, 2688/2796 tall. */

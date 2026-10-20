@@ -5,8 +5,9 @@
   /* Output presets. The keys match the folder names export.mjs writes,
      and the data-size attribute the stylesheet keys off. */
   const SIZES = {
-    a1290: { label: "1290 × 2796", w: 1290, h: 2796, dir: "appstore-1290x2796" },
-    p1242: { label: "1242 × 2688", w: 1242, h: 2688, dir: "play-1242x2688" },
+    a1179: { label: "1179 × 2556 · App Store 6.1\"", w: 1179, h: 2556, dir: "appstore-1179x2556", cli: "appstore" },
+    a1206: { label: "1206 × 2622 · App Store 6.3\"", w: 1206, h: 2622, dir: "appstore-1206x2622", cli: "appstore63" },
+    p1242: { label: "1242 × 2688", w: 1242, h: 2688, dir: "play-1242x2688", cli: "play" },
   };
 
   /* --- export mode --------------------------------------------------
@@ -26,7 +27,7 @@
     });
     body.className = "export";
     body.removeAttribute("data-mode");
-    body.dataset.size = SIZES[params.get("size")] ? params.get("size") : "a1290";
+    body.dataset.size = SIZES[params.get("size")] ? params.get("size") : "a1179";
     document.documentElement.style.background = "#000";
     return;
   }
@@ -48,7 +49,7 @@
   });
 
   let current = 0;
-  let size = "a1290";
+  let size = "a1179";
 
   /* --- per-artboard download links ---------------------------------- */
   const links = slots.map((slot) => {
@@ -90,7 +91,7 @@
     el.className = "pv-hint";
     el.innerHTML =
       `Nothing rendered at <b>${SIZES[size].label}</b> yet. Run ` +
-      `<code>node export.mjs --size ${size === "p1242" ? "play" : "appstore"}</code> ` +
+      `<code>node export.mjs --size ${SIZES[size].cli}</code> ` +
       `in <code>websites/app-store</code>, then try again.`;
     const b = document.createElement("button");
     b.textContent = "Dismiss";
@@ -190,7 +191,7 @@
   new ResizeObserver(clearBar).observe(bar);
   addEventListener("resize", clearBar);
 
-  setSize("a1290");
+  setSize("a1179");
   show(0);
   setMode("contact");
   clearBar();
