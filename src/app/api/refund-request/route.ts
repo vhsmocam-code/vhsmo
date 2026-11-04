@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { REFUND_REQUESTS_OPEN } from "@/lib/refund-status";
+import { areRefundRequestsOpen } from "@/lib/refund-status";
 import {
   NOTES_MAX,
   REFUND_FIELDS,
@@ -26,7 +26,7 @@ import {
  * into a friendly "already received" rather than a duplicate row.
  */
 export async function POST(req: Request) {
-  if (!REFUND_REQUESTS_OPEN) {
+  if (!areRefundRequestsOpen()) {
     return NextResponse.json(
       {
         success: false,

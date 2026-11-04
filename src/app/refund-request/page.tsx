@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { RefundRequestForm } from "@/components/refund/RefundRequestForm";
+import { areRefundRequestsOpen } from "@/lib/refund-status";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Refund request",
@@ -16,6 +19,8 @@ export const metadata: Metadata = {
  * in our own brand, with rows landing in Supabase instead of a spreadsheet.
  */
 export default function Page() {
+  const requestsOpen = areRefundRequestsOpen();
+
   return (
     <div className="container-px mx-auto max-w-2xl pt-24 pb-16 sm:pt-28 sm:pb-24">
       <p className="eyebrow text-halide/55">Pre-orders</p>
@@ -69,7 +74,19 @@ export default function Page() {
       </div>
 
       <div className="mt-10">
-        <RefundRequestForm />
+        {requestsOpen ? (
+          <RefundRequestForm />
+        ) : (
+          <div className="rounded-2xl bg-halide p-8 text-center sm:p-10">
+            <h2 className="font-marker text-3xl text-darkroom">
+              Refund requests are closed
+            </h2>
+            <p className="mt-3 text-sm text-darkroom/65">
+              The deadline to submit a refund request has passed. Please
+              contact us if you need help.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
