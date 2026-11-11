@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
+import { ANDROID_STORE_URL, IOS_STORE_URL } from "@/lib/app-links";
 
 export const dynamic = "force-dynamic";
 
-const ANDROID_STORE_URL =
-  "https://play.google.com/store/apps/details?id=com.vhsmo.app&hl=en";
-const IOS_STORE_URL = "https://apps.apple.com/us/app/vhsmo/id6768032672";
 
 // "0.0.0" means nobody is blocked. Raise these in Vercel only AFTER the new
 // build is live on the respective store.

@@ -36,6 +36,7 @@ const columns = [
     title: "Support",
     Icon: Headphones,
     links: [
+      { label: "Set up your camera", href: "/setup" },
       { label: "FAQ", href: "/#faq" },
       { label: "Contact Us", href: "mailto:team@vhsmo.com" },
     ],
