@@ -1,18 +1,28 @@
 # App screenshots
 
 These files are the source of truth for the phone UI in the campaign.
-The original VHSMO iOS captures are used as-is except for the board 02
-variant, where only the product image is updated to Cosmic Black.
+They are real captures of the current VHSMO app, taken on the iPhone 17 Pro
+simulator (1206 × 2622) on 5 Nov 2026. The status bar was set to 9:41 with full
+signal and battery.
 
-| File                      | Screen                                                       | Source (`../appScreenshots/`)            |
-| ------------------------- | ------------------------------------------------------------ | ---------------------------------------- |
-| `01-home.png`             | VHSMO **Vol. 1** home — pink camera, *System Ready / Offload media*, Recent transfers | `…11.09.02.jpeg`      |
-| `01-home-cosmic-black.png` | `01-home` with only the product image replaced by Cosmic Black | Derived from `01-home.png` |
-| `01-home-cherry-red.png` | `01-home` with only the product image replaced by Cherry Red | Derived from `01-home.png` |
-| `03-live-gallery.png`     | **LIVE Gallery** — *"now rolling. shots land here as you shoot"* | `…11.09.03.jpeg`                       |
-| `04-album-grid.png`       | **Album** `Vhsmo-2026-09-…` — the 991–998 grid                | `…11.09.02 (1).jpeg`                     |
-| `05-gallery-timeline.png` | **GALLERY / VHSMO** — Featured collection "Fav" + Offload timeline | `…11.09.02 (2).jpeg`                 |
-| `06-photo-detail.png`     | **P9999995.JPG** detail — heart / download / trash            | `…11.09.04 (1).jpeg`                     |
+The photos on screen are real VHSMO shots, loaded into the app's own album
+folders. They are also in `../photos/` (`fireworks-portrait.jpg`, `diwali-group.jpg`, …).
+
+| File                       | Screen                                                                 |
+| -------------------------- | ---------------------------------------------------------------------- |
+| `01-home.png`              | Home with the **Baby Pink** camera: *Connected · 86%*, *Camera ready / Offload media*, Latest roll |
+| `01-home-cherry-red.png`   | The same Home with the **Cherry Red** camera picked in the app          |
+| `01-home-cosmic-black.png` | The same Home with the **Cosmic Black** camera picked in the app        |
+| `03-live-gallery.png`      | Album **5 Nov 2026** in **film view**, scrolled to the Halloween group / fireworks frames |
+| `04-album-grid.png`        | The same album in **grid view**                                        |
+| `05-gallery-timeline.png`  | **Your rolls**: Favourites, then the offloads grouped by day            |
+| `06-photo-detail.png`      | **P0001011.JPG** (sari pair) in the viewer, with share / favourite / save / delete |
+| `07-photo-detail.png`      | **P0001010.JPG** (shawl costumes) in the same viewer                    |
+
+The Live Gallery itself only fills when a camera is streaming to the phone.
+Board 03 therefore uses the album film view, which shows the same roll in the
+same film-strip style. The connected Home state was rendered with the camera
+status set on (Connected, 86%), because no camera was attached to the simulator.
 
 Which artboard uses which:
 
@@ -20,15 +30,14 @@ Which artboard uses which:
 * 03 Live gallery → `03-live-gallery`
 * 04 Real moments → `04-album-grid`
 * 05 Memories → `05-gallery-timeline`
-* 06 Favourites, 07 Philosophy → `06-photo-detail`
+* 06 Favourites → `06-photo-detail`; 07 Philosophy → `07-photo-detail`
 
 ## Replacing one
 
-Overwrite the file, keep the filename, reload. All five originals are
-1206 × 2622 (iPhone 16 Pro), which is exactly the mockup's screen
-aspect, so they land pixel-for-pixel with no crop. Any other iPhone
-capture size still works — the screen is `object-fit: cover` — it is
-just centre-cropped by a hair.
+Overwrite the file, keep the filename, and reload. 1206 × 2622 is exactly the
+mockup's screen aspect, so these land pixel-for-pixel with no crop. Any other
+iPhone capture size still works. The screen uses `object-fit: cover`, so it is
+only centre-cropped very slightly.
 
-Don't pre-round the corners or add a device frame: the artwork supplies
-the phone, the Dynamic Island and the glass.
+Don't pre-round the corners or add a device frame. The artwork supplies the
+phone, the Dynamic Island and the glass.
