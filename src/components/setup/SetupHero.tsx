@@ -1,100 +1,74 @@
-import Image from "next/image";
+import { MagneticButton } from "@/components/brand/MagneticButton";
 import { Reveal } from "@/components/brand/Reveal";
-import { Sticker } from "@/components/brand/Sticker";
 import { Scribble } from "@/components/brand/Scribble";
-import { seededRotation } from "@/lib/random";
-import { cameraColours } from "@/lib/setup";
-import { StoreBadges } from "./StoreBadges";
-
-const placements = [
-  "left-[2%] top-[4%] w-[62%] z-10",
-  "right-[0%] top-[24%] w-[64%] z-20",
-  "left-[8%] top-[52%] w-[58%] z-30",
-];
+import { heroMedia } from "@/lib/setup";
+import { MediaSlot } from "./MediaSlot";
 
 /**
- * Setup hero - headline, one line, the store buttons, and the three
- * VHSMO colours floating on the right. Nothing else.
+ * Setup hero - headline, one supporting line, two CTAs and the camera.
  */
 export function SetupHero() {
   return (
     <section
       aria-labelledby="setup-title"
-      className="relative overflow-hidden bg-darkroom pt-28 sm:pt-36"
+      className="relative overflow-hidden bg-darkroom pt-28 sm:pt-32"
     >
       <div
         aria-hidden
         className="pointer-events-none absolute -right-40 top-10 h-[34rem] w-[34rem] rounded-full bg-kodak/10 blur-3xl"
       />
 
-      <div className="shell relative grid grid-cols-12 items-center gap-y-14 pb-20 sm:pb-28 lg:gap-x-10">
+      <div className="shell relative grid grid-cols-12 items-center gap-y-12 pb-20 sm:pb-28 lg:gap-x-10">
         <div className="col-span-12 lg:col-span-6">
           <Reveal>
-            <Sticker rotate={seededRotation(2, 4)} size="md">
-              First roll ✶
-            </Sticker>
+            <p className="eyebrow text-kodak">Camera setup</p>
           </Reveal>
-
           <Reveal delay={0.05}>
             <h1
               id="setup-title"
-              className="display mt-7 text-[clamp(2.8rem,8vw,6.2rem)] text-halide"
+              className="display mt-6 text-[clamp(2.6rem,5.6vw,5rem)] text-halide"
             >
-              Set up your
+              Your VHSMO.
               <br />
               <span className="relative inline-block text-kodak">
-                VHSMO
+                Ready for
                 <Scribble className="absolute -bottom-3 left-0 h-3 w-full" />
               </span>
+              <br />
+              every moment.
             </h1>
           </Reveal>
-
           <Reveal delay={0.1}>
             <p className="mt-8 max-w-md text-balance text-lg leading-relaxed text-halide/75">
-              Camera and phone talking in about five minutes. No cables, no
-              card readers.
+              Getting started is simple. Follow these quick steps to set up
+              your camera and start capturing moments.
             </p>
           </Reveal>
-
           <Reveal delay={0.15}>
-            <StoreBadges className="mt-10" />
-            <a
-              href="#steps"
-              className="mt-8 inline-block text-sm font-semibold text-kodak underline-offset-4 hover:underline"
-            >
-              Show me how ↓
-            </a>
+            <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-5">
+              <MagneticButton href="#step-1">
+                Let&apos;s get started
+                <span aria-hidden>↓</span>
+              </MagneticButton>
+              <a
+                href="#video"
+                className="text-sm font-semibold text-halide underline decoration-kodak decoration-2 underline-offset-[6px] transition-colors hover:text-kodak"
+              >
+                Watch setup video
+              </a>
+            </div>
           </Reveal>
         </div>
 
         <div className="col-span-12 lg:col-span-6">
-          <Reveal
-            delay={0.1}
-            className="relative mx-auto aspect-[1/0.95] w-full max-w-[34rem]"
-          >
-            {cameraColours.map((cam, i) => (
-              <div
-                key={cam.name}
-                className={`absolute ${placements[i]}`}
-                style={{ rotate: `${seededRotation(40 + i * 7, 7)}deg` }}
-              >
-                <div
-                  className="cam-float"
-                  style={{ animationDelay: `${i * -2.3}s` }}
-                >
-                  <Image
-                    src={cam.src}
-                    alt={`VHSMO camera in ${cam.name}`}
-                    width={900}
-                    height={600}
-                    priority={i === 0}
-                    sizes="(min-width: 1024px) 22rem, 60vw"
-                    className="h-auto w-full drop-shadow-[0_1.6rem_1.8rem_rgba(0,0,0,0.55)]"
-                  />
-                </div>
-              </div>
-            ))}
-          </Reveal>
+          <div className="cam-float mx-auto w-full max-w-[36rem]">
+            <MediaSlot
+              config={heroMedia}
+              bare
+              priority
+              sizes="(min-width: 1024px) 36rem, 100vw"
+            />
+          </div>
         </div>
       </div>
     </section>

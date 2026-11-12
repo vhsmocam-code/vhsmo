@@ -1,16 +1,21 @@
 import type { Metadata } from "next";
-import { Marquee } from "@/components/brand/Marquee";
 import { MagneticButton } from "@/components/brand/MagneticButton";
 import { Reveal } from "@/components/brand/Reveal";
 import { Scribble } from "@/components/brand/Scribble";
-import { CameraAnatomy } from "@/components/setup/CameraAnatomy";
+import { AppConnectionGuide } from "@/components/setup/AppConnectionGuide";
+import { ChargingGuide } from "@/components/setup/ChargingGuide";
 import { SetupHero } from "@/components/setup/SetupHero";
-import { SetupWalkthrough } from "@/components/setup/SetupWalkthrough";
+import { SetupProgress } from "@/components/setup/SetupProgress";
+import { SetupStep } from "@/components/setup/SetupStep";
+import { SetupTips } from "@/components/setup/SetupTips";
 import { SetupTroubleshooting } from "@/components/setup/SetupTroubleshooting";
-import { RESERVE_HREF, TAGLINE } from "@/lib/landing";
+import { SetupVideo } from "@/components/setup/SetupVideo";
+import { RESERVE_HREF } from "@/lib/landing";
+import { progressSteps, setupSteps, setupVideo } from "@/lib/setup";
+import { resolveMedia, resolvePoster } from "@/lib/setup-media";
 
 const description =
-  "Set up your VHSMO camera with the VHSMO App: charge, switch on, press the Wi-Fi button and connect in about five minutes. Step-by-step guide plus fixes for common pairing and offload issues.";
+  "Set up your VHSMO camera in minutes: switch it on, spot the notification light, press the Wi-Fi button, connect the VHSMO app, charge it and get the most from the battery.";
 
 export const metadata: Metadata = {
   title: "Set up your VHSMO",
@@ -24,16 +29,28 @@ export const metadata: Metadata = {
 };
 
 /**
- * The setup guide - hero, camera basics, the in-app flow shown with real
- * screenshots, and troubleshooting lifted from the app's own messages.
+ * The setup guide: hero, full walkthrough video, seven camera steps led by
+ * real photos and clips (see public/setup/README.md), then help.
  */
 export default function SetupPage() {
+  const video = resolveMedia({ slot: setupVideo.slot });
+  const sources = video.kind === "video" ? video.sources : [];
+  const poster = resolvePoster(setupVideo.posterSlot);
+
   return (
     <div className="relative overflow-x-clip bg-darkroom text-halide">
       <SetupHero />
-      <Marquee text={TAGLINE.join(" ")} variant="kodak" duration={32} />
-      <CameraAnatomy />
-      <SetupWalkthrough />
+      <SetupVideo sources={sources} poster={poster} />
+
+      <SetupProgress items={progressSteps} />
+      <SetupStep step={setupSteps[0]!} />
+      <SetupStep step={setupSteps[1]!} flip />
+      <SetupStep step={setupSteps[2]!} wide />
+      <SetupStep step={setupSteps[3]!} />
+      <AppConnectionGuide />
+      <ChargingGuide />
+      <SetupTips />
+
       <SetupTroubleshooting />
 
       <section className="section-sm bg-darkroom">
