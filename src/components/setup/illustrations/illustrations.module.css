@@ -1,0 +1,300 @@
+/*
+ * Setup illustrations. Every animated part's *static* state (no animation,
+ * e.g. reduced motion) is the meaningful end state: slider on ON, LED lit,
+ * Wi-Fi on, charged. Decorative bits (flash, ripples, finger) default to
+ * hidden. Loops pause while off screen via [data-playing="false"].
+ */
+
+.stage {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(55% 50% at 50% 42%, rgba(253, 241, 0, 0.07), transparent 70%),
+    radial-gradient(95% 85% at 50% 55%, #362f2c 0%, #1f1a18 72%);
+}
+.stage > svg {
+  display: block;
+  overflow: visible;
+  width: 100%;
+  height: 100%;
+}
+.stage[data-playing="false"] * {
+  animation-play-state: paused !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage * {
+    animation: none !important;
+  }
+}
+
+.fillBox {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* ---------- 01 Power on (6s) ---------- */
+.thumb {
+  animation: thumbSlide 6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes thumbSlide {
+  0%, 20% { transform: translateY(33px); }
+  36%, 86% { transform: translateY(0); }
+  96%, 100% { transform: translateY(33px); }
+}
+.onLabel {
+  animation: onLabel 6s ease-in-out infinite;
+}
+@keyframes onLabel {
+  0%, 32% { opacity: 0; }
+  40%, 84% { opacity: 1; }
+  92%, 100% { opacity: 0; }
+}
+.hint {
+  opacity: 0;
+  animation: hint 6s ease-in-out infinite;
+}
+@keyframes hint {
+  0%, 8% { opacity: 0; transform: translateY(14px); }
+  16%, 30% { opacity: 1; transform: translateY(0); }
+  40%, 100% { opacity: 0; transform: translateY(-10px); }
+}
+
+/* ---------- 02 Notification light (5s) ---------- */
+.ledOn {
+  animation: ledOn 5s ease-in-out infinite;
+}
+@keyframes ledOn {
+  0%, 16% { opacity: 0; }
+  26%, 84% { opacity: 1; }
+  94%, 100% { opacity: 0; }
+}
+.ripple {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ripple 5s ease-out infinite;
+}
+@keyframes ripple {
+  0%, 22% { opacity: 0; transform: scale(0.4); }
+  27% { opacity: 0.8; }
+  55%, 100% { opacity: 0; transform: scale(2.6); }
+}
+
+/* ---------- 03 Ready to shoot (5s) ---------- */
+.shutter {
+  animation: shutter 5s ease-in-out infinite;
+}
+@keyframes shutter {
+  0%, 14% { transform: translateY(0); }
+  18%, 22% { transform: translateY(8px); }
+  28%, 100% { transform: translateY(0); }
+}
+.flashGlow {
+  opacity: 0;
+  animation: flashGlow 5s ease-out infinite;
+}
+@keyframes flashGlow {
+  0%, 19% { opacity: 0; }
+  21% { opacity: 1; }
+  42%, 100% { opacity: 0; }
+}
+.panelFlash {
+  opacity: 0;
+  animation: panelFlash 5s ease-out infinite;
+}
+@keyframes panelFlash {
+  0%, 19% { opacity: 0; }
+  21% { opacity: 0.3; }
+  38%, 100% { opacity: 0; }
+}
+.printIn {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: printIn 5s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+@keyframes printIn {
+  0%, 24% { opacity: 0; transform: translate(-300px, 60px) rotate(-18deg) scale(0.55); }
+  46%, 90% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: none; }
+}
+.countOld {
+  opacity: 0;
+  animation: countOld 5s ease-in-out infinite;
+}
+@keyframes countOld {
+  0%, 26% { opacity: 1; transform: translateY(0); }
+  32%, 100% { opacity: 0; transform: translateY(-24px); }
+}
+.countNew {
+  animation: countNew 5s ease-in-out infinite;
+}
+@keyframes countNew {
+  0%, 27% { opacity: 0; transform: translateY(24px); }
+  34%, 100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- 04 Wi-Fi on (6s) ---------- */
+.finger {
+  opacity: 0;
+  animation: finger 6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes finger {
+  0% { opacity: 0; transform: translate(90px, -120px); }
+  10% { opacity: 1; transform: translate(90px, -120px); }
+  24%, 33% { opacity: 1; transform: translate(0, 0); }
+  46%, 100% { opacity: 0; transform: translate(90px, -120px); }
+}
+.press {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: press 6s ease-in-out infinite;
+}
+@keyframes press {
+  0%, 23% { transform: scale(1); }
+  27%, 32% { transform: scale(0.95); }
+  37%, 100% { transform: scale(1); }
+}
+.wifiGlow {
+  animation: wifiGlow 6s ease-in-out infinite;
+}
+@keyframes wifiGlow {
+  0%, 29% { opacity: 0; }
+  37%, 88% { opacity: 1; }
+  96%, 100% { opacity: 0; }
+}
+.arc {
+  animation: arc 6s ease-out infinite;
+}
+.arc2 { animation-delay: 0.18s; }
+.arc3 { animation-delay: 0.36s; }
+@keyframes arc {
+  0%, 38% { opacity: 0; }
+  46% { opacity: 1; }
+  60% { opacity: 0.35; }
+  70% { opacity: 1; }
+  84% { opacity: 0.8; }
+  94%, 100% { opacity: 0; }
+}
+
+/* ---------- 05 App connect (4.5s) ---------- */
+.dash {
+  animation: dash 1.4s linear infinite;
+}
+@keyframes dash {
+  to { stroke-dashoffset: -36; }
+}
+.pulseArc {
+  animation: pulseArc 1.8s ease-out infinite;
+}
+.pulseArc2 { animation-delay: 0.3s; }
+.pulseArc3 { animation-delay: 0.6s; }
+@keyframes pulseArc {
+  0% { opacity: 0.15; }
+  30% { opacity: 1; }
+  100% { opacity: 0.15; }
+}
+.tile {
+  opacity: 0;
+  animation: tile 4.5s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+.tile2 { animation-delay: 1.5s; }
+.tile3 { animation-delay: 3s; }
+@keyframes tile {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.5); }
+  10% { opacity: 1; transform: translate(30px, -14px) scale(0.85); }
+  50% { opacity: 1; transform: translate(175px, -72px) scale(1); }
+  82% { opacity: 1; transform: translate(345px, -28px) scale(0.75); }
+  92%, 100% { opacity: 0; transform: translate(360px, -26px) scale(0.5); }
+}
+
+/* ---------- 06 Charging (7s) ---------- */
+.plug {
+  animation: plug 7s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes plug {
+  0%, 5% { transform: translateX(170px); }
+  15%, 92% { transform: translateX(0); }
+  100% { transform: translateX(170px); }
+}
+.ledRed {
+  opacity: 0;
+  animation: ledRed 7s ease-in-out infinite;
+}
+@keyframes ledRed {
+  0%, 16% { opacity: 0; }
+  20% { opacity: 1; }
+  29% { opacity: 0.4; }
+  38% { opacity: 1; }
+  47% { opacity: 0.4; }
+  56% { opacity: 1; }
+  62%, 100% { opacity: 0; }
+}
+.ledGreen {
+  animation: ledGreen 7s ease-in-out infinite;
+}
+@keyframes ledGreen {
+  0%, 59% { opacity: 0; }
+  65%, 92% { opacity: 1; }
+  97%, 100% { opacity: 0; }
+}
+.battery {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: battery 7s ease-in-out infinite;
+}
+@keyframes battery {
+  0%, 16% { transform: scaleX(0.06); }
+  60%, 92% { transform: scaleX(1); }
+  100% { transform: scaleX(0.06); }
+}
+.batRed {
+  opacity: 0;
+  animation: batRed 7s ease-in-out infinite;
+}
+@keyframes batRed {
+  0%, 59% { opacity: 1; }
+  65%, 100% { opacity: 0; }
+}
+.batGreen {
+  animation: batGreen 7s ease-in-out infinite;
+}
+@keyframes batGreen {
+  0%, 59% { opacity: 0; }
+  65%, 100% { opacity: 1; }
+}
+.chargeWord {
+  opacity: 0;
+  animation: batRed 7s ease-in-out infinite;
+}
+.fullWord {
+  animation: batGreen 7s ease-in-out infinite;
+}
+
+/* ---------- Charge state stills ---------- */
+.softPulse {
+  animation: softPulse 2.6s ease-in-out infinite;
+}
+@keyframes softPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+/* ---------- Walkthrough progress ---------- */
+.segFill {
+  display: block;
+  height: 100%;
+  transform-origin: left center;
+  transform: scaleX(0);
+  animation-name: segFill;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+@keyframes segFill {
+  to { transform: scaleX(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .segFill {
+    animation: none;
+    transform: scaleX(1);
+  }
+}

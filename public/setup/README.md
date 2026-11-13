@@ -1,14 +1,16 @@
 # /setup media
 
-Every photo, GIF and video on the setup page lives here. **Drop a file at the
-path below and it replaces the placeholder automatically** - no code change.
+Every step on the setup page shows a drawn, animated illustration of the
+camera (`src/components/setup/illustrations/`), and the video section plays a
+drawn walkthrough. **Drop a real file at the path below and it replaces the
+drawing automatically** - no code change.
 If several formats exist for one slot, the first of `mp4 → webm → gif → webp → jpg → png` wins.
 
 Copy and slot definitions live in `src/lib/setup.ts`.
 
 | Slot (file name without extension) | Shows | Ratio | Notes |
 |---|---|---|---|
-| `hero/camera` | Hero camera shot | 6:5 | Transparent PNG/WebP cut-out works best (shown uncropped). Falls back to `camera-black.webp`. |
+| `hero/camera` | Hero camera shot | 6:5 | Transparent PNG/WebP cut-out works best (shown uncropped). Falls back to `camera-pink.webp`. |
 | `video/setup` (+ `video/poster`) | Full setup walkthrough | 16:9 | `setup.mp4` (H.264) and optional `setup.webm`. `poster.jpg/webp` is the thumbnail. |
 | `step-01/media` | Slider moved to ON | 1:1 | Short silent loop |
 | `step-02/media` | Notification LED close-up | 1:1 | Shown uncropped - leave breathing room around the LED |

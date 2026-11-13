@@ -54,7 +54,7 @@ export function SetupHero() {
                 href="#video"
                 className="text-sm font-semibold text-halide underline decoration-kodak decoration-2 underline-offset-[6px] transition-colors hover:text-kodak"
               >
-                Watch setup video
+                Watch the walkthrough
               </a>
             </div>
           </Reveal>

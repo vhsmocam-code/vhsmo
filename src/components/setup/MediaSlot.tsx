@@ -2,13 +2,14 @@ import Image from "next/image";
 import { resolveMedia } from "@/lib/setup-media";
 import type { MediaSlotConfig } from "@/lib/setup";
 import { cn } from "@/lib/utils";
+import { illustrations } from "./illustrations";
 import { LoopVideo } from "./LoopVideo";
 import { MediaFrame } from "./MediaFrame";
 
 /**
  * One media area. Renders whatever real file exists at the slot's path
- * (video, GIF or image) and, until then, a clearly labelled placeholder.
- * Never draws fake product imagery.
+ * (video, GIF or image); until then the slot's drawn illustration, and
+ * failing that a clearly labelled placeholder.
  */
 export function MediaSlot({
   config,
@@ -23,7 +24,15 @@ export function MediaSlot({
   bare?: boolean;
   className?: string;
 }) {
-  const media = resolveMedia(config);
+  // A real file always wins; then the drawn illustration; then the fallback.
+  const media = resolveMedia({
+    slot: config.slot,
+    fallback: config.illustration ? undefined : config.fallback,
+  });
+  const Illustration =
+    media.kind === "placeholder" && config.illustration
+      ? illustrations[config.illustration]
+      : null;
   const fitClass = config.fit === "cover" ? "object-cover" : "object-contain";
 
   return (
@@ -47,7 +56,8 @@ export function MediaSlot({
           className={cn(fitClass, bare && "drop-shadow-[0_1.6rem_1.8rem_rgba(0,0,0,0.5)]")}
         />
       )}
-      {media.kind === "placeholder" && <Placeholder config={config} />}
+      {Illustration && <Illustration label={config.alt} />}
+      {media.kind === "placeholder" && !Illustration && <Placeholder config={config} />}
     </MediaFrame>
   );
 }

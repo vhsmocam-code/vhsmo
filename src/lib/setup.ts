@@ -17,8 +17,21 @@ export const CAMERA_WIFI = {
  * among mp4, webm, gif, webp, jpg, png. `ratio` is fixed so nothing shifts
  * while media loads.
  */
+/** Drawn, animated stand-ins (src/components/setup/illustrations). */
+export type IllustrationId =
+  | "power-on"
+  | "notification-light"
+  | "ready-to-shoot"
+  | "wifi-on"
+  | "app-connect"
+  | "charging"
+  | "charge-red"
+  | "charge-green";
+
 export type MediaSlotConfig = {
   slot: string;
+  /** Shown when the slot has no real file yet. */
+  illustration?: IllustrationId;
   /** CSS aspect-ratio, e.g. "4 / 5". */
   ratio: string;
   /** contain = never crop hardware details; cover = lifestyle shots. */
@@ -34,15 +47,15 @@ export const heroMedia: MediaSlotConfig = {
   slot: "hero/camera",
   ratio: "6 / 5",
   fit: "contain",
-  alt: "The VHSMO camera",
+  alt: "The VHSMO camera in baby pink",
   brief: "Hero shot of the VHSMO camera",
-  fallback: "/setup/camera-black.webp",
+  fallback: "/setup/camera-pink.webp",
 };
 
 export const setupVideo = {
   eyebrow: "Watch",
   title: "Prefer watching? We've got you.",
-  body: "Watch the complete walkthrough and get your VHSMO ready in just a few minutes.",
+  body: "Here's the whole setup in about 30 seconds - switch on, shoot, connect and charge.",
   /** public/setup/video/setup.(mp4|webm) and poster.(webp|jpg|png) */
   slot: "video/setup",
   posterSlot: "video/poster",
@@ -71,6 +84,7 @@ export const setupSteps: SetupStepContent[] = [
     body: "Move the slider button to the ON position to power up your VHSMO camera.",
     media: {
       slot: "step-01/media",
+      illustration: "power-on",
       ratio: "1 / 1",
       fit: "cover",
       alt: "The slider button on the VHSMO camera being moved to ON",
@@ -87,6 +101,7 @@ export const setupSteps: SetupStepContent[] = [
     body: "Once your VHSMO powers on, wait for the notification LED to light up. This LED indicates that the camera has powered on and is ready for use.",
     media: {
       slot: "step-02/media",
+      illustration: "notification-light",
       ratio: "1 / 1",
       fit: "contain",
       alt: "Close-up of the notification LED on the VHSMO camera",
@@ -101,6 +116,7 @@ export const setupSteps: SetupStepContent[] = [
     body: "Your VHSMO is now ready to capture moments. Start taking photos and enjoy the experience.",
     media: {
       slot: "step-03/media",
+      illustration: "ready-to-shoot",
       ratio: "16 / 9",
       fit: "cover",
       alt: "Someone taking a photo with the VHSMO camera",
@@ -116,6 +132,7 @@ export const setupSteps: SetupStepContent[] = [
     note: "Wi-Fi is only needed when you access your photos through the VHSMO app.",
     media: {
       slot: "step-04/media",
+      illustration: "wifi-on",
       ratio: "1 / 1",
       fit: "cover",
       alt: "The Wi-Fi button on the VHSMO camera being pressed and lighting up",
@@ -133,6 +150,7 @@ export const appGuide = {
   body: "Open the VHSMO app and follow the on-screen instructions to connect your camera and access your photos.",
   media: {
     slot: "step-05/camera",
+    illustration: "app-connect",
     ratio: "4 / 3",
     fit: "cover",
     alt: "The VHSMO camera connecting to the VHSMO app",
@@ -189,6 +207,7 @@ export const charging = {
   photosLine: "One full charge lets you capture 1,000+ photos, so you never have to worry about missing a moment.",
   media: {
     slot: "step-06/media",
+    illustration: "charging",
     ratio: "4 / 3",
     fit: "cover",
     alt: "The VHSMO charging indicator changing from red to green",
@@ -202,6 +221,7 @@ export const charging = {
       meaning: "Charging",
       media: {
         slot: "step-06/charging-red",
+        illustration: "charge-red",
         ratio: "4 / 3",
         fit: "cover",
         alt: "The VHSMO charging LED glowing red",
@@ -215,6 +235,7 @@ export const charging = {
       meaning: "Fully charged",
       media: {
         slot: "step-06/charged-green",
+        illustration: "charge-green",
         ratio: "4 / 3",
         fit: "cover",
         alt: "The VHSMO charging LED glowing green",
