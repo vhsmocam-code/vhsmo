@@ -53,7 +53,7 @@ export function Charging({ label, paused }: { label: string; paused?: boolean })
 
         <g transform={`translate(${tx} ${ty}) scale(${k})`}>
           <CameraBack>
-            <rect x="913" y={BACK.portY - 14} width="8" height="28" rx="3" fill="#1E1A1B" />
+            <rect x={BACK.w - 7} y={BACK.portY - 14} width="8" height="28" rx="3" fill="#1E1A1B" />
           </CameraBack>
         </g>
 

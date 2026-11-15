@@ -6,12 +6,15 @@ import { IllustrationStage } from "./Stage";
 import { useSvgId } from "./useSvgId";
 import s from "./illustrations.module.css";
 
-/** Step 02 - the top of the back: the LED beside the viewfinder lights white. */
+/**
+ * Step 02 - the top of the back: the LED beside the viewfinder lights
+ * during start-up, then goes out. Out means ready.
+ */
 export function NotificationLight({ label, paused }: { label: string; paused?: boolean }) {
   const uid = useSvgId("led");
-  const k = 1.3;
-  const tx = 400 - 520 * k;
-  const ty = 170;
+  const k = 1.15;
+  const tx = 400 - 495 * k;
+  const ty = 150;
   const lx = tx + BACK.led.x * k;
   const ly = ty + BACK.led.y * k;
 
@@ -36,11 +39,11 @@ export function NotificationLight({ label, paused }: { label: string; paused?: b
         </g>
 
         {/* Callout */}
-        <path d={`M${lx} ${ly + 34}V${ly + 170}`} stroke={INK} strokeOpacity="0.55" strokeWidth="2" strokeDasharray="4 7" />
-        <circle cx={lx} cy={ly + 170} r="4" fill={INK} />
+        <path d={`M${lx} ${ly + 34}V${ly + 100}`} stroke={INK} strokeOpacity="0.55" strokeWidth="2" strokeDasharray="4 7" />
+        <circle cx={lx} cy={ly + 100} r="4" fill={INK} />
         <text
           x={lx}
-          y={ly + 212}
+          y={ly + 140}
           textAnchor="middle"
           fontFamily="var(--font-display), system-ui, sans-serif"
           fontWeight="700"
@@ -48,6 +51,18 @@ export function NotificationLight({ label, paused }: { label: string; paused?: b
           fill={INK}
         >
           Notification light
+        </text>
+        <text
+          x={lx}
+          y={ly + 172}
+          textAnchor="middle"
+          fontFamily="var(--font-display), system-ui, sans-serif"
+          fontWeight="700"
+          fontSize="22"
+          fill={INK}
+          className={s.readyTag}
+        >
+          Light off = ready
         </text>
       </svg>
     </IllustrationStage>

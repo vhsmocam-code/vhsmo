@@ -37,7 +37,12 @@ export function SetupStep({
         {step.body}
       </p>
       {step.note && (
-        <p className="mt-6 max-w-md border-l-2 border-kodak pl-4 text-sm leading-relaxed text-halide/60">
+        <p
+          className={cn(
+            "mt-6 max-w-md border-l-2 border-kodak pl-4 text-left text-sm leading-relaxed text-halide/60",
+            wide && "mx-auto",
+          )}
+        >
           {step.note}
         </p>
       )}

@@ -64,9 +64,18 @@
   animation: ledOn 5s ease-in-out infinite;
 }
 @keyframes ledOn {
-  0%, 16% { opacity: 0; }
-  26%, 84% { opacity: 1; }
-  94%, 100% { opacity: 0; }
+  0%, 10% { opacity: 0; }
+  18%, 50% { opacity: 1; }
+  60%, 100% { opacity: 0; }
+}
+.readyTag {
+  opacity: 0;
+  animation: readyTag 5s ease-in-out infinite;
+}
+@keyframes readyTag {
+  0%, 58% { opacity: 0; transform: translateY(6px); }
+  70%, 92% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; }
 }
 .ripple {
   opacity: 0;
@@ -277,6 +286,68 @@
 @keyframes softPulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.45; }
+}
+
+/* ---------- Side panel, USB and reset scenes ---------- */
+/* Default (static) state = panel slid away, card showing. */
+.panelOpen {
+  transform: translateX(200px);
+  opacity: 0;
+}
+.panel {
+  transform: translateX(200px);
+  opacity: 0;
+  animation: panelSlide 6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes panelSlide {
+  0%, 10% { transform: translateX(0); opacity: 1; }
+  26%, 78% { transform: translateX(200px); opacity: 0; }
+  92%, 100% { transform: translateX(0); opacity: 1; }
+}
+.card {
+  transform: translateY(-34px);
+  animation: cardOut 6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes cardOut {
+  0%, 30% { transform: translateY(0); }
+  44%, 70% { transform: translateY(-46px); }
+  84%, 100% { transform: translateY(0); }
+}
+.holdRing {
+  stroke-dasharray: 214;
+  stroke-dashoffset: 0;
+  animation: holdRing 7s linear infinite;
+}
+@keyframes holdRing {
+  0%, 10% { stroke-dashoffset: 214; opacity: 0; }
+  12% { stroke-dashoffset: 214; opacity: 1; }
+  70% { stroke-dashoffset: 0; opacity: 1; }
+  94% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+.blink {
+  animation: blink 7s ease-in-out infinite;
+}
+@keyframes blink {
+  0%, 70% { opacity: 0.2; }
+  73% { opacity: 1; }
+  77% { opacity: 0.2; }
+  81% { opacity: 1; }
+  85% { opacity: 0.2; }
+  89% { opacity: 1; }
+  95%, 100% { opacity: 0.2; }
+}
+.file {
+  opacity: 0;
+  animation: file 4.5s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+.file2 { animation-delay: 1.5s; }
+.file3 { animation-delay: 3s; }
+@keyframes file {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.6); }
+  12% { opacity: 1; transform: translate(20px, 0) scale(0.95); }
+  80% { opacity: 1; transform: translate(330px, 0) scale(0.95); }
+  92%, 100% { opacity: 0; transform: translate(350px, 0) scale(0.6); }
 }
 
 /* ---------- Walkthrough progress ---------- */

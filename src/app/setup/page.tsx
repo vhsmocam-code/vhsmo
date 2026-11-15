@@ -4,7 +4,9 @@ import { Reveal } from "@/components/brand/Reveal";
 import { Scribble } from "@/components/brand/Scribble";
 import { AppConnectionGuide } from "@/components/setup/AppConnectionGuide";
 import { ChargingGuide } from "@/components/setup/ChargingGuide";
+import { GoodToKnow } from "@/components/setup/GoodToKnow";
 import { SetupHero } from "@/components/setup/SetupHero";
+import { SetupInside } from "@/components/setup/SetupInside";
 import { SetupProgress } from "@/components/setup/SetupProgress";
 import { SetupStep } from "@/components/setup/SetupStep";
 import { SetupTips } from "@/components/setup/SetupTips";
@@ -41,6 +43,7 @@ export default function SetupPage() {
     <div className="relative overflow-x-clip bg-darkroom text-halide">
       <SetupHero />
       <SetupVideo sources={sources} poster={poster} />
+      <SetupInside />
 
       <SetupProgress items={progressSteps} />
       <SetupStep step={setupSteps[0]!} />
@@ -50,6 +53,7 @@ export default function SetupPage() {
       <AppConnectionGuide />
       <ChargingGuide />
       <SetupTips />
+      <GoodToKnow />
 
       <SetupTroubleshooting />
 

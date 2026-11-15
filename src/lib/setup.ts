@@ -26,7 +26,10 @@ export type IllustrationId =
   | "app-connect"
   | "charging"
   | "charge-red"
-  | "charge-green";
+  | "charge-green"
+  | "memory-card"
+  | "usb-transfer"
+  | "reset-button";
 
 export type MediaSlotConfig = {
   slot: string;
@@ -96,16 +99,15 @@ export const setupSteps: SetupStepContent[] = [
     number: "02",
     label: "Notification light",
     title: "Look for the notification light.",
-    // CONFIRM against hardware: LED colour and behaviour are deliberately
-    // not described until the team verifies them on the real camera.
-    body: "Once your VHSMO powers on, wait for the notification LED to light up. This LED indicates that the camera has powered on and is ready for use.",
+    // Per the video script: startup sound, light on while starting, then off.
+    body: "You'll hear a startup sound as your VHSMO wakes up, and the notification light comes on while it starts. Once the light turns off, your camera is ready to go.",
     media: {
       slot: "step-02/media",
       illustration: "notification-light",
       ratio: "1 / 1",
       fit: "contain",
-      alt: "Close-up of the notification LED on the VHSMO camera",
-      brief: "Close-up GIF or photo: notification LED",
+      alt: "The notification light beside the viewfinder lighting up, then turning off when the camera is ready",
+      brief: "Close-up GIF: notification LED on during startup, then off",
     },
   },
   {
@@ -113,7 +115,8 @@ export const setupSteps: SetupStepContent[] = [
     number: "03",
     label: "Ready",
     title: "That's it. You're ready!",
-    body: "Your VHSMO is now ready to capture moments. Start taking photos and enjoy the experience.",
+    body: "Point your VHSMO at whatever you'd like to capture and press the shutter button. Your photo is saved to the memory card automatically. No screens, no distractions. Just you and the moment.",
+    note: "Want flash? Slide the switch up to Flash and your camera will use flash for your photos.",
     media: {
       slot: "step-03/media",
       illustration: "ready-to-shoot",
@@ -156,6 +159,17 @@ export const appGuide = {
     alt: "The VHSMO camera connecting to the VHSMO app",
     brief: "Camera + phone connecting (photo or GIF)",
   } satisfies MediaSlotConfig,
+  /** The first connection triggers a compulsory firmware update. */
+  firmware: {
+    tag: "Important",
+    title: "Your first update is required.",
+    body: "The first time you connect your VHSMO to the app, you'll be asked to install a firmware update. It includes important fixes and optimisations, so it's compulsory. Future updates arrive the same way.",
+    points: [
+      "Follow the instructions in the app.",
+      "Keep your camera powered on and connected the whole time.",
+      "Charge it first: updates need at least 2 battery bars.",
+    ],
+  },
   screens: [
     {
       n: 1,
@@ -245,6 +259,63 @@ export const charging = {
   ],
 };
 
+/** Unnumbered strip after the video: the card that's already in the camera. */
+export const inside = {
+  id: "inside",
+  eyebrow: "Already inside",
+  title: "Nothing extra to buy.",
+  body: "Your VHSMO comes with a memory card already installed, so there is nothing to buy or set up. It holds over 2,500 photos, so you can capture thousands of memories before you ever need to transfer or delete a single picture.",
+  stat: "2,500+",
+  statLabel: "photos on the card",
+  media: {
+    slot: "inside/media",
+    illustration: "memory-card",
+    ratio: "4 / 3",
+    fit: "cover",
+    alt: "The side panel of the VHSMO opening to show the memory card",
+    brief: "Photo or GIF: side panel open, memory card visible",
+  } satisfies MediaSlotConfig,
+};
+
+/** Unnumbered section after the tips: USB transfer and the reset button. */
+export const goodToKnow = {
+  id: "good-to-know",
+  eyebrow: "Good to know",
+  title: "Two more things, just in case.",
+  items: [
+    {
+      id: "usb",
+      title: "Prefer a computer? Use USB.",
+      body: "Connect your VHSMO to your computer with a USB data cable, open the camera's storage and copy your photos across. When you're done, safely eject the storage before you unplug it.",
+      note: "Handy when you have lots of photos to back up.",
+      media: {
+        slot: "good-to-know/usb",
+        illustration: "usb-transfer",
+        ratio: "4 / 3",
+        fit: "cover",
+        alt: "The VHSMO connected to a laptop with a USB cable while photos copy across",
+        brief: "GIF: camera on USB, photo folder on the laptop",
+      } satisfies MediaSlotConfig,
+    },
+    {
+      id: "reset",
+      title: "Camera stuck? Reset it.",
+      // CONFIRM against hardware: the position of the reset button under the
+      // side panel is taken from the script, not yet checked on a camera.
+      body: "Like any electronic device, your VHSMO can very rarely stop responding. On the side where the memory card goes in, you'll find a small reset button under the same panel. Press and hold it for about four seconds, until the indicator lights blink. The camera restarts and you're back to capturing.",
+      note: "Hold for about 4 seconds, until the lights blink.",
+      media: {
+        slot: "good-to-know/reset",
+        illustration: "reset-button",
+        ratio: "4 / 3",
+        fit: "cover",
+        alt: "Pressing and holding the small reset button under the side panel",
+        brief: "Photo or GIF: side panel open, reset button pressed",
+      } satisfies MediaSlotConfig,
+    },
+  ],
+};
+
 /** Step 07: tips. */
 export const tips = {
   id: "step-7",
@@ -254,7 +325,7 @@ export const tips = {
   items: [
     {
       title: "Save your battery.",
-      body: "Keep the Wi-Fi button turned OFF when you aren't using the mobile app. This helps conserve battery.",
+      body: "Keep the Wi-Fi button turned OFF whenever you aren't using the VHSMO app. It can significantly improve your battery life, so switch it off once you're done.",
     },
     {
       title: "Charge before heading out.",
@@ -265,8 +336,8 @@ export const tips = {
       body: "Connect through the VHSMO app regularly to view and transfer your captured photos.",
     },
     {
-      title: "Keep capturing.",
-      body: "Your VHSMO is made to capture everyday moments. Don't overthink it!",
+      title: "Stay in the moment.",
+      body: "Don't worry about checking every picture right after taking it. Enjoy the people around you, capture the little things, and let the memories happen naturally.",
     },
   ],
 };
@@ -282,6 +353,10 @@ export const progressSteps = [
 export type TroubleItem = { q: string; a: string };
 
 export const troubleshooting: TroubleItem[] = [
+  {
+    q: "My camera is stuck or won't respond",
+    a: "Open the side panel (the one over the memory card) and press and hold the small reset button for about four seconds, until the indicator lights blink. The camera restarts and you're good to go.",
+  },
   {
     q: "The Wi-Fi button won't light up",
     a: "Give it a charge. Plug the camera in for a few minutes, then press the Wi-Fi button again. Make sure the power slider is on ON, not OFF.",

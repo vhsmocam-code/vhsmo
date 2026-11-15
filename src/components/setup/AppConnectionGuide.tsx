@@ -1,3 +1,4 @@
+import { RefreshCw } from "lucide-react";
 import { Reveal } from "@/components/brand/Reveal";
 import { appGuide } from "@/lib/setup";
 import { JoinDetails } from "./JoinDetails";
@@ -66,6 +67,30 @@ export function AppConnectionGuide() {
             </li>
           ))}
         </ol>
+
+        {/* First connection: compulsory firmware update */}
+        <Reveal className="mx-auto mt-16 max-w-3xl">
+          <div className="border-2 border-kodak/70 bg-darkroom-deep/60 p-6 sm:p-8">
+            <div className="flex items-center gap-3">
+              <RefreshCw aria-hidden className="size-5 text-kodak" />
+              <span className="eyebrow text-kodak">{appGuide.firmware.tag}</span>
+            </div>
+            <h3 className="display mt-4 text-[clamp(1.5rem,3vw,2.2rem)] text-halide">
+              {appGuide.firmware.title}
+            </h3>
+            <p className="mt-4 max-w-xl text-base leading-relaxed text-halide/75">
+              {appGuide.firmware.body}
+            </p>
+            <ul className="mt-6 flex flex-col gap-3 text-sm leading-relaxed text-halide/80 sm:text-base">
+              {appGuide.firmware.points.map((point) => (
+                <li key={point} className="flex gap-3">
+                  <span aria-hidden className="mt-2 size-1.5 shrink-0 rounded-full bg-kodak" />
+                  <span>{point}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Reveal>
 
         <Reveal className="mx-auto mt-14 max-w-md">
           <JoinDetails />

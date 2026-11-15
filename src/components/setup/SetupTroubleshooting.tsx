@@ -49,6 +49,18 @@ export function SetupTroubleshooting() {
               team@vhsmo.com
             </a>
           </p>
+          <p className="mt-8 max-w-sm text-sm leading-relaxed text-darkroom/70">
+            We&apos;d love to see the world through your VHSMO. Tag{" "}
+            <a
+              href="https://www.instagram.com/vhsmo.cam_/"
+              target="_blank"
+              rel="noreferrer"
+              className="font-semibold text-darkroom underline underline-offset-4"
+            >
+              @vhsmo.cam_
+            </a>{" "}
+            in your favourite memories.
+          </p>
           <div className="mt-10">
             <p className="eyebrow mb-3 text-darkroom/55">Get the app</p>
             <StoreBadges tone="light" />

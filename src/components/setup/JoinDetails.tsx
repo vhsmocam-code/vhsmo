@@ -84,12 +84,17 @@ export function JoinDetails() {
   return (
     <div className="border-t border-halide/15 pt-6">
       <p className="text-sm text-halide/60">
-        Prompt didn&apos;t show? Join it yourself in Wi-Fi settings:
+        Prompt didn&apos;t show? In your phone&apos;s Wi-Fi settings, look for a
+        network ending in &ldquo;vhsmo&rdquo; and join it:
       </p>
       <div className="mt-4 flex flex-wrap gap-x-10 gap-y-4">
         <CopyValue label="Network" value={CAMERA_WIFI.network} />
         <CopyValue label="Password" value={CAMERA_WIFI.password} />
       </div>
+      <p className="mt-5 text-sm text-halide/50">
+        Your phone may say the network has no internet. That&apos;s completely
+        normal - VHSMO connects straight to your phone, no internet needed.
+      </p>
     </div>
   );
 }
