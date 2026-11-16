@@ -20,7 +20,7 @@ const scenes = [
   { id: "shoot", label: "Start shooting", seconds: 5, C: ReadyToShoot },
   { id: "wifi", label: "Press the Wi-Fi button", seconds: 6, C: WifiOn },
   { id: "app", label: "Connect in the app", seconds: 5, C: AppConnect },
-  { id: "charge", label: "Charge it up", seconds: 7, C: Charging },
+  { id: "charge", label: "Charge it up", seconds: 8, C: Charging },
 ] as const;
 
 /**

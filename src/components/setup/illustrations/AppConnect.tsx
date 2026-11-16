@@ -76,7 +76,7 @@ export function AppConnect({ label, paused }: { label: string; paused?: boolean 
         {/* Phone with the real app Home screen */}
         <rect x="790" y="120" width="300" height="650" rx="50" fill="#0b0a09" stroke="#fff" strokeOpacity="0.14" strokeWidth="2" />
         <image
-          href="/setup/step-05/app-5.webp"
+          href="/setup/step-05/app-2.webp"
           x="800"
           y="130"
           width="280"

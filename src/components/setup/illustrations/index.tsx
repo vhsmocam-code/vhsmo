@@ -4,7 +4,7 @@ import { AppConnect } from "./AppConnect";
 import { ChargeState, Charging } from "./Charging";
 import { NotificationLight } from "./NotificationLight";
 import { PowerOn } from "./PowerOn";
-import { MemoryCard, ResetButton } from "./SideScenes";
+import { ResetButton } from "./ResetButton";
 import { UsbTransfer } from "./UsbTransfer";
 import { ReadyToShoot } from "./ReadyToShoot";
 import { WifiOn } from "./WifiOn";
@@ -29,7 +29,6 @@ export const illustrations: Record<IllustrationId, Scene> = {
   charging: Charging,
   "charge-red": ChargeRed,
   "charge-green": ChargeGreen,
-  "memory-card": MemoryCard,
   "usb-transfer": UsbTransfer,
   "reset-button": ResetButton,
 };
@@ -37,7 +36,6 @@ export const illustrations: Record<IllustrationId, Scene> = {
 export {
   AppConnect,
   Charging,
-  MemoryCard,
   NotificationLight,
   PowerOn,
   ReadyToShoot,

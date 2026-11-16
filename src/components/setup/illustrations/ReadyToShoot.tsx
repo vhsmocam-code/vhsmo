@@ -1,6 +1,7 @@
 "use client";
 
 import { CameraFront, FRONT } from "./CameraFront";
+import { LabelFrame, SceneLabel } from "./SceneLabel";
 import { IllustrationStage } from "./Stage";
 import { useSvgId } from "./useSvgId";
 import s from "./illustrations.module.css";
@@ -58,22 +59,13 @@ export function ReadyToShoot({ label, paused }: { label: string; paused?: boolea
         {print("p2", 1250, 430, -5)}
         {print("p3", 1270, 420, 2, s.printIn)}
 
-        <g fontFamily="var(--font-display), system-ui, sans-serif" fill="#e3e3e1">
-          <text x="1270" y="660" textAnchor="middle" fontSize="20" fontWeight="600" letterSpacing="5" fillOpacity="0.55">
-            FRAME
-          </text>
-          <g fontSize="64" fontWeight="800">
-            <text x="1270" y="735" textAnchor="middle" className={s.countOld}>
-              023
-            </text>
-            <text x="1270" y="735" textAnchor="middle" fill="#fdf100" className={s.countNew}>
-              024
-            </text>
-          </g>
-        </g>
-
         <rect width="1600" height="900" fill="#fff" className={s.panelFlash} />
       </svg>
+      <LabelFrame w={1600} h={900}>
+        <SceneLabel w={1600} h={900} x={1270} y={653} align="middle" sub="FRAME" subSize={20} minSub={10} subColor="rgba(227,227,225,0.6)" tracking="0.25em" />
+        <SceneLabel w={1600} h={900} x={1270} y={713} align="middle" className={s.countOld} title="023" titleSize={64} minTitle={16} titleColor="#e3e3e1" />
+        <SceneLabel w={1600} h={900} x={1270} y={713} align="middle" className={s.countNew} title="024" titleSize={64} minTitle={16} titleColor="#fdf100" />
+      </LabelFrame>
     </IllustrationStage>
   );
 }

@@ -8,6 +8,7 @@
 .stage {
   position: absolute;
   inset: 0;
+  container-type: size;
   background:
     radial-gradient(55% 50% at 50% 42%, rgba(253, 241, 0, 0.07), transparent 70%),
     radial-gradient(95% 85% at 50% 55%, #362f2c 0%, #1f1a18 72%);
@@ -67,6 +68,14 @@
   0%, 10% { opacity: 0; }
   18%, 50% { opacity: 1; }
   60%, 100% { opacity: 0; }
+}
+.startTag {
+  animation: startTag 5s ease-in-out infinite;
+}
+@keyframes startTag {
+  0%, 8% { opacity: 0; }
+  16%, 50% { opacity: 1; }
+  58%, 100% { opacity: 0; }
 }
 .readyTag {
   opacity: 0;
@@ -216,67 +225,150 @@
   92%, 100% { opacity: 0; transform: translate(360px, -26px) scale(0.5); }
 }
 
-/* ---------- 06 Charging (7s) ---------- */
-.plug {
-  animation: plug 7s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+/* ---------- HTML labels laid over a scene ---------- */
+.labelFrame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  container-type: inline-size;
+  pointer-events: none;
 }
-@keyframes plug {
-  0%, 5% { transform: translateX(170px); }
-  15%, 92% { transform: translateX(0); }
-  100% { transform: translateX(170px); }
+.label {
+  position: absolute;
+  white-space: nowrap;
+  font-family: var(--font-display), system-ui, sans-serif;
+  line-height: 1.18;
 }
-.ledRed {
-  opacity: 0;
-  animation: ledRed 7s ease-in-out infinite;
+.labelTitle {
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
-@keyframes ledRed {
-  0%, 16% { opacity: 0; }
-  20% { opacity: 1; }
-  29% { opacity: 0.4; }
-  38% { opacity: 1; }
-  47% { opacity: 0.4; }
-  56% { opacity: 1; }
-  62%, 100% { opacity: 0; }
+.labelSub {
+  font-weight: 600;
+  opacity: 0.85;
 }
-.ledGreen {
-  animation: ledGreen 7s ease-in-out infinite;
+
+/* ---------- 3D scenes: stage, camera rig ---------- */
+.world3dWrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
 }
-@keyframes ledGreen {
-  0%, 59% { opacity: 0; }
-  65%, 92% { opacity: 1; }
-  97%, 100% { opacity: 0; }
+.world3d {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1200px;
+  height: 900px;
+  transform-origin: 0 0;
+}
+.persp {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1200px;
+  height: 900px;
+}
+.rig {
+  position: absolute;
+  left: 600px;
+  top: 450px;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+}
+.cube {
+  position: absolute;
+  transform-style: preserve-3d;
+}
+.slice {
+  position: absolute;
+  inset: 0;
+}
+.plane3d,
+.cablePlane {
+  position: absolute;
+  transform-style: preserve-3d;
+}
+.overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1200px;
+  height: 900px;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* ---------- 06 Charging (8s): front → right side, plug in, charge ---------- */
+/* Static state = turned to the side, plugged in, full. */
+.sideTurn {
+  transform: var(--poseSide);
+  animation: sideTurn 8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes sideTurn {
+  0%, 10% { transform: var(--poseFront); }
+  32%, 90% { transform: var(--poseSide); }
+  98%, 100% { transform: var(--poseFront); }
+}
+.plug3 {
+  animation: plug3 8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes plug3 {
+  0%, 34% { transform: translateX(190px); opacity: 0; }
+  36% { opacity: 1; }
+  46%, 90% { transform: translateX(0); opacity: 1; }
+  97%, 100% { transform: translateX(190px); opacity: 0; }
+}
+.capSide {
+  animation: capSide 8s ease-in-out infinite;
+}
+@keyframes capSide {
+  0%, 30% { opacity: 0; }
+  38%, 90% { opacity: 1; }
+  96%, 100% { opacity: 0; }
 }
 .battery {
   transform-box: fill-box;
   transform-origin: left center;
-  animation: battery 7s ease-in-out infinite;
+  animation: battery 8s ease-in-out infinite;
 }
 @keyframes battery {
-  0%, 16% { transform: scaleX(0.06); }
-  60%, 92% { transform: scaleX(1); }
-  100% { transform: scaleX(0.06); }
+  0%, 46% { transform: scaleX(0.06); }
+  80%, 90% { transform: scaleX(1); }
+  98%, 100% { transform: scaleX(0.06); }
 }
 .batRed {
   opacity: 0;
-  animation: batRed 7s ease-in-out infinite;
+  animation: batRed 8s ease-in-out infinite;
 }
 @keyframes batRed {
-  0%, 59% { opacity: 1; }
-  65%, 100% { opacity: 0; }
+  0%, 74% { opacity: 1; }
+  80%, 100% { opacity: 0; }
 }
 .batGreen {
-  animation: batGreen 7s ease-in-out infinite;
+  animation: batGreen 8s ease-in-out infinite;
 }
 @keyframes batGreen {
-  0%, 59% { opacity: 0; }
-  65%, 100% { opacity: 1; }
+  0%, 74% { opacity: 0; }
+  80%, 100% { opacity: 1; }
 }
+/* The words swap without overlapping: one is gone before the other appears. */
 .chargeWord {
   opacity: 0;
-  animation: batRed 7s ease-in-out infinite;
+  animation: chargeWord 8s ease-in-out infinite;
+}
+@keyframes chargeWord {
+  0%, 72% { opacity: 1; }
+  76%, 100% { opacity: 0; }
 }
 .fullWord {
-  animation: batGreen 7s ease-in-out infinite;
+  animation: fullWord 8s ease-in-out infinite;
+}
+@keyframes fullWord {
+  0%, 77% { opacity: 0; }
+  81%, 100% { opacity: 1; }
 }
 
 /* ---------- Charge state stills ---------- */
@@ -288,66 +380,96 @@
   50% { opacity: 0.45; }
 }
 
-/* ---------- Side panel, USB and reset scenes ---------- */
-/* Default (static) state = panel slid away, card showing. */
-.panelOpen {
-  transform: translateX(200px);
+/* ---------- Reset / SD card (9s): front → bottom, open the cover ---------- */
+/* Static state = turned to the bottom, cover off, hold ring full. */
+.bottomTurn {
+  transform: var(--poseBottom);
+  animation: bottomTurn 9s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes bottomTurn {
+  0%, 8% { transform: var(--poseFront); }
+  28%, 92% { transform: var(--poseBottom); }
+  98%, 100% { transform: var(--poseFront); }
+}
+.screwTurn {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: screwTurn 9s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes screwTurn {
+  0%, 30% { transform: rotate(0deg); }
+  40%, 100% { transform: rotate(-720deg); }
+}
+.coverOff {
   opacity: 0;
+  animation: coverOff 9s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 }
-.panel {
-  transform: translateX(200px);
-  opacity: 0;
-  animation: panelSlide 6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+@keyframes coverOff {
+  0%, 38% { transform: translateY(0); opacity: 1; }
+  50%, 92% { transform: translateY(90px); opacity: 0; }
+  98%, 100% { transform: translateY(0); opacity: 1; }
 }
-@keyframes panelSlide {
-  0%, 10% { transform: translateX(0); opacity: 1; }
-  26%, 78% { transform: translateX(200px); opacity: 0; }
-  92%, 100% { transform: translateX(0); opacity: 1; }
+.labelsIn {
+  animation: labelsIn 9s ease-in-out infinite;
 }
-.card {
-  transform: translateY(-34px);
-  animation: cardOut 6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
-}
-@keyframes cardOut {
-  0%, 30% { transform: translateY(0); }
-  44%, 70% { transform: translateY(-46px); }
-  84%, 100% { transform: translateY(0); }
+@keyframes labelsIn {
+  0%, 48% { opacity: 0; }
+  58%, 92% { opacity: 1; }
+  98%, 100% { opacity: 0; }
 }
 .holdRing {
-  stroke-dasharray: 214;
+  stroke-dasharray: 176;
   stroke-dashoffset: 0;
-  animation: holdRing 7s linear infinite;
+  animation: holdRing 9s linear infinite;
 }
 @keyframes holdRing {
-  0%, 10% { stroke-dashoffset: 214; opacity: 0; }
-  12% { stroke-dashoffset: 214; opacity: 1; }
-  70% { stroke-dashoffset: 0; opacity: 1; }
-  94% { stroke-dashoffset: 0; opacity: 1; }
-  100% { stroke-dashoffset: 0; opacity: 0; }
+  0%, 56% { stroke-dashoffset: 176; opacity: 0; }
+  58% { stroke-dashoffset: 176; opacity: 1; }
+  82% { stroke-dashoffset: 0; opacity: 1; }
+  92% { stroke-dashoffset: 0; opacity: 1; }
+  98%, 100% { stroke-dashoffset: 0; opacity: 0; }
 }
 .blink {
-  animation: blink 7s ease-in-out infinite;
+  animation: blink 9s ease-in-out infinite;
 }
 @keyframes blink {
-  0%, 70% { opacity: 0.2; }
-  73% { opacity: 1; }
-  77% { opacity: 0.2; }
-  81% { opacity: 1; }
-  85% { opacity: 0.2; }
-  89% { opacity: 1; }
-  95%, 100% { opacity: 0.2; }
+  0%, 82% { opacity: 0.2; }
+  84% { opacity: 1; }
+  86% { opacity: 0.2; }
+  88% { opacity: 1; }
+  90% { opacity: 0.2; }
+  92%, 94% { opacity: 1; }
+  98%, 100% { opacity: 0.2; }
 }
-.file {
+.staticRig {
+  transform: var(--pose);
+}
+/* USB (10s): cable to the laptop, then to the phone; photos hop across. */
+.cableA {
+  animation: cableA 10s ease-in-out infinite;
+}
+@keyframes cableA {
+  0%, 46% { opacity: 1; }
+  50%, 96% { opacity: 0; }
+  100% { opacity: 1; }
+}
+.cableB {
+  animation: cableB 10s ease-in-out infinite;
+}
+@keyframes cableB {
+  0%, 48% { opacity: 0; }
+  52%, 96% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.hop {
   opacity: 0;
-  animation: file 4.5s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  animation: hop 10s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 }
-.file2 { animation-delay: 1.5s; }
-.file3 { animation-delay: 3s; }
-@keyframes file {
+@keyframes hop {
   0% { opacity: 0; transform: translate(0, 0) scale(0.6); }
-  12% { opacity: 1; transform: translate(20px, 0) scale(0.95); }
-  80% { opacity: 1; transform: translate(330px, 0) scale(0.95); }
-  92%, 100% { opacity: 0; transform: translate(350px, 0) scale(0.6); }
+  4% { opacity: 1; transform: translate(0, 0) scale(0.9); }
+  30% { opacity: 1; transform: translate(var(--dx), var(--dy)) scale(0.9); }
+  36%, 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.5); }
 }
 
 /* ---------- Walkthrough progress ---------- */

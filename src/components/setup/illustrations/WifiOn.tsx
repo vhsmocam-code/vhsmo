@@ -28,12 +28,17 @@ export function WifiOn({ label, paused }: { label: string; paused?: boolean }) {
           <circle cx={cx} cy={cy} r={r + 19} fill="none" stroke={INK} strokeOpacity="0.35" strokeWidth="1.5" />
         </g>
 
-        {/* Signal */}
-        <g fill="none" stroke={INK} strokeWidth="6" strokeLinecap="round">
-          <path d={arcPath(cx, cy, r + 38, 234, 306)} className={s.arc} />
-          <path d={arcPath(cx, cy, r + 62, 238, 302)} className={`${s.arc} ${s.arc2}`} />
-          <path d={arcPath(cx, cy, r + 86, 241, 299)} className={`${s.arc} ${s.arc3}`} />
-        </g>
+        {/* Signal: white pulses, with a faint dark under-stroke so they read on the pink body */}
+        {[
+          [r + 38, 234, 306, ""],
+          [r + 62, 238, 302, s.arc2],
+          [r + 86, 241, 299, s.arc3],
+        ].map(([rad, a0, a1, extra]) => (
+          <g key={String(rad)} className={`${s.arc} ${extra}`} fill="none" strokeLinecap="round">
+            <path d={arcPath(cx, cy, Number(rad), Number(a0), Number(a1))} stroke={INK} strokeOpacity="0.28" strokeWidth="11" />
+            <path d={arcPath(cx, cy, Number(rad), Number(a0), Number(a1))} stroke="#fff" strokeWidth="6.5" />
+          </g>
+        ))}
 
         {/* Fingertip */}
         <g transform={`translate(${cx} ${cy})`}>

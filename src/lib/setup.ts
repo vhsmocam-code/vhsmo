@@ -27,7 +27,6 @@ export type IllustrationId =
   | "charging"
   | "charge-red"
   | "charge-green"
-  | "memory-card"
   | "usb-transfer"
   | "reset-button";
 
@@ -58,12 +57,10 @@ export const heroMedia: MediaSlotConfig = {
 export const setupVideo = {
   eyebrow: "Watch",
   title: "Prefer watching? We've got you.",
-  body: "Here's the whole setup in about 30 seconds - switch on, shoot, connect and charge.",
-  /** public/setup/video/setup.(mp4|webm) and poster.(webp|jpg|png) */
-  slot: "video/setup",
-  posterSlot: "video/poster",
+  body: "The whole setup, start to finish: switch on, shoot, connect and charge.",
+  /** https://www.youtube.com/watch?v=bC3Oyn1y418 */
+  youtubeId: "bC3Oyn1y418",
   alt: "VHSMO setup walkthrough video",
-  brief: "Full setup walkthrough video",
 } as const;
 
 export type SetupStepContent = {
@@ -74,6 +71,8 @@ export type SetupStepContent = {
   title: string;
   body: string;
   note?: string;
+  /** Show the note as a highlighted callout with this icon instead of a quiet aside. */
+  noteIcon?: "flash" | "wifi";
   media: MediaSlotConfig;
 };
 
@@ -84,7 +83,7 @@ export const setupSteps: SetupStepContent[] = [
     number: "01",
     label: "Switch on",
     title: "First things first. Switch it on.",
-    body: "Move the slider button to the ON position to power up your VHSMO camera.",
+    body: "Pull the slider from OFF to ON to power up your VHSMO camera.",
     media: {
       slot: "step-01/media",
       illustration: "power-on",
@@ -99,15 +98,15 @@ export const setupSteps: SetupStepContent[] = [
     number: "02",
     label: "Notification light",
     title: "Look for the notification light.",
-    // Per the video script: startup sound, light on while starting, then off.
-    body: "You'll hear a startup sound as your VHSMO wakes up, and the notification light comes on while it starts. Once the light turns off, your camera is ready to go.",
+    // Confirmed by the team: red while starting, then no light means ready.
+    body: "As soon as you switch it on, the notification light glows red for a few seconds while your VHSMO starts up, and you'll hear a startup sound. When the light goes out, your camera is on and ready to go. No light means it's ready.",
     media: {
       slot: "step-02/media",
       illustration: "notification-light",
       ratio: "1 / 1",
       fit: "contain",
-      alt: "The notification light beside the viewfinder lighting up, then turning off when the camera is ready",
-      brief: "Close-up GIF: notification LED on during startup, then off",
+      alt: "The notification light beside the viewfinder glowing red while the camera starts, then turning off when it is ready",
+      brief: "Close-up GIF: notification LED red during startup, then off",
     },
   },
   {
@@ -117,6 +116,7 @@ export const setupSteps: SetupStepContent[] = [
     title: "That's it. You're ready!",
     body: "Point your VHSMO at whatever you'd like to capture and press the shutter button. Your photo is saved to the memory card automatically. No screens, no distractions. Just you and the moment.",
     note: "Want flash? Slide the switch up to Flash and your camera will use flash for your photos.",
+    noteIcon: "flash",
     media: {
       slot: "step-03/media",
       illustration: "ready-to-shoot",
@@ -133,6 +133,7 @@ export const setupSteps: SetupStepContent[] = [
     title: "Want to see your moments? Connect.",
     body: "When you want to view or, more importantly, offload your photos, press the Wi-Fi button on your VHSMO. The button will light up to indicate that Wi-Fi is enabled.",
     note: "Wi-Fi is only needed when you access your photos through the VHSMO app.",
+    noteIcon: "wifi",
     media: {
       slot: "step-04/media",
       illustration: "wifi-on",
@@ -173,38 +174,24 @@ export const appGuide = {
   screens: [
     {
       n: 1,
-      title: "Let's set it up",
-      body: "Open the app and tap Let's set it up.",
+      title: "Live Gallery",
+      body: "See your shots appear as you take them, straight from your camera.",
       src: "/setup/step-05/app-1.webp",
-      alt: "The VHSMO app's first screen with a Let's set it up button",
+      alt: "The VHSMO app's Live Gallery showing photos from the connected camera",
     },
     {
       n: 2,
-      title: "Pick your camera",
-      body: "Choose your camera's colour.",
+      title: "Home",
+      body: "Your camera shows as connected, with its battery level. Tap Offload media to move your photos across.",
       src: "/setup/step-05/app-2.webp",
-      alt: "The Let's find your VHSMO screen with the three camera colours",
+      alt: "The VHSMO app's Home screen with the camera connected and an Offload media button",
     },
     {
       n: 3,
-      title: "Press the Wi-Fi button",
-      body: "Press the button on the camera, then tap Light's on!",
+      title: "Offload Gallery",
+      body: "Every offload is saved on your phone and sorted by day, ready to look back on.",
       src: "/setup/step-05/app-3.webp",
-      alt: "The Press the Wi-Fi button screen showing the back of the camera",
-    },
-    {
-      n: 4,
-      title: "Join vhsmo",
-      body: "Tap Join when your phone asks and the app finds your camera.",
-      src: "/setup/step-05/app-4.webp",
-      alt: "The Finding your camera screen with the vhsmo network details",
-    },
-    {
-      n: 5,
-      title: "Offload from Home",
-      body: "Tap Offload media to move your photos onto your phone.",
-      src: "/setup/step-05/app-5.webp",
-      alt: "The VHSMO app's Home screen with the offload button",
+      alt: "The VHSMO app's Your rolls screen with favourites and offloaded rolls sorted by day",
     },
   ],
 };
@@ -215,7 +202,7 @@ export const charging = {
   number: "06",
   label: "Charging",
   title: "Power up. Get back out there.",
-  body: "Your VHSMO takes up to 8 hours to fully charge.",
+  body: "Plug a USB-C cable into the charging port on the side of your VHSMO, next to the ON/OFF switch. It takes up to 8 hours to fully charge.",
   hours: "8",
   photos: "1,000+",
   photosLine: "One full charge lets you capture 1,000+ photos, so you never have to worry about missing a moment.",
@@ -224,8 +211,8 @@ export const charging = {
     illustration: "charging",
     ratio: "4 / 3",
     fit: "cover",
-    alt: "The VHSMO charging indicator changing from red to green",
-    brief: "GIF: charging LED red to green",
+    alt: "The VHSMO turning from the front to its side, where a cable plugs into the charging port next to the ON/OFF switch",
+    brief: "GIF: camera turns to the side port, cable plugs in, charging",
   } satisfies MediaSlotConfig,
   states: [
     {
@@ -259,24 +246,6 @@ export const charging = {
   ],
 };
 
-/** Unnumbered strip after the video: the card that's already in the camera. */
-export const inside = {
-  id: "inside",
-  eyebrow: "Already inside",
-  title: "Nothing extra to buy.",
-  body: "Your VHSMO comes with a memory card already installed, so there is nothing to buy or set up. It holds over 2,500 photos, so you can capture thousands of memories before you ever need to transfer or delete a single picture.",
-  stat: "2,500+",
-  statLabel: "photos on the card",
-  media: {
-    slot: "inside/media",
-    illustration: "memory-card",
-    ratio: "4 / 3",
-    fit: "cover",
-    alt: "The side panel of the VHSMO opening to show the memory card",
-    brief: "Photo or GIF: side panel open, memory card visible",
-  } satisfies MediaSlotConfig,
-};
-
 /** Unnumbered section after the tips: USB transfer and the reset button. */
 export const goodToKnow = {
   id: "good-to-know",
@@ -285,32 +254,32 @@ export const goodToKnow = {
   items: [
     {
       id: "usb",
-      title: "Prefer a computer? Use USB.",
-      body: "Connect your VHSMO to your computer with a USB data cable, open the camera's storage and copy your photos across. When you're done, safely eject the storage before you unplug it.",
+      title: "Prefer a cable? Use USB.",
+      body: "Connect your VHSMO to your computer or phone with a USB data cable, open the camera's storage and copy your photos across. When you're done, safely eject the storage before you unplug it.",
       note: "Handy when you have lots of photos to back up.",
       media: {
         slot: "good-to-know/usb",
         illustration: "usb-transfer",
         ratio: "4 / 3",
         fit: "cover",
-        alt: "The VHSMO connected to a laptop with a USB cable while photos copy across",
-        brief: "GIF: camera on USB, photo folder on the laptop",
+        alt: "The VHSMO on a USB cable, copying photos to a laptop and then to a phone",
+        brief: "GIF: camera on USB, photos copying to a laptop, then a phone",
       } satisfies MediaSlotConfig,
     },
     {
       id: "reset",
       title: "Camera stuck? Reset it.",
-      // CONFIRM against hardware: the position of the reset button under the
-      // side panel is taken from the script, not yet checked on a camera.
-      body: "Like any electronic device, your VHSMO can very rarely stop responding. On the side where the memory card goes in, you'll find a small reset button under the same panel. Press and hold it for about four seconds, until the indicator lights blink. The camera restarts and you're back to capturing.",
+      // CONFIRM against hardware: the cover position on the underside and the
+      // screw, reset button and card order are from the team's description.
+      body: "Like any electronic device, your VHSMO can very rarely stop responding. Turn it over and unscrew the small cover on the underside: you'll find the reset button in the middle and the memory card on the right. Press and hold the reset button for about four seconds, until the indicator lights blink. The camera restarts and you're back to capturing.",
       note: "Hold for about 4 seconds, until the lights blink.",
       media: {
         slot: "good-to-know/reset",
         illustration: "reset-button",
         ratio: "4 / 3",
         fit: "cover",
-        alt: "Pressing and holding the small reset button under the side panel",
-        brief: "Photo or GIF: side panel open, reset button pressed",
+        alt: "The VHSMO turning onto its underside, the small cover coming off to show the reset button and the memory card",
+        brief: "Photo or GIF: underside cover open, reset button pressed",
       } satisfies MediaSlotConfig,
     },
   ],
@@ -348,53 +317,4 @@ export const progressSteps = [
   { id: appGuide.id, number: appGuide.number, label: appGuide.label },
   { id: charging.id, number: charging.number, label: charging.label },
   { id: tips.id, number: tips.number, label: tips.label },
-];
-
-export type TroubleItem = { q: string; a: string };
-
-export const troubleshooting: TroubleItem[] = [
-  {
-    q: "My camera is stuck or won't respond",
-    a: "Open the side panel (the one over the memory card) and press and hold the small reset button for about four seconds, until the indicator lights blink. The camera restarts and you're good to go.",
-  },
-  {
-    q: "The Wi-Fi button won't light up",
-    a: "Give it a charge. Plug the camera in for a few minutes, then press the Wi-Fi button again. Make sure the power slider is on ON, not OFF.",
-  },
-  {
-    q: "The app can't find my camera",
-    a: "Check the Wi-Fi button is still lit and your phone is close to the camera. In the app, tap Stuck? Join manually, then join the vhsmo network from your phone's Wi-Fi settings (password vhsmo123) and come back to the app.",
-  },
-  {
-    q: "It says \"Unable to Join\"",
-    a: "The camera's Wi-Fi needs to be on - press the Wi-Fi button so it stays lit. If you changed the camera's network name or password, use the new details. Tap Open Settings to join by hand if you'd rather.",
-  },
-  {
-    q: "It says \"Please Wait\" on iPhone",
-    a: "iOS limits Wi-Fi join attempts to once per minute. Wait a moment and tap Try auto-join again.",
-  },
-  {
-    q: "My phone says \"No internet\"",
-    a: "That's fine - the camera doesn't need internet. Your phone is talking straight to the camera over its own Wi-Fi. Stay connected.",
-  },
-  {
-    q: "Why does the app want my location?",
-    a: "iOS and Android only let apps join and read Wi-Fi networks with location permission. VHSMO uses it to connect to and communicate with your camera - nothing else.",
-  },
-  {
-    q: "I changed my camera's Wi-Fi name or password",
-    a: "Update them in the app under Settings → Camera → Wi-Fi name / Wi-Fi password. If a connection fails in Live Gallery, tap Get Help to enter the new details and Save & Connect. Names can be up to 10 characters; passwords need 8–32 characters with no spaces.",
-  },
-  {
-    q: "My offload stopped halfway",
-    a: "Make sure the camera is still on and the Wi-Fi button is lit, reconnect, then tap Try again and Offload. Keep the camera close to your phone until it says Transfer complete.",
-  },
-  {
-    q: "The app says my battery is low",
-    a: "Plug the camera into a charger before you offload. Firmware updates need at least 2 bars - a low battery mid-update can damage the camera.",
-  },
-  {
-    q: "My photos aren't in my phone's Photos app",
-    a: "Offloaded shots live in the VHSMO app's Gallery, sorted by day. To also copy them to your phone's Photos, turn on Save to phone gallery in the app's Settings.",
-  },
 ];

@@ -42,7 +42,7 @@ export function AppConnectionGuide() {
         </div>
 
         {/* The in-app sequence */}
-        <ol className="no-scrollbar -mx-[clamp(1.375rem,4vw,5rem)] mt-20 flex snap-x snap-mandatory gap-6 overflow-x-auto px-[clamp(1.375rem,4vw,5rem)] pb-4 sm:mt-28 lg:mx-0 lg:grid lg:grid-cols-5 lg:gap-5 lg:overflow-visible lg:px-0">
+        <ol className="no-scrollbar -mx-[clamp(1.375rem,4vw,5rem)] mt-20 flex snap-x snap-mandatory gap-6 overflow-x-auto px-[clamp(1.375rem,4vw,5rem)] pb-4 sm:mt-28 lg:mx-0 lg:mx-auto lg:grid lg:max-w-4xl lg:grid-cols-3 lg:gap-10 lg:overflow-visible lg:px-0">
           {appGuide.screens.map((s, i) => (
             <li
               key={s.n}
@@ -57,10 +57,10 @@ export function AppConnectionGuide() {
                     {s.title}
                   </h3>
                 </div>
-                <div className="mx-auto mt-5 w-full max-w-[14rem] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-1.5">
+                <div className="mx-auto mt-5 w-full max-w-[15rem] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-1.5">
                   <PhoneFrame src={s.src} alt={s.alt} />
                 </div>
-                <p className="mx-auto mt-5 max-w-[14rem] text-sm leading-relaxed text-halide/60">
+                <p className="mx-auto mt-5 max-w-[15rem] text-sm leading-relaxed text-halide/60">
                   {s.body}
                 </p>
               </Reveal>

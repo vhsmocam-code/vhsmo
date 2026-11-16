@@ -2,30 +2,34 @@ import { useSvgId } from "./useSvgId";
 import { DARK, SILVER, TONES, type Tone } from "./geometry";
 
 /**
- * The front of the VHSMO, drawn from a photo of the real camera: chamfered
- * body, dark viewfinder, two-lamp flash, ringed lens.
- * Local units: 985 x 757 with the body's top-left at 0,0; the shutter sits
+ * The front of the VHSMO: the back's traced outline mirrored left-right
+ * (front and back are the same body), with the dark viewfinder, two-lamp
+ * flash and ringed lens measured from a photo of the real camera.
+ * Local units: 985 x 718 with the body's top-left at 0,0; the shutter sits
  * on top at the left (negative y).
  */
 export const FRONT = {
   w: 985,
-  h: 757,
-  flash: { x: 740, y: 114 },
-  lens: { x: 492, y: 446 },
+  h: 718,
+  flash: { x: 740, y: 108 },
+  lens: { x: 492, y: 423 },
 } as const;
 
-const BODY =
-  "M170 6H790C850 6 880 30 912 70L962 135C980 160 985 185 985 215V560C985 600 975 630 955 655L905 715C880 740 850 755 800 755H175C145 755 125 745 100 725L30 655C8 630 0 600 0 560V215C0 185 10 165 30 140L82 70C110 30 130 6 170 6Z";
+export const FRONT_BODY =
+  "M848 3.2H125.3C98.5 3.2 83.5 15 66.4 32.1L23.6 85.7C8.6 103.9 2.1 124.2 0 149.9V578.2C2.1 599.6 8.6 616.7 23.6 633.8L68.5 678.8C85.7 698.1 100.6 710.9 128.5 716.3H845.8C873.7 714.1 886.5 706.6 903.6 690.6L950.7 643.5C965.7 627.4 976.4 608.1 985 583.5V149.9C982.9 126.3 976.4 107.1 961.4 89.9L914.3 38.5C897.2 19.3 877.9 6.4 848 3.2Z";
 
 export function CameraFront({
   tone = "pink",
   shutterClassName,
   shadow = true,
+  hideShutter = false,
   children,
 }: {
   tone?: Tone;
   shutterClassName?: string;
   shadow?: boolean;
+  /** Skip the flat shutter art (the 3D camera builds its own). */
+  hideShutter?: boolean;
   children?: React.ReactNode;
 }) {
   const t = TONES[tone];
@@ -75,43 +79,45 @@ export function CameraFront({
           <feGaussianBlur stdDeviation="18" />
         </filter>
         <clipPath id={`${id}-clip`}>
-          <path d={BODY} />
+          <path d={FRONT_BODY} />
         </clipPath>
       </defs>
 
       {shadow && (
-        <path d={BODY} transform="translate(10 28)" fill="#000" opacity="0.4" filter={`url(#${id}-blur)`} />
+        <path d={FRONT_BODY} transform="translate(10 28)" fill="#000" opacity="0.4" filter={`url(#${id}-blur)`} />
       )}
 
       {/* Shutter */}
+      {!hideShutter && (
       <g className={shutterClassName}>
-        <rect x="189" y="-18" width="138" height="34" rx="8" fill={`url(#${id}-metal)`} stroke={SILVER.dark} strokeWidth="2" />
+        <rect x="179" y="-18" width="121" height="34" rx="8" fill={`url(#${id}-metal)`} stroke={SILVER.dark} strokeWidth="2" />
         {[-10, -3, 4].map((y, i) => (
-          <line key={y} x1="197" x2="319" y1={y} y2={y} stroke={i % 2 ? "#fff" : SILVER.dark} strokeOpacity="0.7" strokeWidth="2.5" />
+          <line key={y} x1="186" x2="293" y1={y} y2={y} stroke={i % 2 ? "#fff" : SILVER.dark} strokeOpacity="0.7" strokeWidth="2.5" />
         ))}
       </g>
+      )}
 
       {/* Body: soft gradient, directional bevel, gloss streaks */}
-      <path d={BODY} fill={`url(#${id}-body)`} stroke={t.edge} strokeWidth="3" />
+      <path d={FRONT_BODY} fill={`url(#${id}-body)`} stroke={t.edge} strokeWidth="3" />
       <g clipPath={`url(#${id}-clip)`}>
-        <path d={BODY} fill="none" stroke={`url(#${id}-bevel)`} strokeWidth="20" />
+        <path d={FRONT_BODY} fill="none" stroke={`url(#${id}-bevel)`} strokeWidth="20" />
         <path d="M180 18H790" stroke="#fff" strokeOpacity="0.5" strokeWidth="5" strokeLinecap="round" />
-        <path d="M26 190C34 164 52 140 80 106" fill="none" stroke="#fff" strokeOpacity="0.45" strokeWidth="6" strokeLinecap="round" />
+        <path d="M16 146C22 122 34 104 54 78" fill="none" stroke="#fff" strokeOpacity="0.45" strokeWidth="6" strokeLinecap="round" />
       </g>
 
       {/* Viewfinder: raised frame, dark window with a reflection */}
-      <rect x="373" y="53" width="225" height="127" rx="9" fill={t.frame} stroke={t.edge} strokeWidth="3" />
-      <path d="M382 58H588" stroke="#fff" strokeOpacity="0.55" strokeWidth="3.5" strokeLinecap="round" />
-      <rect x="402" y="62" width="184" height="102" rx="6" fill={`url(#${id}-glass)`} stroke="#0c0a0a" strokeWidth="2.5" />
-      <rect x="446" y="78" width="108" height="56" rx="3" fill="#8b8785" fillOpacity="0.5" />
-      <rect x="480" y="92" width="40" height="30" fill="#1b1819" fillOpacity="0.8" />
-      <path d="M414 70H458L430 156H414Z" fill="#fff" fillOpacity="0.07" />
+      <rect x="373" y="50" width="225" height="120" rx="9" fill={t.frame} stroke={t.edge} strokeWidth="3" />
+      <path d="M382 55H588" stroke="#fff" strokeOpacity="0.55" strokeWidth="3.5" strokeLinecap="round" />
+      <rect x="402" y="59" width="184" height="97" rx="6" fill={`url(#${id}-glass)`} stroke="#0c0a0a" strokeWidth="2.5" />
+      <rect x="446" y="74" width="108" height="53" rx="3" fill="#8b8785" fillOpacity="0.5" />
+      <rect x="480" y="87" width="40" height="28" fill="#1b1819" fillOpacity="0.8" />
+      <path d="M414 66H458L430 148H414Z" fill="#fff" fillOpacity="0.07" />
 
       {/* Flash: translucent pill with two lamps */}
-      <rect x="654" y="66" width="172" height="96" rx="48" fill={`url(#${id}-flash)`} stroke="#8f979c" strokeWidth="2.5" />
-      <path d="M690 74H790" stroke="#fff" strokeOpacity="0.5" strokeWidth="3" strokeLinecap="round" />
-      <rect x="684" y="98" width="43" height="34" rx="3" fill="#F3EFCF" stroke="#c9c4a0" strokeWidth="1.5" />
-      <rect x="753" y="98" width="44" height="34" rx="3" fill="#F3EFCF" stroke="#c9c4a0" strokeWidth="1.5" />
+      <rect x="654" y="63" width="172" height="91" rx="45" fill={`url(#${id}-flash)`} stroke="#8f979c" strokeWidth="2.5" />
+      <path d="M690 70H790" stroke="#fff" strokeOpacity="0.5" strokeWidth="3" strokeLinecap="round" />
+      <rect x="684" y="93" width="43" height="32" rx="3" fill="#F3EFCF" stroke="#c9c4a0" strokeWidth="1.5" />
+      <rect x="753" y="93" width="44" height="32" rx="3" fill="#F3EFCF" stroke="#c9c4a0" strokeWidth="1.5" />
 
       {/* Lens: black gasket, silver ring, pink disc, black lens */}
       <circle cx={lx} cy={ly} r="217" fill={DARK} />

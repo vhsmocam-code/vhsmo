@@ -19,8 +19,8 @@ export const BACK = {
   portY: 430,
 } as const;
 
-/** Chamfered, rounded body, traced from the photo. */
-const BODY =
+/** Chamfered, rounded body, traced from the photo. The front mirrors it. */
+export const BACK_BODY =
   "M128 3H803C828 3 842 14 858 30L898 80C912 97 918 116 920 140V540C918 560 912 576 898 592L856 634C840 652 826 664 800 669H130C104 667 92 660 76 645L32 601C18 586 8 568 0 545V140C2 118 8 100 22 84L66 36C82 18 100 6 128 3Z";
 
 const FONT = "var(--font-display), system-ui, sans-serif";
@@ -91,12 +91,12 @@ export function CameraBack({
           <feGaussianBlur stdDeviation="16" />
         </filter>
         <clipPath id={`${id}-clip`}>
-          <path d={BODY} />
+          <path d={BACK_BODY} />
         </clipPath>
       </defs>
 
       {shadow && (
-        <path d={BODY} transform="translate(8 26)" fill="#000" opacity="0.4" filter={`url(#${id}-blur)`} />
+        <path d={BACK_BODY} transform="translate(8 26)" fill="#000" opacity="0.4" filter={`url(#${id}-blur)`} />
       )}
 
       {/* Shutter, peeking over the top edge */}
@@ -106,9 +106,9 @@ export function CameraBack({
       ))}
 
       {/* Body: soft gradient, directional bevel, gloss streak */}
-      <path d={BODY} fill={`url(#${id}-body)`} stroke={t.edge} strokeWidth="3" />
+      <path d={BACK_BODY} fill={`url(#${id}-body)`} stroke={t.edge} strokeWidth="3" />
       <g clipPath={`url(#${id}-clip)`}>
-        <path d={BODY} fill="none" stroke={`url(#${id}-bevel)`} strokeWidth="16" />
+        <path d={BACK_BODY} fill="none" stroke={`url(#${id}-bevel)`} strokeWidth="16" />
         <path d="M120 14H800" stroke="#fff" strokeOpacity="0.5" strokeWidth="4" strokeLinecap="round" />
         <path d="M24 108C30 84 46 64 68 42" fill="none" stroke="#fff" strokeOpacity="0.45" strokeWidth="5" strokeLinecap="round" />
       </g>
@@ -120,12 +120,12 @@ export function CameraBack({
       <path d="M426 82H470L452 138H426Z" fill="#fff" fillOpacity="0.07" />
 
       {/* LED (unlit) */}
-      <circle cx={BACK.led.x} cy={BACK.led.y} r="6" fill="#8a4b3c" stroke={t.edge} strokeWidth="1.5" />
+      <circle cx={BACK.led.x} cy={BACK.led.y} r="6" fill="#8C4A5E" stroke={t.edge} strokeWidth="1.5" />
       <circle cx={BACK.led.x} cy={BACK.led.y} r="3.4" fill={DARK} />
 
       {/* Power slot, embossed labels, silver thumb */}
       <rect x="141" y="295" width="73" height="121" rx="36.5" fill={t.light} stroke={t.edge} strokeWidth="2.5" />
-      <rect x="148" y="302" width="59" height="107" rx="29.5" fill="#E3B3A0" />
+      <rect x="148" y="302" width="59" height="107" rx="29.5" fill="#E79DB6" />
       <g fontFamily={FONT} fontWeight="700" fontSize="23">
         {label("Flash", 304)}
         {label("ON", 358)}
@@ -145,7 +145,7 @@ export function CameraBack({
       </text>
       <g transform={`translate(${BACK.slider.x} ${BACK.slider[thumbAt]})`}>
         <g className={thumbClassName}>
-          <rect x="-35" y="-29" width="70" height="58" rx="15" fill="#B9806C" />
+          <rect x="-35" y="-29" width="70" height="58" rx="15" fill="#B9708A" />
           <rect x="-33" y="-28" width="66" height="54" rx="14" fill={`url(#${id}-metal)`} stroke={SILVER.dark} strokeWidth="1.5" />
           {[-17, -9, -1, 7, 15].map((y, i) => (
             <line key={y} x1="-27" x2="27" y1={y} y2={y} stroke={i % 2 ? "#fff" : "#8f8f95"} strokeOpacity={i % 2 ? 0.9 : 0.8} strokeWidth="3" strokeLinecap="round" />
@@ -160,7 +160,7 @@ export function CameraBack({
 
       {/* VHSMO mark: off-white disc, four-point star cut out */}
       <g transform="translate(791 547)">
-        <circle r="52" fill="#F6ECE6" stroke="#E6D8D0" strokeWidth="1.5" />
+        <circle r="52" fill="#F6ECE6" stroke="#EAD5DC" strokeWidth="1.5" />
         <path
           d="M0-37C3-14 14-3 37 0C14 3 3 14 0 37C-3 14-14 3-37 0C-14-3-3-14 0-37Z"
           fill={t.body}

@@ -15,20 +15,20 @@ export function arcPath(cx: number, cy: number, r: number, from: number, to: num
 }
 
 /**
- * Body palettes. The default ("pink") is sampled from photos of the real
- * VHSMO: a peachy pink. `light` and `shade` drive the soft body gradient,
- * `edge` the rim line. Black and red are kept as alternates.
+ * Body palettes. The default ("pink") is Baby Pink, sampled from the
+ * product photos. `light` and `shade` drive the soft body gradient, `edge`
+ * the rim line. Black and red are kept as alternates.
  */
 export const TONES = {
   pink: {
-    body: "#F3C1AC",
-    edge: "#DDA08A",
-    light: "#FBDCCF",
-    shade: "#E7B09B",
-    embossLight: "#F9D3C3",
-    embossDark: "#D2967F",
-    frame: "#EFBAA4",
-    lensDisc: "#F2C0AB",
+    body: "#F7B6CC",
+    edge: "#E491AD",
+    light: "#FDDBE6",
+    shade: "#EDA3BC",
+    embossLight: "#FCCEDE",
+    embossDark: "#DA85A2",
+    frame: "#F4ADC5",
+    lensDisc: "#F6B5CB",
   },
   black: {
     body: "#1c1c1c",

@@ -6,15 +6,13 @@ import { AppConnectionGuide } from "@/components/setup/AppConnectionGuide";
 import { ChargingGuide } from "@/components/setup/ChargingGuide";
 import { GoodToKnow } from "@/components/setup/GoodToKnow";
 import { SetupHero } from "@/components/setup/SetupHero";
-import { SetupInside } from "@/components/setup/SetupInside";
 import { SetupProgress } from "@/components/setup/SetupProgress";
 import { SetupStep } from "@/components/setup/SetupStep";
 import { SetupTips } from "@/components/setup/SetupTips";
 import { SetupTroubleshooting } from "@/components/setup/SetupTroubleshooting";
 import { SetupVideo } from "@/components/setup/SetupVideo";
 import { RESERVE_HREF } from "@/lib/landing";
-import { progressSteps, setupSteps, setupVideo } from "@/lib/setup";
-import { resolveMedia, resolvePoster } from "@/lib/setup-media";
+import { progressSteps, setupSteps } from "@/lib/setup";
 
 const description =
   "Set up your VHSMO camera in minutes: switch it on, spot the notification light, press the Wi-Fi button, connect the VHSMO app, charge it and get the most from the battery.";
@@ -35,15 +33,10 @@ export const metadata: Metadata = {
  * real photos and clips (see public/setup/README.md), then help.
  */
 export default function SetupPage() {
-  const video = resolveMedia({ slot: setupVideo.slot });
-  const sources = video.kind === "video" ? video.sources : [];
-  const poster = resolvePoster(setupVideo.posterSlot);
-
   return (
     <div className="relative overflow-x-clip bg-darkroom text-halide">
       <SetupHero />
-      <SetupVideo sources={sources} poster={poster} />
-      <SetupInside />
+      <SetupVideo />
 
       <SetupProgress items={progressSteps} />
       <SetupStep step={setupSteps[0]!} />

@@ -1,3 +1,4 @@
+import { Wifi, Zap } from "lucide-react";
 import { Reveal } from "@/components/brand/Reveal";
 import type { SetupStepContent } from "@/lib/setup";
 import { cn } from "@/lib/utils";
@@ -36,7 +37,25 @@ export function SetupStep({
       >
         {step.body}
       </p>
-      {step.note && (
+      {step.note && step.noteIcon ? (
+        <div
+          className={cn(
+            "mt-8 flex max-w-md items-start gap-4 rounded-2xl border border-kodak/50 bg-kodak/10 p-5 text-left",
+            wide && "mx-auto",
+          )}
+        >
+          <span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full bg-kodak text-darkroom">
+            {step.noteIcon === "wifi" ? (
+              <Wifi className="size-5" strokeWidth={2.5} aria-hidden />
+            ) : (
+              <Zap className="size-5" strokeWidth={2.5} aria-hidden />
+            )}
+          </span>
+          <p className="text-base font-medium leading-relaxed text-halide sm:text-lg">
+            {step.note}
+          </p>
+        </div>
+      ) : step.note ? (
         <p
           className={cn(
             "mt-6 max-w-md border-l-2 border-kodak pl-4 text-left text-sm leading-relaxed text-halide/60",
@@ -45,7 +64,7 @@ export function SetupStep({
         >
           {step.note}
         </p>
-      )}
+      ) : null}
     </Reveal>
   );
 
