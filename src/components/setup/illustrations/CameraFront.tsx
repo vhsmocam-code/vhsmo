@@ -23,6 +23,7 @@ export function CameraFront({
   shutterClassName,
   shadow = true,
   hideShutter = false,
+  hideLens = false,
   children,
 }: {
   tone?: Tone;
@@ -30,6 +31,8 @@ export function CameraFront({
   shadow?: boolean;
   /** Skip the flat shutter art (the 3D camera builds its own). */
   hideShutter?: boolean;
+  /** Skip the flat lens art (the 3D camera builds a real stepped lens). */
+  hideLens?: boolean;
   children?: React.ReactNode;
 }) {
   const t = TONES[tone];
@@ -120,6 +123,14 @@ export function CameraFront({
       <rect x="753" y="93" width="44" height="32" rx="3" fill="#F3EFCF" stroke="#c9c4a0" strokeWidth="1.5" />
 
       {/* Lens: black gasket, silver ring, pink disc, black lens */}
+      {hideLens ? (
+        // The 3D lens sits here: a soft contact shadow and a dark seat.
+        <>
+          <circle cx={lx + 6} cy={ly + 10} r="228" fill="#000" opacity="0.18" filter={`url(#${id}-blur)`} />
+          <circle cx={lx} cy={ly} r="217" fill={DARK} />
+        </>
+      ) : (
+      <>
       <circle cx={lx} cy={ly} r="217" fill={DARK} />
       <circle cx={lx} cy={ly} r="217" fill="none" stroke="#fff" strokeOpacity="0.08" strokeWidth="4" />
       <circle cx={lx} cy={ly} r="202" fill={`url(#${id}-ring)`} />
@@ -134,6 +145,8 @@ export function CameraFront({
       ))}
       <circle cx={lx} cy={ly} r="13" fill="#000" />
       <circle cx={lx - 40} cy={ly - 42} r="9" fill="#fff" fillOpacity="0.2" />
+      </>
+      )}
 
       {children}
     </g>

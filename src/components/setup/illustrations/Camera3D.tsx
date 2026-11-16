@@ -167,6 +167,169 @@ const SIDE_FACES = (() => {
   }).filter((f) => f.len > 0.5);
 })();
 
+
+/**
+ * The lens stands out of the front as stepped rings, like the real one:
+ * a black gasket, a silver trim ring, then the tall pink shield. The black
+ * lens sits recessed inside the shield's opening, not bulging past it.
+ * Radii match the flat art in CameraFront; z values are heights above the
+ * front face.
+ */
+const LENS = {
+  x: FRONT.lens.x,
+  y: FRONT.lens.y,
+  gasket: { r: 217, z0: 0, z1: 8 },
+  trim: { r: 202, z0: 8, z1: 30 },
+  /** The pink shield: the outermost part, open in the middle. */
+  housing: { r: 192, z0: 30, z1: 96 },
+  /** The black lens, almost level with the shield, just inside its opening. */
+  opening: { r: 126 },
+  glass: { z: 90 },
+} as const;
+/** Light from the top-left, as for the body walls. */
+const LIGHT = [-0.45, -0.89] as const;
+
+/** One cylinder wall around the lens axis: facets from z0 to z1 above the face. */
+function LensWall({
+  r,
+  z0,
+  z1,
+  facets,
+  face,
+  color,
+  inward = false,
+}: {
+  r: number;
+  z0: number;
+  z1: number;
+  facets: number;
+  /** z of the front face in cube coordinates. */
+  face: number;
+  color: (lit: number) => string;
+  /** Face the inside (for the wall around the recessed glass). */
+  inward?: boolean;
+}) {
+  const h = z1 - z0;
+  const wf = r2((2 * Math.PI * r) / facets + 1.2);
+  return (
+    <>
+      {Array.from({ length: facets }, (_, i) => {
+        const th = (i / facets) * 2 * Math.PI;
+        const cx = LENS.x + r * Math.cos(th);
+        const cy = LENS.y + r * Math.sin(th);
+        const n = inward ? -1 : 1;
+        const lit = 0.5 + 0.5 * n * (Math.cos(th) * LIGHT[0] + Math.sin(th) * LIGHT[1]);
+        const rot = (th * 180) / Math.PI + (inward ? -90 : 90);
+        return (
+          <div
+            key={i}
+            className={s.plane3d}
+            style={{
+              left: r2(cx - wf / 2),
+              top: r2(cy - h / 2),
+              width: wf,
+              height: h,
+              background: color(lit),
+              backfaceVisibility: "hidden",
+              transform: `translateZ(${r2(face + (z0 + z1) / 2)}px) rotateZ(${r2(rot)}deg) rotateX(90deg)`,
+            }}
+          />
+        );
+      })}
+    </>
+  );
+}
+
+/** A flat disc (cap) facing the viewer, `z` above the front face. */
+function LensCap({ r, z, face, children }: { r: number; z: number; face: number; children: ReactNode }) {
+  return (
+    <div
+      className={s.plane3d}
+      style={{
+        left: LENS.x - r,
+        top: LENS.y - r,
+        width: r * 2,
+        height: r * 2,
+        transform: `translateZ(${r2(face + z)}px)`,
+      }}
+    >
+      <svg width={r * 2} height={r * 2} viewBox={`${-r} ${-r} ${r * 2} ${r * 2}`} style={{ display: "block", overflow: "visible" }}>
+        {children}
+      </svg>
+    </div>
+  );
+}
+
+/** Annulus path (outer r1, inner r2) centred on the origin, for even-odd fill. */
+const ring = (ro: number, ri: number) =>
+  `M${-ro} 0a${ro} ${ro} 0 1 0 ${ro * 2} 0a${ro} ${ro} 0 1 0 ${-ro * 2} 0Z` +
+  `M${-ri} 0a${ri} ${ri} 0 1 0 ${ri * 2} 0a${ri} ${ri} 0 1 0 ${-ri * 2} 0Z`;
+
+function Lens3D({ face, tone }: { face: number; tone: Tone }) {
+  const t = TONES[tone];
+  const L = LENS;
+  const black = (lit: number) => mix("#050404", "#3d393a", lit * 0.9);
+  const silver = (lit: number) => mix("#7d7d83", "#fbfbfc", lit);
+  const pink = (lit: number) => mix(t.edge, t.light, 0.15 + lit * 0.7);
+  return (
+    <div className={s.plane3d}>
+      <LensWall {...L.gasket} facets={28} face={face} color={black} />
+      <LensCap r={L.gasket.r} z={L.gasket.z1} face={face}>
+        <path d={ring(L.gasket.r, L.trim.r)} fill="#141112" fillRule="evenodd" />
+      </LensCap>
+
+      <LensWall {...L.trim} facets={28} face={face} color={silver} />
+      <LensCap r={L.trim.r} z={L.trim.z1} face={face}>
+        <defs>
+          <linearGradient id="lens3d-trim" x1="0.1" y1="0" x2="0.9" y2="1">
+            <stop offset="0" stopColor="#ffffff" />
+            <stop offset="0.3" stopColor="#b8b8be" />
+            <stop offset="0.55" stopColor="#f5f5f6" />
+            <stop offset="1" stopColor="#85858b" />
+          </linearGradient>
+        </defs>
+        <path d={ring(L.trim.r, L.housing.r)} fill="url(#lens3d-trim)" fillRule="evenodd" />
+      </LensCap>
+
+      <LensWall {...L.housing} facets={28} face={face} color={pink} />
+      <LensCap r={L.housing.r} z={L.housing.z1} face={face}>
+        <defs>
+          <radialGradient id={`lens3d-housing-${tone}`} cx="0.38" cy="0.32" r="0.85">
+            <stop offset="0" stopColor={t.light} />
+            <stop offset="0.55" stopColor={t.lensDisc} />
+            <stop offset="1" stopColor={t.shade} />
+          </radialGradient>
+        </defs>
+        <path d={ring(L.housing.r, L.opening.r)} fill={`url(#lens3d-housing-${tone})`} fillRule="evenodd" stroke={t.edge} strokeWidth="2" />
+        {[170, 156, 142].map((r) => (
+          <circle key={r} r={r} fill="none" stroke={t.edge} strokeOpacity="0.45" strokeWidth="1.5" />
+        ))}
+        <path d="M-150 -100A180 180 0 0 1 -60 -168" fill="none" stroke="#fff" strokeOpacity="0.45" strokeWidth="7" strokeLinecap="round" />
+      </LensCap>
+
+      {/* The black lens, just inside the shield: a short dark inner wall, then the glass */}
+      <LensWall r={L.opening.r} z0={L.glass.z} z1={L.housing.z1} facets={28} face={face} color={black} inward />
+      <LensCap r={L.opening.r} z={L.glass.z} face={face}>
+        <defs>
+          <radialGradient id="lens3d-glass" cx="0.4" cy="0.35" r="0.8">
+            <stop offset="0" stopColor="#3a3637" />
+            <stop offset="0.6" stopColor="#171415" />
+            <stop offset="1" stopColor="#0b0909" />
+          </radialGradient>
+        </defs>
+        <circle r={L.opening.r} fill="#120f10" />
+        <circle r={L.opening.r - 14} fill="url(#lens3d-glass)" />
+        {[100, 78, 54].map((r) => (
+          <circle key={r} r={r} fill="none" stroke="#2f2b2c" strokeWidth="2" />
+        ))}
+        <circle r="13" fill="#000" />
+        <circle cx="-40" cy="-42" r="9" fill="#fff" fillOpacity="0.22" />
+        <path d="M-86 -44A96 96 0 0 1 -34 -90" fill="none" stroke="#fff" strokeOpacity="0.18" strokeWidth="6" strokeLinecap="round" />
+      </LensCap>
+    </div>
+  );
+}
+
 const SHUTTER = { x: 240, r: 56, top: -32, bodyTop: 6, facets: 20 } as const;
 
 export function Camera3D({
@@ -282,8 +445,11 @@ export function Camera3D({
             }}
             aria-hidden
           >
-            <CameraFront tone={tone} shadow={false} hideShutter />
+            <CameraFront tone={tone} shadow={false} hideShutter hideLens />
           </svg>
+
+          {/* The lens, built in 3D on the front face */}
+          <Lens3D face={d / 2} tone={tone} />
 
           {/* Right face band: local x runs front (0) → back (band) */}
           {right != null && (
