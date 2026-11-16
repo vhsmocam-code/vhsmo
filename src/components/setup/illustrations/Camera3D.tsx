@@ -25,8 +25,8 @@ import s from "./illustrations.module.css";
 export const CAM3D = {
   w: FRONT.w,
   h: FRONT.h,
-  /** Body depth: about 0.30 of the width (the photos measure 0.32-0.34). */
-  d: 296,
+  /** Body depth: 0.25 of the width. */
+  d: 246,
   perspective: 2600,
   /** Rig origin and perspective origin in the 1200 x 900 world. */
   cx: 600,
@@ -215,8 +215,10 @@ export function Camera3D({
                 top: r2(f.my - d / 2),
                 width: r2(f.len + 1.5),
                 height: d,
-                // Local top is the back of the body, bottom the front.
-                backgroundImage: `linear-gradient(180deg, ${mix(t.shade, t.edge, 0.55)} 0%, ${mix(t.edge, t.body, f.lit * 0.75)} 9%, ${mix(t.shade, t.light, f.lit * 0.9)} 86%, ${mix(t.light, "#ffffff", 0.35 + f.lit * 0.3)} 100%)`,
+                // Local top is the back of the body, bottom the front. Plain
+                // body tone, shaded by how much the wall faces the light; no
+                // white rim (that was only a reflection in the photos).
+                backgroundImage: `linear-gradient(180deg, ${mix(t.shade, t.body, 0.45 + f.lit * 0.15)} 0%, ${mix(t.shade, t.body, 0.72 + f.lit * 0.18)} 100%)`,
                 transform: `rotateZ(${f.angle}deg) rotateX(90deg)`,
               }}
             />

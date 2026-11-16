@@ -37,11 +37,11 @@
   80%, 100% { transform: scale(1.14); opacity: 0; }
 }
 
-/* Phone size: fits under the header with its caption on phones, and
-   fills most of the viewport height on laptops. 0.46 is the screen's
-   width/height ratio. */
+/* Phone size: on phones it takes all the height left after the header
+   and the caption (about 12rem), and on laptops most of the viewport
+   height. 0.46 is the screen's width/height ratio. */
 .phone {
-  width: min(66vw, calc(min(56svh, 36rem) * 0.46));
+  width: min(78vw, calc((100svh - 12rem) * 0.46));
 }
 @media (min-width: 1024px) {
   .phone {

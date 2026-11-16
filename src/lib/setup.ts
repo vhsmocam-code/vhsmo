@@ -312,8 +312,8 @@ export const goodToKnow = {
         illustration: "usb-transfer",
         ratio: "4 / 3",
         fit: "cover",
-        alt: "The VHSMO on a desk with a USB cable: six photos travel down the cable into a laptop, then the cable moves to a phone and they copy there too",
-        brief: "GIF: photos copy over USB to a laptop, then to a phone",
+        alt: "The VHSMO on a desk, wired to a phone with a USB cable; six photos appear on the phone one by one",
+        brief: "GIF: photos copy over USB onto a phone",
       } satisfies MediaSlotConfig,
     },
     {
