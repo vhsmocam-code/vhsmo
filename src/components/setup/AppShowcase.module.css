@@ -1,0 +1,50 @@
+/* The scroll-driven phone in step 05. The global reduced-motion rule in
+   globals.css stops every loop here. */
+
+.float {
+  animation: tourFloat 7s ease-in-out infinite;
+}
+@keyframes tourFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.glow {
+  transition: background-color 900ms var(--ease-out-expo);
+}
+
+/* A yellow ring around an important button. Hollow, so the button under
+   it stays readable; the outer ring breathes out. Not interactive. */
+.ring {
+  position: absolute;
+  pointer-events: none;
+  border: 2.5px solid var(--color-kodak);
+  background: rgba(253, 241, 0, 0.07);
+  box-shadow:
+    0 0 0 1.5px rgba(31, 26, 24, 0.4),
+    0 0 18px rgba(253, 241, 0, 0.45);
+}
+.ring::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  border: 2px solid var(--color-kodak);
+  animation: ringPulse 2.2s ease-out infinite;
+}
+@keyframes ringPulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  80%, 100% { transform: scale(1.14); opacity: 0; }
+}
+
+/* Phone size: fits under the header with its caption on phones, and
+   fills most of the viewport height on laptops. 0.46 is the screen's
+   width/height ratio. */
+.phone {
+  width: min(66vw, calc(min(56svh, 36rem) * 0.46));
+}
+@media (min-width: 1024px) {
+  .phone {
+    width: calc(min(72svh, 46rem) * 0.46);
+  }
+}

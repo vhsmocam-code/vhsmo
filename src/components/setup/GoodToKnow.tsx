@@ -2,6 +2,7 @@ import { Reveal } from "@/components/brand/Reveal";
 import { goodToKnow } from "@/lib/setup";
 import { cn } from "@/lib/utils";
 import { MediaSlot } from "./MediaSlot";
+import { NoteCallout } from "./NoteCallout";
 
 /**
  * Unnumbered section after the tips: the USB route for big batches of
@@ -45,9 +46,9 @@ export function GoodToKnow() {
                   <p className="mt-5 max-w-md text-lg leading-relaxed text-halide/75">
                     {item.body}
                   </p>
-                  <p className="mt-6 max-w-md border-l-2 border-kodak pl-4 text-sm leading-relaxed text-halide/60">
+                  <NoteCallout icon={item.noteIcon} className="mt-8">
                     {item.note}
-                  </p>
+                  </NoteCallout>
                 </Reveal>
               </div>
               <div

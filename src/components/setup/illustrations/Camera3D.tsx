@@ -18,14 +18,15 @@ import s from "./illustrations.module.css";
  * Cube coordinates: x right, y down, z toward the viewer; the cube's centre
  * sits on the rig origin.
  *
- * Right face / underside details come from the team's description of the
- * real camera, not photos: CONFIRM against hardware.
+ * Right-face and underside details are measured from photos of the real
+ * camera. Which end of the USB face is the top is inferred from how the
+ * photo was held: CONFIRM against hardware.
  */
 export const CAM3D = {
   w: FRONT.w,
   h: FRONT.h,
-  /** Body depth: about 1/4 of the width. */
-  d: 246,
+  /** Body depth: about 0.30 of the width (the photos measure 0.32-0.34). */
+  d: 296,
   perspective: 2600,
   /** Rig origin and perspective origin in the 1200 x 900 world. */
   cx: 600,
@@ -35,9 +36,9 @@ export const CAM3D = {
 /** The flat areas of the real body (front-view coordinates). */
 export const FACES = {
   /** Right face (the ON/OFF switch side): x = W, flat between these y. */
-  right: { y0: 150, y1: 578 },
+  right: { y0: 150, y1: 583 },
   /** Bottom face: y = H, flat between these x. */
-  bottom: { x0: 140, x1: 840 },
+  bottom: { x0: 128, x1: 846 },
   /** Depth of the band the side details sit on (a hair inside the edges). */
   band: CAM3D.d - 12,
 } as const;
@@ -66,6 +67,16 @@ export function project(pt: { x: number; y: number; z: number }, pose: Pose) {
   const Z = z2;
   const f = CAM3D.perspective / (CAM3D.perspective - Z);
   return { x: Math.round((CAM3D.cx + X * f) * 100) / 100, y: Math.round((CAM3D.cy + Y * f) * 100) / 100 };
+}
+
+/** Shift a pose's translation so a cube point lands on a world target. */
+export function centerOn(pt: { x: number; y: number; z: number }, pose: Pose, target: { x: number; y: number }): Pose {
+  const p0 = project(pt, { ...pose, tx: 0, ty: 0 });
+  const rad = (d: number) => (d * Math.PI) / 180;
+  const z1 = -pt.x * Math.sin(rad(pose.ry)) + pt.z * Math.cos(rad(pose.ry));
+  const z2 = pt.y * Math.sin(rad(pose.rx)) + z1 * Math.cos(rad(pose.rx));
+  const f = CAM3D.perspective / (CAM3D.perspective - z2);
+  return { ...pose, tx: Math.round(((target.x - p0.x) / f) * 10) / 10, ty: Math.round(((target.y - p0.y) / f) * 10) / 10 };
 }
 
 /** A point given in front-view coordinates (x, y from the top-left) and z. */
@@ -156,7 +167,7 @@ const SIDE_FACES = (() => {
   }).filter((f) => f.len > 0.5);
 })();
 
-const SHUTTER = { x: 240, r: 46, top: -16, bodyTop: 6, facets: 16 } as const;
+const SHUTTER = { x: 240, r: 56, top: -32, bodyTop: 6, facets: 20 } as const;
 
 export function Camera3D({
   tone = "pink",
@@ -205,7 +216,7 @@ export function Camera3D({
                 width: r2(f.len + 1.5),
                 height: d,
                 // Local top is the back of the body, bottom the front.
-                backgroundImage: `linear-gradient(180deg, ${mix(t.edge, t.body, f.lit * 0.75)}, ${mix(t.shade, t.light, f.lit * 0.95)})`,
+                backgroundImage: `linear-gradient(180deg, ${mix(t.shade, t.edge, 0.55)} 0%, ${mix(t.edge, t.body, f.lit * 0.75)} 9%, ${mix(t.shade, t.light, f.lit * 0.9)} 86%, ${mix(t.light, "#ffffff", 0.35 + f.lit * 0.3)} 100%)`,
                 transform: `rotateZ(${f.angle}deg) rotateX(90deg)`,
               }}
             />
@@ -240,11 +251,21 @@ export function Camera3D({
                 width: SHUTTER.r * 2,
                 height: SHUTTER.r * 2,
                 borderRadius: "50%",
-                backgroundImage: `radial-gradient(circle at 35% 35%, #ffffff, #c4c4c9 55%, ${SILVER.dark})`,
-                boxShadow: "inset 0 0 0 4px rgba(255,255,255,0.55)",
+                backgroundImage: `radial-gradient(circle at 50% 50%, #e9e9ec 0 38%, transparent 38%), repeating-radial-gradient(circle at 50% 50%, rgba(60,60,66,0.28) 0 1.5px, transparent 1.5px 4px), radial-gradient(circle at 35% 35%, #ffffff, #c4c4c9 55%, ${SILVER.dark})`,
+                boxShadow: "inset 0 0 0 3px rgba(255,255,255,0.55)",
                 transform: "rotateX(90deg)",
               }}
-            />
+            >
+              {/* The engraved camera icon on the cap */}
+              <svg width={SHUTTER.r * 2} height={SHUTTER.r * 2} viewBox="0 0 112 112" style={{ display: "block" }} aria-hidden>
+                <g fill="none" stroke="#6f6f75" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round">
+                  <rect x="30" y="40" width="52" height="36" rx="5" />
+                  <path d="M42 40l4-8h20l4 8" />
+                  <circle cx="56" cy="58" r="10" />
+                  <circle cx="56" cy="58" r="3.5" fill="#6f6f75" />
+                </g>
+              </svg>
+            </div>
           </div>
 
           {/* Drawn front */}

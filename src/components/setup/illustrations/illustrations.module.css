@@ -195,12 +195,6 @@
 }
 
 /* ---------- 05 App connect (4.5s) ---------- */
-.dash {
-  animation: dash 1.4s linear infinite;
-}
-@keyframes dash {
-  to { stroke-dashoffset: -36; }
-}
 .pulseArc {
   animation: pulseArc 1.8s ease-out infinite;
 }
@@ -320,6 +314,27 @@
   36% { opacity: 1; }
   46%, 90% { transform: translateX(0); opacity: 1; }
   97%, 100% { transform: translateX(190px); opacity: 0; }
+}
+/* The charging LED beside the port: red while charging, green when full. */
+.chgLedRed {
+  opacity: 0;
+  animation: chgLedRed 8s ease-in-out infinite;
+}
+@keyframes chgLedRed {
+  0%, 44% { opacity: 0; }
+  48% { opacity: 1; }
+  58% { opacity: 0.45; }
+  66% { opacity: 1; }
+  74% { opacity: 0.7; }
+  78%, 100% { opacity: 0; }
+}
+.chgLedGreen {
+  animation: chgLedGreen 8s ease-in-out infinite;
+}
+@keyframes chgLedGreen {
+  0%, 75% { opacity: 0; }
+  81%, 90% { opacity: 1; }
+  96%, 100% { opacity: 0; }
 }
 .capSide {
   animation: capSide 8s ease-in-out infinite;
@@ -444,32 +459,336 @@
 .staticRig {
   transform: var(--pose);
 }
-/* USB (10s): cable to the laptop, then to the phone; photos hop across. */
-.cableA {
-  animation: cableA 10s ease-in-out infinite;
+/* ---------- USB transfer (14 s): laptop copy, unplug, phone copy ---------- */
+/* Static state = laptop docked, all six photos in, "Done" chip showing.
+   Every time below is in seconds on the 14 s loop; the tile and slot times
+   match DEPART_L / DEPART_P in UsbTransfer.tsx. */
+.usbFloor {
+  position: absolute;
+  left: 0;
+  top: 770px;
+  width: 1200px;
+  height: 130px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0));
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
-@keyframes cableA {
-  0%, 46% { opacity: 1; }
-  50%, 96% { opacity: 0; }
-  100% { opacity: 1; }
+.usbLayer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1200px;
+  height: 900px;
+  pointer-events: none;
 }
-.cableB {
-  animation: cableB 10s ease-in-out infinite;
+.usbTile {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 44px;
+  height: 44px;
+  box-sizing: border-box;
+  border: 5px solid #f3f0e8;
+  border-bottom-width: 11px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #5b4f45, rgba(253, 241, 0, 0.9));
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
+  offset-rotate: 0deg;
+  opacity: 0;
+  animation: usbTile 14s cubic-bezier(0.45, 0, 0.35, 1) infinite both;
 }
-@keyframes cableB {
-  0%, 48% { opacity: 0; }
-  52%, 96% { opacity: 1; }
+@keyframes usbTile {
+  0% { offset-distance: 0%; opacity: 0; transform: scale(0.7); }
+  0.8% { offset-distance: 0%; opacity: 1; transform: scale(1); }
+  9% { offset-distance: 100%; opacity: 1; transform: scale(1); }
+  9.8%, 100% { offset-distance: 100%; opacity: 0; transform: scale(0.45); }
+}
+.usbPlugA,
+.usbPlugB {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 40px;
+  height: 18px;
+  border-radius: 5px 3px 3px 5px;
+  background: linear-gradient(90deg, #f4f2ed 0 72%, #b9b9b9 72%);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  offset-anchor: 100% 50%;
+  offset-rotate: auto;
+  offset-distance: 100%;
+}
+.usbPlugB {
+  opacity: 0;
+}
+.usbPlugA { animation: usbPlugA 14s cubic-bezier(0.5, 0, 0.3, 1) infinite; }
+.usbPlugB { animation: usbPlugB 14s cubic-bezier(0.5, 0, 0.3, 1) infinite; }
+
+@keyframes usbPlugA {
+  0% { offset-distance: 0%; opacity: 1; }
+  3.571% { offset-distance: 0%; opacity: 1; }
+  7.143% { offset-distance: 100%; opacity: 1; }
+  50% { offset-distance: 100%; opacity: 1; }
+  53.571% { offset-distance: 0%; opacity: 1; }
+  56.071% { offset-distance: 0%; opacity: 1; }
+  56.429% { offset-distance: 0%; opacity: 0; }
+  99.643% { offset-distance: 0%; opacity: 0; }
+  100% { offset-distance: 0%; opacity: 1; }
+}
+@keyframes usbPlugB {
+  0% { offset-distance: 0%; opacity: 0; }
+  56.071% { offset-distance: 0%; opacity: 0; }
+  56.429% { offset-distance: 0%; opacity: 1; }
+  60% { offset-distance: 100%; opacity: 1; }
+  95.714% { offset-distance: 100%; opacity: 1; }
+  99.286% { offset-distance: 0%; opacity: 1; }
+  99.643% { offset-distance: 0%; opacity: 0; }
+  100% { offset-distance: 0%; opacity: 0; }
+}
+
+.usbTailA,
+.usbTailB {
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 0;
+}
+.usbTailB { stroke-dashoffset: 1; }
+.usbTailA { animation: usbTailA 14s cubic-bezier(0.5, 0, 0.3, 1) infinite; }
+.usbTailB { animation: usbTailB 14s cubic-bezier(0.5, 0, 0.3, 1) infinite; }
+@keyframes usbTailA {
+  0% { stroke-dashoffset: 1; }
+  3.571% { stroke-dashoffset: 1; }
+  7.143% { stroke-dashoffset: 0; }
+  50% { stroke-dashoffset: 0; }
+  53.571% { stroke-dashoffset: 1; }
+  100% { stroke-dashoffset: 1; }
+}
+@keyframes usbTailB {
+  0% { stroke-dashoffset: 1; }
+  56.429% { stroke-dashoffset: 1; }
+  60% { stroke-dashoffset: 0; }
+  95.714% { stroke-dashoffset: 0; }
+  99.286% { stroke-dashoffset: 1; }
+  100% { stroke-dashoffset: 1; }
+}
+
+.usbLapDev { animation: usbLapDev 14s ease-in-out infinite; }
+.usbPhoneDev { opacity: 0; animation: usbPhoneDev 14s ease-in-out infinite; }
+@keyframes usbLapDev {
+  0% { transform: translateX(260px); opacity: 0; }
+  5.714% { transform: translateX(0); opacity: 1; }
+  50% { transform: translateX(0); opacity: 1; }
+  55.714% { transform: translateX(260px); opacity: 0; }
+  100% { transform: translateX(260px); opacity: 0; }
+}
+@keyframes usbPhoneDev {
+  0% { transform: translateX(260px); opacity: 0; }
+  52.857% { transform: translateX(260px); opacity: 0; }
+  58.571% { transform: translateX(0); opacity: 1; }
+  95.714% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(260px); opacity: 0; }
+}
+
+.usbSlot {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.usbSlotL0 { transform-box: fill-box; transform-origin: center; animation: usbSlotL0 14s ease-out infinite; }
+@keyframes usbSlotL0 {
+  0% { opacity: 0; transform: scale(0.6); }
+  17.214% { opacity: 0; transform: scale(0.6); }
+  19% { opacity: 1; transform: scale(1.1); }
+  20.786% { opacity: 1; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1); }
+  52.857% { opacity: 0; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+.usbSlotL1 { transform-box: fill-box; transform-origin: center; animation: usbSlotL1 14s ease-out infinite; }
+@keyframes usbSlotL1 {
+  0% { opacity: 0; transform: scale(0.6); }
+  21.143% { opacity: 0; transform: scale(0.6); }
+  22.929% { opacity: 1; transform: scale(1.1); }
+  24.714% { opacity: 1; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1); }
+  52.857% { opacity: 0; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+.usbSlotL2 { transform-box: fill-box; transform-origin: center; animation: usbSlotL2 14s ease-out infinite; }
+@keyframes usbSlotL2 {
+  0% { opacity: 0; transform: scale(0.6); }
+  25.071% { opacity: 0; transform: scale(0.6); }
+  26.857% { opacity: 1; transform: scale(1.1); }
+  28.643% { opacity: 1; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1); }
+  52.857% { opacity: 0; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+.usbSlotL3 { transform-box: fill-box; transform-origin: center; animation: usbSlotL3 14s ease-out infinite; }
+@keyframes usbSlotL3 {
+  0% { opacity: 0; transform: scale(0.6); }
+  29% { opacity: 0; transform: scale(0.6); }
+  30.786% { opacity: 1; transform: scale(1.1); }
+  32.571% { opacity: 1; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1); }
+  52.857% { opacity: 0; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+.usbSlotL4 { transform-box: fill-box; transform-origin: center; animation: usbSlotL4 14s ease-out infinite; }
+@keyframes usbSlotL4 {
+  0% { opacity: 0; transform: scale(0.6); }
+  32.929% { opacity: 0; transform: scale(0.6); }
+  34.714% { opacity: 1; transform: scale(1.1); }
+  36.5% { opacity: 1; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1); }
+  52.857% { opacity: 0; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+.usbSlotL5 { transform-box: fill-box; transform-origin: center; animation: usbSlotL5 14s ease-out infinite; }
+@keyframes usbSlotL5 {
+  0% { opacity: 0; transform: scale(0.6); }
+  36.857% { opacity: 0; transform: scale(0.6); }
+  38.643% { opacity: 1; transform: scale(1.1); }
+  40.429% { opacity: 1; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1); }
+  52.857% { opacity: 0; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+.usbSlotP0 { transform-box: fill-box; transform-origin: center; animation: usbSlotP0 14s ease-out infinite; }
+@keyframes usbSlotP0 {
+  0% { opacity: 0; transform: scale(0.6); }
+  71.5% { opacity: 0; transform: scale(0.6); }
+  73.286% { opacity: 1; transform: scale(1.1); }
+  75.071% { opacity: 1; transform: scale(1); }
+  95.714% { opacity: 1; transform: scale(1); }
+  99.286% { opacity: 0; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+.usbSlotP1 { transform-box: fill-box; transform-origin: center; animation: usbSlotP1 14s ease-out infinite; }
+@keyframes usbSlotP1 {
+  0% { opacity: 0; transform: scale(0.6); }
+  75.071% { opacity: 0; transform: scale(0.6); }
+  76.857% { opacity: 1; transform: scale(1.1); }
+  78.643% { opacity: 1; transform: scale(1); }
+  95.714% { opacity: 1; transform: scale(1); }
+  99.286% { opacity: 0; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+.usbSlotP2 { transform-box: fill-box; transform-origin: center; animation: usbSlotP2 14s ease-out infinite; }
+@keyframes usbSlotP2 {
+  0% { opacity: 0; transform: scale(0.6); }
+  78.643% { opacity: 0; transform: scale(0.6); }
+  80.429% { opacity: 1; transform: scale(1.1); }
+  82.214% { opacity: 1; transform: scale(1); }
+  95.714% { opacity: 1; transform: scale(1); }
+  99.286% { opacity: 0; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+.usbSlotP3 { transform-box: fill-box; transform-origin: center; animation: usbSlotP3 14s ease-out infinite; }
+@keyframes usbSlotP3 {
+  0% { opacity: 0; transform: scale(0.6); }
+  82.214% { opacity: 0; transform: scale(0.6); }
+  84% { opacity: 1; transform: scale(1.1); }
+  85.786% { opacity: 1; transform: scale(1); }
+  95.714% { opacity: 1; transform: scale(1); }
+  99.286% { opacity: 0; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+.usbSlotP4 { transform-box: fill-box; transform-origin: center; animation: usbSlotP4 14s ease-out infinite; }
+@keyframes usbSlotP4 {
+  0% { opacity: 0; transform: scale(0.6); }
+  85.786% { opacity: 0; transform: scale(0.6); }
+  87.571% { opacity: 1; transform: scale(1.1); }
+  89.357% { opacity: 1; transform: scale(1); }
+  95.714% { opacity: 1; transform: scale(1); }
+  99.286% { opacity: 0; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+.usbSlotP5 { transform-box: fill-box; transform-origin: center; animation: usbSlotP5 14s ease-out infinite; }
+@keyframes usbSlotP5 {
+  0% { opacity: 0; transform: scale(0.6); }
+  89.357% { opacity: 0; transform: scale(0.6); }
+  91.143% { opacity: 1; transform: scale(1.1); }
+  92.929% { opacity: 1; transform: scale(1); }
+  95.714% { opacity: 1; transform: scale(1); }
+  99.286% { opacity: 0; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+.usbBarL { transform-box: fill-box; transform-origin: left center; animation: usbBarL 14s ease-in-out infinite; }
+.usbBarP { transform-box: fill-box; transform-origin: left center; animation: usbBarP 14s ease-in-out infinite; }
+@keyframes usbBarL {
+  0% { transform: scaleX(0); }
+  8.571% { transform: scaleX(0); }
+  37.857% { transform: scaleX(1); }
+  55.714% { transform: scaleX(1); }
+  56.429% { transform: scaleX(0); }
+  100% { transform: scaleX(0); }
+}
+@keyframes usbBarP {
+  0% { transform: scaleX(0); }
+  62.857% { transform: scaleX(0); }
+  90.714% { transform: scaleX(1); }
+  99.929% { transform: scaleX(1); }
+  100% { transform: scaleX(0); }
+}
+
+.usbChipLapCopy { opacity: 0; animation: usbChipLapCopy 14s ease-in-out infinite; }
+.usbChipLapDone { animation: usbChipLapDone 14s ease-in-out infinite; }
+.usbChipPhoneCopy { opacity: 0; animation: usbChipPhoneCopy 14s ease-in-out infinite; }
+.usbChipPhoneDone { opacity: 0; animation: usbChipPhoneDone 14s ease-in-out infinite; }
+@keyframes usbChipLapCopy {
+  0% { opacity: 0; }
+  6.429% { opacity: 0; }
+  7.857% { opacity: 1; }
+  38.571% { opacity: 1; }
+  40% { opacity: 0; }
   100% { opacity: 0; }
 }
-.hop {
-  opacity: 0;
-  animation: hop 10s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+@keyframes usbChipLapDone {
+  0% { opacity: 0; transform: translateY(8px); }
+  39.286% { opacity: 0; transform: translateY(8px); }
+  41.429% { opacity: 1; transform: translateY(0); }
+  49.286% { opacity: 1; transform: translateY(0); }
+  51.429% { opacity: 0; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(8px); }
 }
-@keyframes hop {
-  0% { opacity: 0; transform: translate(0, 0) scale(0.6); }
-  4% { opacity: 1; transform: translate(0, 0) scale(0.9); }
-  30% { opacity: 1; transform: translate(var(--dx), var(--dy)) scale(0.9); }
-  36%, 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.5); }
+@keyframes usbChipPhoneCopy {
+  0% { opacity: 0; }
+  59.286% { opacity: 0; }
+  60.714% { opacity: 1; }
+  91.429% { opacity: 1; }
+  92.857% { opacity: 0; }
+  100% { opacity: 0; }
+}
+@keyframes usbChipPhoneDone {
+  0% { opacity: 0; transform: translateY(8px); }
+  92.143% { opacity: 0; transform: translateY(8px); }
+  94.286% { opacity: 1; transform: translateY(0); }
+  96.429% { opacity: 1; transform: translateY(0); }
+  98.571% { opacity: 0; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(8px); }
+}
+
+.usbPulseA, .usbPulseB { opacity: 0; transform-box: fill-box; transform-origin: center; }
+.usbPulseA { animation: usbPulseA 14s ease-out infinite; }
+.usbPulseB { animation: usbPulseB 14s ease-out infinite; }
+@keyframes usbPulseA {
+  0% { opacity: 0; transform: scale(0.5); }
+  7.143% { opacity: 0.9; transform: scale(0.6); }
+  11.429% { opacity: 0; transform: scale(2.2); }
+  100% { opacity: 0; transform: scale(2.2); }
+}
+@keyframes usbPulseB {
+  0% { opacity: 0; transform: scale(0.5); }
+  60% { opacity: 0; transform: scale(0.5); }
+  60.714% { opacity: 0.9; transform: scale(0.6); }
+  65% { opacity: 0; transform: scale(2.2); }
+  100% { opacity: 0; transform: scale(2.2); }
+}
+
+@supports not (offset-path: path("M0 0")) {
+  .usbTile,
+  .usbPlugA,
+  .usbPlugB {
+    display: none;
+  }
 }
 
 /* ---------- Walkthrough progress ---------- */

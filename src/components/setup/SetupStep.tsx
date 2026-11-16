@@ -1,8 +1,8 @@
-import { Wifi, Zap } from "lucide-react";
 import { Reveal } from "@/components/brand/Reveal";
 import type { SetupStepContent } from "@/lib/setup";
 import { cn } from "@/lib/utils";
 import { MediaSlot } from "./MediaSlot";
+import { NoteCallout } from "./NoteCallout";
 
 /**
  * One setup step: a big marker numeral, a short heading, a line or two,
@@ -38,23 +38,9 @@ export function SetupStep({
         {step.body}
       </p>
       {step.note && step.noteIcon ? (
-        <div
-          className={cn(
-            "mt-8 flex max-w-md items-start gap-4 rounded-2xl border border-kodak/50 bg-kodak/10 p-5 text-left",
-            wide && "mx-auto",
-          )}
-        >
-          <span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full bg-kodak text-darkroom">
-            {step.noteIcon === "wifi" ? (
-              <Wifi className="size-5" strokeWidth={2.5} aria-hidden />
-            ) : (
-              <Zap className="size-5" strokeWidth={2.5} aria-hidden />
-            )}
-          </span>
-          <p className="text-base font-medium leading-relaxed text-halide sm:text-lg">
-            {step.note}
-          </p>
-        </div>
+        <NoteCallout icon={step.noteIcon} className={cn("mt-8", wide && "mx-auto")}>
+          {step.note}
+        </NoteCallout>
       ) : step.note ? (
         <p
           className={cn(

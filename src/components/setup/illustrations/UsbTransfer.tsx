@@ -1,35 +1,65 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { Camera3D, frontPoint, poseCss, project, type Pose } from "./Camera3D";
+import { CAM3D, Camera3D, centerOn, frontPoint, poseCss, project, type Pose } from "./Camera3D";
+import { SceneLabel } from "./SceneLabel";
 import { Stage3D } from "./Stage3D";
 import { useSvgId } from "./useSvgId";
 import { CABLE_END, UsbCable, UsbPortFace } from "./UsbPort";
 import s from "./illustrations.module.css";
 
-const FONT = "var(--font-display), system-ui, sans-serif";
 const KODAK = "#fdf100";
 
-/** The camera, turned to show its charging / data port, cable plugged in. */
-const POSE: Pose = { rx: 0, ry: -66, s: 0.62, tx: -320, ty: 40 };
+/**
+ * Times (seconds on the 14 s loop) when each photo leaves the plug. The
+ * keyframes in illustrations.module.css (usbSlotL* / usbSlotP*) are built
+ * from the same numbers: change them together.
+ */
+const DEPART_L = (i: number) => 1.2 + 0.55 * i;
+const DEPART_P = (i: number) => 8.8 + 0.5 * i;
 
-/** Laptop: drawn in its own units, then scaled into the top right. */
-const LAPTOP = { x: 690, y: 150, k: 0.78 } as const;
-const lap = (x: number, y: number) => ({
-  x: LAPTOP.x + (x - 640) * LAPTOP.k,
-  y: LAPTOP.y + (y - 190) * LAPTOP.k,
-});
-/** Phone, bottom right, USB-C port at the bottom edge. */
-const PHONE = { x: 905, y: 520, w: 160, h: 320 } as const;
+/** The desk line, and the camera standing on it, turned to show the port. */
+const FLOOR = 770;
+const POSE: Pose = centerOn(
+  frontPoint(CAM3D.w / 2, CAM3D.h, 0),
+  { rx: 0, ry: -64, s: 0.6, tx: 0, ty: 0 },
+  { x: 330, y: FLOOR - 14 },
+);
+
+/** Devices, drawn in their own local units and docked to one cable. */
+const LAP = { x: 690 } as const;
+/** Phone stands upright on a small stand, centred under the laptop's spot. */
+const PHONE = { x: LAP.x + 220 - 75 } as const;
+/** Where the cable lies on the desk before it rises to a device. */
+const Q = { x: 600, y: FLOOR - 6 } as const;
+const PORT_L = { x: LAP.x + 3, y: FLOOR - 11 } as const;
+const PORT_P = { x: PHONE.x + 75, y: FLOOR - 26 } as const;
+
+const r1 = (v: number) => Math.round(v * 10) / 10;
+
+/** A cable drawn as a round tube: dark edge, off-white body, thin highlight. */
+function CableStroke({ d, className, pathLength }: { d: string; className?: string; pathLength?: number }) {
+  return (
+    <g fill="none" strokeLinecap="round" strokeLinejoin="round">
+      <path d={d} stroke="#5d5851" strokeWidth="21" className={className} pathLength={pathLength} />
+      <path d={d} stroke="#ebe8e1" strokeWidth="16" className={className} pathLength={pathLength} />
+      <path d={d} stroke="#ffffff" strokeOpacity="0.85" strokeWidth="3.5" transform="translate(0 -3.2)" className={className} pathLength={pathLength} />
+    </g>
+  );
+}
 
 /**
- * USB transfer: the camera on a data cable. Photos copy to a laptop, then
- * the cable moves to a phone and they copy there too.
+ * USB transfer: the camera sits on a desk on a data cable. Six photos
+ * travel down the cable into a laptop; then the plug comes out, the laptop
+ * slides away, a phone slides in and the same photos copy across.
  */
 export function UsbTransfer({ label, paused }: { label: string; paused?: boolean }) {
   const uid = useSvgId("usb");
   const probe = useRef<HTMLDivElement>(null);
-  const [end, setEnd] = useState(() => project(frontPoint(CABLE_END.x, CABLE_END.y), POSE));
+  const [end, setEnd] = useState(() => {
+    const p = project(frontPoint(CABLE_END.x, CABLE_END.y), POSE);
+    return { x: r1(p.x), y: r1(p.y) };
+  });
 
   // The cable stub is drawn in 3D; measure where its end actually lands so
   // the 2D cable joins it exactly.
@@ -42,8 +72,8 @@ export function UsbTransfer({ label, paused }: { label: string; paused?: boolean
       if (!wr.width) return;
       const k = wr.width / 1200;
       const pr = el.getBoundingClientRect();
-      const x = Math.round(((pr.left + pr.width / 2 - wr.left) / k) * 10) / 10;
-      const y = Math.round(((pr.top + pr.height / 2 - wr.top) / k) * 10) / 10;
+      const x = r1((pr.left + pr.width / 2 - wr.left) / k);
+      const y = r1((pr.top + pr.height / 2 - wr.top) / k);
       setEnd((p) => (Math.abs(p.x - x) < 0.5 && Math.abs(p.y - y) < 0.5 ? p : { x, y }));
     };
     const raf = requestAnimationFrame(measure);
@@ -56,29 +86,118 @@ export function UsbTransfer({ label, paused }: { label: string; paused?: boolean
     };
   }, []);
 
-  const screenL = lap(712, 350);
-  // Both runs leave the stub heading down, so the cable sags before it rises.
-  const toLaptop = `M${end.x} ${end.y}C${end.x + 25} ${end.y + 80} ${screenL.x - 150} ${screenL.y + 10} ${screenL.x - 6} ${screenL.y}`;
-  const portB = { x: PHONE.x + PHONE.w / 2, y: PHONE.y + PHONE.h };
-  const toPhone = `M${end.x} ${end.y}C${end.x + 25} ${end.y + 110} ${portB.x} ${portB.y + 80} ${portB.x} ${portB.y + 8}`;
+  const main = `M${end.x} ${end.y}C${r1(end.x + 6)} ${r1(end.y + 90)} ${Q.x - 190} ${Q.y + 8} ${Q.x} ${Q.y}`;
+  const tailA = `M${Q.x} ${Q.y}C${Q.x + 36} ${Q.y} ${PORT_L.x - 40} ${PORT_L.y + 4} ${PORT_L.x} ${PORT_L.y}`;
+  // The phone tail rises from below into the port on the phone's bottom edge.
+  const tailB = `M${Q.x} ${Q.y}C${Q.x + 150} ${Q.y} ${PORT_P.x} ${PORT_P.y + 22} ${PORT_P.x} ${PORT_P.y}`;
+  const tailAOnly = (d: string) => d.slice(d.indexOf("C"));
+  const fullA = `${main}${tailAOnly(tailA)}`;
+  const fullB = `${main}${tailAOnly(tailB)}`;
+  const q = (d: string) => `path("${d}")`;
 
-  const start = { x: end.x + 30, y: end.y + 40 };
-  const lapTarget = lap(910, 350);
-  const phoneTarget = { x: PHONE.x + PHONE.w / 2, y: PHONE.y + PHONE.h * 0.48 };
-  const hop = (t: { x: number; y: number }, delay: number) =>
-    ({ "--dx": `${t.x - start.x}px`, "--dy": `${t.y - start.y}px`, animationDelay: `${delay}s` }) as CSSProperties;
-
-  const lapTiles = [
-    [0, 0],
-    [1, 0],
-    [2, 0],
-    [0, 1],
-    [1, 1],
-    [2, 1],
-  ] as const;
+  const lapSlot = (i: number) => ({ x: 62 + (i % 3) * 110, y: -224 + Math.floor(i / 3) * 90 });
+  const phoneSlot = (i: number) => ({ x: 13 + (i % 2) * 66, y: -274 + Math.floor(i / 2) * 66 });
 
   return (
-    <Stage3D label={label} paused={paused}>
+    <Stage3D
+      label={label}
+      paused={paused}
+      labels={
+        <>
+          <SceneLabel w={1200} h={900} x={910} y={448} align="middle" className={s.usbChipLapCopy} title="Copying your photos…" titleSize={30} minTitle={12} titleColor="#e3e3e1" />
+          <SceneLabel w={1200} h={900} x={910} y={448} align="middle" className={s.usbChipLapDone} title="Done · safe to eject" titleSize={30} minTitle={12} />
+          <SceneLabel w={1200} h={900} x={910} y={416} align="middle" className={s.usbChipPhoneCopy} title="Copying your photos…" titleSize={30} minTitle={12} titleColor="#e3e3e1" />
+          <SceneLabel w={1200} h={900} x={910} y={416} align="middle" className={s.usbChipPhoneDone} title="Saved to your phone" titleSize={30} minTitle={12} />
+        </>
+      }
+    >
+      <div className={s.usbFloor} />
+
+      <svg className={s.overlay} viewBox="0 0 1200 900" width="1200" height="900" aria-hidden>
+        <defs>
+          <linearGradient id={`${uid}-tile`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#5b4f45" />
+            <stop offset="1" stopColor={KODAK} stopOpacity="0.9" />
+          </linearGradient>
+          <linearGradient id={`${uid}-base`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#e4e4e7" />
+            <stop offset="1" stopColor="#a9a9ae" />
+          </linearGradient>
+          <radialGradient id={`${uid}-shadow`}>
+            <stop offset="0" stopColor="#000" stopOpacity="0.5" />
+            <stop offset="1" stopColor="#000" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+
+        {/* Camera shadow on the desk */}
+        <ellipse cx="330" cy={FLOOR - 8} rx="210" ry="18" fill={`url(#${uid}-shadow)`} />
+
+        {/* Laptop */}
+        <g transform={`translate(${LAP.x} ${FLOOR})`}>
+          <g className={s.usbLapDev}>
+            <ellipse cx="220" cy="4" rx="260" ry="16" fill={`url(#${uid}-shadow)`} />
+            <rect x="0" y="-22" width="440" height="22" rx="8" fill={`url(#${uid}-base)`} />
+            <rect x="170" y="-22" width="100" height="6" rx="3" fill="#8c8c92" />
+            <rect x="34" y="-292" width="372" height="272" rx="14" fill="#14110f" stroke="#8f8f95" strokeWidth="2.5" />
+            <rect x="46" y="-280" width="348" height="246" rx="6" fill="#1f1a18" />
+            <rect x="46" y="-280" width="348" height="26" rx="6" fill="#2c2623" />
+            {[0, 1, 2].map((i) => (
+              <circle key={i} cx={62 + i * 16} cy="-267" r="4.5" fill={["#ff5f57", "#febc2e", "#28c840"][i]} />
+            ))}
+            {Array.from({ length: 6 }, (_, i) => {
+              const p = lapSlot(i);
+              return (
+                <g key={i} transform={`translate(${p.x} ${p.y})`}>
+                  <rect width="96" height="76" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.14)" strokeDasharray="5 5" />
+                  <g className={s[`usbSlotL${i}` as keyof typeof s]}>
+                    <rect width="96" height="76" rx="8" fill="#f3f0e8" />
+                    <rect x="6" y="6" width="84" height="50" rx="3" fill={`url(#${uid}-tile)`} opacity={0.6 + ((i * 7) % 4) * 0.1} />
+                  </g>
+                </g>
+              );
+            })}
+            <rect x="62" y="-46" width="316" height="8" rx="4" fill="rgba(255,255,255,0.12)" />
+            <rect x="62" y="-46" width="316" height="8" rx="4" fill={KODAK} className={s.usbBarL} />
+          </g>
+        </g>
+
+        {/* Phone, upright on a small stand; USB-C port on its bottom edge */}
+        <g transform={`translate(${PHONE.x} ${FLOOR})`}>
+          <g className={s.usbPhoneDev}>
+            <ellipse cx="75" cy="4" rx="125" ry="11" fill={`url(#${uid}-shadow)`} />
+            <rect x="18" y="-28" width="30" height="28" rx="6" fill="#3a3533" />
+            <rect x="102" y="-28" width="30" height="28" rx="6" fill="#3a3533" />
+            <rect x="0" y="-326" width="150" height="300" rx="26" fill="#0f0d0c" stroke="#9a9aa0" strokeWidth="3" />
+            <rect x="8" y="-318" width="134" height="284" rx="20" fill="#1f1a18" />
+            <rect x="55" y="-310" width="40" height="11" rx="5.5" fill="#0a0908" />
+            <rect x="66" y="-29" width="18" height="6" rx="3" fill="#3a3a3e" />
+            {Array.from({ length: 6 }, (_, i) => {
+              const p = phoneSlot(i);
+              return (
+                <g key={i} transform={`translate(${p.x} ${p.y})`}>
+                  <rect width="58" height="58" rx="7" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.14)" strokeDasharray="4 4" />
+                  <g className={s[`usbSlotP${i}` as keyof typeof s]}>
+                    <rect width="58" height="58" rx="7" fill="#f3f0e8" />
+                    <rect x="4" y="4" width="50" height="40" rx="3" fill={`url(#${uid}-tile)`} opacity={0.6 + ((i * 5) % 4) * 0.1} />
+                  </g>
+                </g>
+              );
+            })}
+            <rect x="13" y="-292" width="124" height="5" rx="2.5" fill="rgba(255,255,255,0.12)" />
+            <rect x="13" y="-292" width="124" height="5" rx="2.5" fill={KODAK} className={s.usbBarP} />
+          </g>
+        </g>
+
+        {/* The cable: one run along the desk, then a tail that plugs into each device */}
+        <CableStroke d={main} />
+        <CableStroke d={tailA} className={s.usbTailA} pathLength={1} />
+        <CableStroke d={tailB} className={s.usbTailB} pathLength={1} />
+
+        {/* A ripple where each device connects */}
+        <circle cx={PORT_L.x} cy={PORT_L.y} r="14" fill="none" stroke={KODAK} strokeWidth="3" className={s.usbPulseA} />
+        <circle cx={PORT_P.x} cy={PORT_P.y} r="14" fill="none" stroke={KODAK} strokeWidth="3" className={s.usbPulseB} />
+      </svg>
+
       <Camera3D
         rigClassName={s.staticRig}
         rigStyle={{ "--pose": poseCss(POSE) } as CSSProperties}
@@ -87,90 +206,17 @@ export function UsbTransfer({ label, paused }: { label: string; paused?: boolean
         <UsbCable endRef={probe} />
       </Camera3D>
 
-      <svg className={s.overlay} viewBox="0 0 1200 900" width="1200" height="900" aria-hidden>
-        <defs>
-          <linearGradient id={`${uid}-tile`} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#5b4f45" />
-            <stop offset="1" stopColor={KODAK} stopOpacity="0.85" />
-          </linearGradient>
-          <linearGradient id={`${uid}-lid`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#d9d9dc" />
-            <stop offset="1" stopColor="#a9a9ae" />
-          </linearGradient>
-        </defs>
-
-        {/* Laptop */}
-        <g transform={`translate(${LAPTOP.x} ${LAPTOP.y}) scale(${LAPTOP.k}) translate(-640 -190)`}>
-          <rect x="690" y="190" width="440" height="320" rx="20" fill="#0f0d0c" stroke="#9a9aa0" strokeWidth="6" />
-          <path d="M640 540H1180L1150 600H670Z" fill={`url(#${uid}-lid)`} />
-          <rect x="860" y="540" width="100" height="10" rx="5" fill="#8c8c92" />
-          <rect x="712" y="212" width="396" height="276" rx="10" fill="#26211f" />
-          <rect x="712" y="212" width="396" height="36" rx="10" fill="#3a332f" />
-          {[0, 1, 2].map((i) => (
-            <circle key={i} cx={734 + i * 20} cy="230" r="5" fill={["#ff5f57", "#febc2e", "#28c840"][i]} />
-          ))}
-          <text x="910" y="236" textAnchor="middle" fontFamily={FONT} fontWeight="700" fontSize="18" fill="#e3e3e1" fillOpacity="0.8">
-            VHSMO
-          </text>
-          {lapTiles.map(([c, r]) => (
-            <g key={`${c}${r}`} transform={`translate(${742 + c * 120} ${272 + r * 100})`}>
-              <rect width="100" height="82" rx="6" fill="#f3f0e8" />
-              <rect x="6" y="6" width="88" height="56" rx="3" fill={`url(#${uid}-tile)`} opacity={0.55 + ((c + r) % 3) * 0.2} />
-            </g>
-          ))}
-        </g>
-
-        {/* Phone with its gallery */}
-        <g>
-          <rect x={PHONE.x} y={PHONE.y} width={PHONE.w} height={PHONE.h} rx="28" fill="#0f0d0c" stroke="#9a9aa0" strokeWidth="4" />
-          <rect x={PHONE.x + 9} y={PHONE.y + 9} width={PHONE.w - 18} height={PHONE.h - 18} rx="20" fill="#26211f" />
-          <rect x={PHONE.x + PHONE.w / 2 - 22} y={PHONE.y + 18} width="44" height="12" rx="6" fill="#0f0d0c" />
-          {[0, 1].map((c) =>
-            [0, 1, 2, 3].map((r) => (
-              <rect
-                key={`${c}${r}`}
-                x={PHONE.x + 20 + c * 62}
-                y={PHONE.y + 48 + r * 64}
-                width="56"
-                height="56"
-                rx="6"
-                fill={`url(#${uid}-tile)`}
-                opacity={0.5 + ((c + r) % 3) * 0.2}
-              />
-            )),
-          )}
-          <rect x={portB.x - 14} y={portB.y - 3} width="28" height="6" rx="3" fill="#3a3a3e" />
-        </g>
-
-        {/* Cable to the laptop, then to the phone */}
-        <g className={s.cableA}>
-          <path d={toLaptop} fill="none" stroke="#ebe8e1" strokeWidth="16" strokeLinecap="round" />
-          <path d={toLaptop} fill="none" stroke={KODAK} strokeOpacity="0.8" strokeWidth="3" strokeDasharray="10 26" className={s.dash} />
-          <rect x={screenL.x - 22} y={screenL.y - 11} width="20" height="22" rx="5" fill="#d9d9dc" />
-        </g>
-        <g className={s.cableB}>
-          <path d={toPhone} fill="none" stroke="#ebe8e1" strokeWidth="16" strokeLinecap="round" />
-          <path d={toPhone} fill="none" stroke={KODAK} strokeOpacity="0.8" strokeWidth="3" strokeDasharray="10 26" className={s.dash} />
-          <rect x={portB.x - 11} y={portB.y + 4} width="22" height="20" rx="5" fill="#d9d9dc" />
-        </g>
-
-        {/* Photos hop across: three to the laptop, then three to the phone */}
-        {[
-          [lapTarget, 0.6],
-          [lapTarget, 1.3],
-          [lapTarget, 2.0],
-          [phoneTarget, 5.6],
-          [phoneTarget, 6.3],
-          [phoneTarget, 7.0],
-        ].map(([t, delay], i) => (
-          <g key={i} transform={`translate(${start.x} ${start.y})`}>
-            <g className={s.hop} style={hop(t as { x: number; y: number }, delay as number)}>
-              <rect x="-22" y="-22" width="44" height="44" rx="6" fill="#f3f0e8" />
-              <rect x="-17" y="-17" width="34" height="27" rx="2" fill={`url(#${uid}-tile)`} />
-            </g>
-          </g>
+      {/* Photos travel along the cable; the plug follows the tail in and out */}
+      <div className={s.usbLayer}>
+        {Array.from({ length: 6 }, (_, i) => (
+          <span key={`l${i}`} className={s.usbTile} style={{ offsetPath: q(fullA), animationDelay: `${DEPART_L(i)}s` }} />
         ))}
-      </svg>
+        {Array.from({ length: 6 }, (_, i) => (
+          <span key={`p${i}`} className={s.usbTile} style={{ offsetPath: q(fullB), animationDelay: `${DEPART_P(i)}s` }} />
+        ))}
+        <span className={s.usbPlugA} style={{ offsetPath: q(tailA) }} />
+        <span className={s.usbPlugB} style={{ offsetPath: q(tailB) }} />
+      </div>
     </Stage3D>
   );
 }

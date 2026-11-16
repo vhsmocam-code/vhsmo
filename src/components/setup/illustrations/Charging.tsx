@@ -1,13 +1,10 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { BACK, CameraBack } from "./CameraBack";
-import { CAM3D, Camera3D, frontPoint, poseCss, project, type Pose } from "./Camera3D";
+import { CAM3D, Camera3D, centerOn, frontPoint, poseCss, project, type Pose } from "./Camera3D";
 import { SceneLabel } from "./SceneLabel";
-import { IllustrationStage } from "./Stage";
 import { Stage3D } from "./Stage3D";
-import { useSvgId } from "./useSvgId";
-import { PORT_Y, UsbCable, UsbPortFace } from "./UsbPort";
+import { LED, LED_POINT, PORT, PORT_POINT, UsbCable, UsbPortFace } from "./UsbPort";
 import s from "./illustrations.module.css";
 
 const RED = "#ff3b30";
@@ -24,7 +21,7 @@ const SIDE_POSE: Pose = { rx: 0, ry: -68, s: 0.88, tx: -110, ty: -40 };
  * fills (red while charging, green when full).
  */
 export function Charging({ label, paused }: { label: string; paused?: boolean }) {
-  const portAt = project(frontPoint(CAM3D.w, PORT_Y), SIDE_POSE);
+  const portAt = project(PORT_POINT, SIDE_POSE);
 
   return (
     <Stage3D
@@ -39,7 +36,7 @@ export function Charging({ label, paused }: { label: string; paused?: boolean })
             y={portAt.y - 110}
             className={s.capSide}
             title="Charging port"
-            sub={["On the side, next to", "the ON/OFF switch"]}
+            sub={["On the side, next to the", "ON/OFF switch. The light", "beside it shows charging."]}
           />
           <SceneLabel w={1200} h={900} x={452} y={843} align="end" className={s.chargeWord} title="Charging" titleSize={26} minTitle={11} titleColor="#e3e3e1" />
           <SceneLabel w={1200} h={900} x={452} y={843} align="end" className={s.fullWord} title="Full" titleSize={26} minTitle={11} titleColor="#e3e3e1" />
@@ -54,7 +51,7 @@ export function Charging({ label, paused }: { label: string; paused?: boolean })
             "--poseSide": poseCss(SIDE_POSE),
           } as CSSProperties
         }
-        right={<UsbPortFace />}
+        right={<UsbPortFace led="animated" />}
       >
         {/* The cable lies out from the port along +x and plugs in */}
         <UsbCable animated />
@@ -81,7 +78,10 @@ export function Charging({ label, paused }: { label: string; paused?: boolean })
   );
 }
 
-/** Still for one LED state: close on the viewfinder with the dot glowing. */
+/** Close-up of the port face for one LED state: the light beside the port. */
+const MID = frontPoint(CAM3D.w, (PORT.y + LED.y) / 2, CAM3D.d / 2 - (PORT.depth + LED.depth) / 2);
+const STILL_POSE: Pose = centerOn(MID, { rx: 0, ry: -72, s: 1.55, tx: 0, ty: 0 }, { x: 600, y: 450 });
+
 export function ChargeState({
   label,
   state,
@@ -89,30 +89,13 @@ export function ChargeState({
   label: string;
   state: "red" | "green";
 }) {
-  const uid = useSvgId(`cs${state}`);
-  const c = state === "red" ? RED : GREEN;
-  const k = 2;
-  const tx = 720 - BACK.led.x * k;
-  const ty = 470 - BACK.led.y * k;
-
   return (
-    <IllustrationStage label={label}>
-      <svg viewBox="0 0 1200 900" preserveAspectRatio="xMidYMid meet" aria-hidden>
-        <defs>
-          <radialGradient id={`${uid}-glow`}>
-            <stop offset="0" stopColor={c} stopOpacity="0.95" />
-            <stop offset="0.28" stopColor={c} stopOpacity="0.4" />
-            <stop offset="1" stopColor={c} stopOpacity="0" />
-          </radialGradient>
-        </defs>
-        <g transform={`translate(${tx} ${ty}) scale(${k})`}>
-          <CameraBack />
-        </g>
-        <g className={state === "red" ? s.softPulse : undefined}>
-          <circle cx="720" cy="470" r="120" fill={`url(#${uid}-glow)`} />
-          <circle cx="720" cy="470" r="17" fill={c} />
-        </g>
-      </svg>
-    </IllustrationStage>
+    <Stage3D label={label}>
+      <Camera3D
+        rigClassName={s.staticRig}
+        rigStyle={{ "--pose": poseCss(STILL_POSE) } as CSSProperties}
+        right={<UsbPortFace led={state} ledClassName={state === "red" ? s.softPulse : undefined} />}
+      />
+    </Stage3D>
   );
 }

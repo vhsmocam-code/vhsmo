@@ -72,7 +72,7 @@ export type SetupStepContent = {
   body: string;
   note?: string;
   /** Show the note as a highlighted callout with this icon instead of a quiet aside. */
-  noteIcon?: "flash" | "wifi";
+  noteIcon?: "flash" | "wifi" | "usb" | "reset";
   media: MediaSlotConfig;
 };
 
@@ -145,6 +145,24 @@ export const setupSteps: SetupStepContent[] = [
   },
 ];
 
+/**
+ * A yellow ring drawn around a button on an app screenshot. `x`/`y` place
+ * its centre as a percent of the screenshot's width/height; `w`, `h` and
+ * the corner radius `r` are a percent of the screenshot's width (so the
+ * ring keeps its shape at any size). Without `r` the ring is a pill/circle.
+ */
+export type TourHighlight = { x: number; y: number; w: number; h: number; r?: number };
+export type TourScreen = {
+  id: string;
+  title: string;
+  caption: string;
+  src: string;
+  alt: string;
+  /** Colour of the soft glow behind the phone. */
+  glow: string;
+  highlights: TourHighlight[];
+};
+
 /** Step 05: connect through the VHSMO app. */
 export const appGuide = {
   id: "step-5",
@@ -171,29 +189,60 @@ export const appGuide = {
       "Charge it first: updates need at least 2 battery bars.",
     ],
   },
-  screens: [
+  /**
+   * The scroll story: four real screens from the app (iOS simulator
+   * captures, demo photos, mock camera) that change in one phone as the
+   * visitor scrolls. Highlight positions are measured from
+   * public/setup/step-05/tour-*.webp (900 x 1958); re-measure if the
+   * screenshots change.
+   */
+  tour: [
     {
-      n: 1,
-      title: "Live Gallery",
-      body: "See your shots appear as you take them, straight from your camera.",
-      src: "/setup/step-05/app-1.webp",
-      alt: "The VHSMO app's Live Gallery showing photos from the connected camera",
-    },
-    {
-      n: 2,
+      id: "home",
       title: "Home",
-      body: "Your camera shows as connected, with its battery level. Tap Offload media to move your photos across.",
-      src: "/setup/step-05/app-2.webp",
-      alt: "The VHSMO app's Home screen with the camera connected and an Offload media button",
+      caption: "Once your camera shows Connected with its battery level, tap Offload media to bring your photos across.",
+      src: "/setup/step-05/tour-home.webp",
+      alt: "The VHSMO app's Home screen: the pink camera, Connected with 86% battery, and an Offload media button",
+      glow: "#fdf100",
+      highlights: [
+        { x: 16.6, y: 44.3, w: 33, h: 9 },
+        { x: 50.1, y: 52.3, w: 96.5, h: 21.5, r: 6 },
+      ],
     },
     {
-      n: 3,
-      title: "Offload Gallery",
-      body: "Every offload is saved on your phone and sorted by day, ready to look back on.",
-      src: "/setup/step-05/app-3.webp",
-      alt: "The VHSMO app's Your rolls screen with favourites and offloaded rolls sorted by day",
+      id: "live",
+      title: "Live Gallery",
+      caption: "Your shots land here as you take them. Tap the yellow button to take a photo from your phone.",
+      src: "/setup/step-05/tour-live.webp",
+      alt: "The VHSMO app's Live Gallery showing photos from the connected camera in a film strip",
+      glow: "#ff5fa2",
+      highlights: [
+        { x: 11.3, y: 9.85, w: 18, h: 8.5 },
+        { x: 50, y: 83.1, w: 19.5, h: 19.5 },
+      ],
     },
-  ],
+    {
+      id: "rolls",
+      title: "Your rolls",
+      caption: "Every offload is saved on your phone as a roll, sorted by day, with your favourites on top.",
+      src: "/setup/step-05/tour-rolls.webp",
+      alt: "The VHSMO app's Your rolls screen with favourites and offloaded rolls sorted by day",
+      glow: "#1093ff",
+      highlights: [
+        { x: 50.1, y: 25.7, w: 96.5, h: 43, r: 7 },
+        { x: 26.1, y: 55.2, w: 46.5, h: 55.5, r: 6 },
+      ],
+    },
+    {
+      id: "favs",
+      title: "Favourites",
+      caption: "Your favourite shots, kept together in one roll. Switch between the film strip and a grid.",
+      src: "/setup/step-05/tour-favs.webp",
+      alt: "The Favourites roll in the VHSMO app, shown as a film strip of photos",
+      glow: "#ff5fa2",
+      highlights: [{ x: 86.8, y: 9.35, w: 21.5, h: 11.5 }],
+    },
+  ] as TourScreen[],
 };
 
 /** Step 06: charging. */
@@ -202,7 +251,7 @@ export const charging = {
   number: "06",
   label: "Charging",
   title: "Power up. Get back out there.",
-  body: "Plug a USB-C cable into the charging port on the side of your VHSMO, next to the ON/OFF switch. It takes up to 8 hours to fully charge.",
+  body: "Plug a USB-C cable into the charging port on the side of your VHSMO, next to the ON/OFF switch. The small light beside the port glows red while it charges and turns green when it's full. It takes up to 8 hours to fully charge.",
   hours: "8",
   photos: "1,000+",
   photosLine: "One full charge lets you capture 1,000+ photos, so you never have to worry about missing a moment.",
@@ -211,8 +260,8 @@ export const charging = {
     illustration: "charging",
     ratio: "4 / 3",
     fit: "cover",
-    alt: "The VHSMO turning from the front to its side, where a cable plugs into the charging port next to the ON/OFF switch",
-    brief: "GIF: camera turns to the side port, cable plugs in, charging",
+    alt: "The VHSMO turning from the front to its side, where a cable plugs into the USB-C port and the light beside it glows red, then green when charged",
+    brief: "GIF: camera turns to the side port, cable plugs in, light beside the port red then green",
   } satisfies MediaSlotConfig,
   states: [
     {
@@ -225,8 +274,8 @@ export const charging = {
         illustration: "charge-red",
         ratio: "4 / 3",
         fit: "cover",
-        alt: "The VHSMO charging LED glowing red",
-        brief: "Photo: charging LED red",
+        alt: "The small light beside the VHSMO's USB-C port glowing red while it charges",
+        brief: "Photo: light beside the USB-C port glowing red",
       } satisfies MediaSlotConfig,
     },
     {
@@ -239,8 +288,8 @@ export const charging = {
         illustration: "charge-green",
         ratio: "4 / 3",
         fit: "cover",
-        alt: "The VHSMO charging LED glowing green",
-        brief: "Photo: charged LED green",
+        alt: "The small light beside the VHSMO's USB-C port glowing green when it is fully charged",
+        brief: "Photo: light beside the USB-C port glowing green",
       } satisfies MediaSlotConfig,
     },
   ],
@@ -257,28 +306,30 @@ export const goodToKnow = {
       title: "Prefer a cable? Use USB.",
       body: "Connect your VHSMO to your computer or phone with a USB data cable, open the camera's storage and copy your photos across. When you're done, safely eject the storage before you unplug it.",
       note: "Handy when you have lots of photos to back up.",
+      noteIcon: "usb" as const,
       media: {
         slot: "good-to-know/usb",
         illustration: "usb-transfer",
         ratio: "4 / 3",
         fit: "cover",
-        alt: "The VHSMO on a USB cable, copying photos to a laptop and then to a phone",
-        brief: "GIF: camera on USB, photos copying to a laptop, then a phone",
+        alt: "The VHSMO on a desk with a USB cable: six photos travel down the cable into a laptop, then the cable moves to a phone and they copy there too",
+        brief: "GIF: photos copy over USB to a laptop, then to a phone",
       } satisfies MediaSlotConfig,
     },
     {
       id: "reset",
       title: "Camera stuck? Reset it.",
-      // CONFIRM against hardware: the cover position on the underside and the
-      // screw, reset button and card order are from the team's description.
-      body: "Like any electronic device, your VHSMO can very rarely stop responding. Turn it over and unscrew the small cover on the underside: you'll find the reset button in the middle and the memory card on the right. Press and hold the reset button for about four seconds, until the indicator lights blink. The camera restarts and you're back to capturing.",
+      // Matches the real underside: a small cover marked with a memory-card
+      // icon, an R and a screw. CONFIRM the open layout against hardware.
+      body: "Like any electronic device, your VHSMO can very rarely stop responding. Turn it over and unscrew the small cover on the underside, the one marked with a memory-card icon and an R. Press and hold the reset button (R) for about four seconds, until the indicator lights blink. The camera restarts and you're back to capturing.",
       note: "Hold for about 4 seconds, until the lights blink.",
+      noteIcon: "reset" as const,
       media: {
         slot: "good-to-know/reset",
         illustration: "reset-button",
         ratio: "4 / 3",
         fit: "cover",
-        alt: "The VHSMO turning onto its underside, the small cover coming off to show the reset button and the memory card",
+        alt: "The VHSMO turning onto its underside, the cover marked with a memory-card icon, an R and a screw coming off to show the card and the reset button",
         brief: "Photo or GIF: underside cover open, reset button pressed",
       } satisfies MediaSlotConfig,
     },
