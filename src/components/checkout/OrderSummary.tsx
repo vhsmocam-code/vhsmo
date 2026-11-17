@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { track } from "@vercel/analytics";
 import { formatCurrency } from "@/lib/utils";
+import { loadRazorpay } from "@/lib/load-razorpay";
 import type { CartItem } from "@/lib/cart-context";
 import type { Address } from "@/components/address/types";
 import { CouponInput } from "./CouponInput";
@@ -81,6 +82,11 @@ export function OrderSummary({
   const [couponLoading, setCouponLoading] = useState(false);
 
   const [couponError, setCouponError] = useState("");
+
+  // Fetch the payment script while the shopper fills in the form.
+  useEffect(() => {
+    loadRazorpay().catch(() => {});
+  }, []);
 
   const handleCheckout = async () => {
     if (processing) return;
@@ -234,6 +240,7 @@ track("pay_securely_clicked", {
         },
       };
 
+      await loadRazorpay();
       const razorpay = new (window as any).Razorpay(options);
       razorpay.open();
     } catch (err) {
@@ -322,7 +329,7 @@ track("pay_securely_clicked", {
                 )}
                 <p className="text-xs text-darkroom/45">Qty: {item.quantity}</p>
                 {soldOut && (
-                  <span className="mt-1.5 inline-flex w-fit items-center gap-1 rounded-full bg-red-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-red-600 ring-1 ring-inset ring-red-500/25">
+                  <span className="mt-1.5 inline-flex w-fit items-center gap-1 rounded-full bg-red-500/10 px-2 py-0.5 text-[11px] sm:text-[10px] font-bold uppercase tracking-wider text-red-600 ring-1 ring-inset ring-red-500/25">
                     <PackageX className="size-3" />
                     Out of stock
                   </span>
@@ -359,7 +366,7 @@ track("pay_securely_clicked", {
                 setCouponError("");
               }}
               aria-label="Remove coupon"
-              className="flex size-8 shrink-0 items-center justify-center rounded-full text-darkroom/45 transition-colors hover:bg-darkroom/[0.06] hover:text-darkroom/70"
+              className="tap-target flex size-8 shrink-0 items-center justify-center rounded-full text-darkroom/45 transition-colors hover:bg-darkroom/[0.06] hover:text-darkroom/70"
             >
               <X className="size-4" />
             </button>

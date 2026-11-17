@@ -60,7 +60,7 @@ function CopyValue({ label, value }: { label: string; value: string }) {
           onClick={onCopy}
           aria-label={`Copy ${label.toLowerCase()}`}
           className={cn(
-            "flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold transition-colors",
+            "tap-target flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold transition-colors",
             copied ? "bg-kodak text-darkroom" : "text-halide/60 hover:bg-halide/10 hover:text-halide",
           )}
         >

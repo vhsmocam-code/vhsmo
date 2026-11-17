@@ -27,8 +27,9 @@ export function CheckoutHeader() {
       <div className="container-px mx-auto flex h-16 max-w-[90rem] items-center justify-between gap-4">
         <Link
           href="/"
+          aria-label="Back to store"
           className={cn(
-            "flex items-center gap-2 text-sm font-semibold transition-colors",
+            "tap-target flex items-center gap-2 text-sm font-semibold transition-colors",
             scrolled
               ? "text-halide/70 hover:text-halide"
               : "text-darkroom/60 hover:text-darkroom",

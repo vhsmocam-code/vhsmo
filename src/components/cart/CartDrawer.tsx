@@ -148,7 +148,7 @@ export function CartDrawer() {
                             </p>
                           )}
                           {soldOut && (
-                            <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-red-600 ring-1 ring-inset ring-red-500/25">
+                            <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2 py-0.5 text-[11px] sm:text-[10px] font-bold uppercase tracking-wider text-red-600 ring-1 ring-inset ring-red-500/25">
                               <PackageX className="size-3" />
                               Out of stock
                             </span>
@@ -156,7 +156,7 @@ export function CartDrawer() {
                         </div>
                         <button
                           onClick={() => removeItem(item.id, item.variant)}
-                          className="flex size-8 items-center justify-center rounded-full text-darkroom/55 transition-colors hover:bg-darkroom/[0.06] hover:text-darkroom"
+                          className="tap-target flex size-8 items-center justify-center rounded-full text-darkroom/55 transition-colors hover:bg-darkroom/[0.06] hover:text-darkroom"
                           aria-label={`Remove ${item.name}`}
                         >
                           <Trash2 className="size-4" />

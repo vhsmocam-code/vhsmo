@@ -104,6 +104,7 @@ export function Header() {
             width={logo.width}
             height={logo.height}
             priority
+            sizes="48px"
             className="h-9 w-auto sm:h-10"
           />
         </Link>
@@ -132,7 +133,7 @@ export function Header() {
             data-cart-icon
             onClick={openCart}
             aria-label={`Open cart${isHydrated && count > 0 ? ` (${count} items)` : ""}`}
-            className="relative flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-halide/10"
+            className="tap-target relative flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-halide/10"
           >
             <ShoppingBag className="h-5 w-5" aria-hidden />
             {isHydrated && count > 0 && (
@@ -151,7 +152,7 @@ export function Header() {
             type="button"
             onClick={() => setMenuOpen(true)}
             aria-label="Open menu"
-            className="flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-halide/10 md:hidden"
+            className="tap-target flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-halide/10 md:hidden"
           >
             <Menu className="h-5 w-5" aria-hidden />
           </button>
@@ -174,6 +175,7 @@ export function Header() {
                 alt="VHSMO"
                 width={2311}
                 height={679}
+                sizes="96px"
                 className="h-6 w-auto -rotate-2"
               />
               <button

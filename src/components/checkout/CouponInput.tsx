@@ -45,7 +45,7 @@ export function CouponInput({ onApply, loading, error }: Props) {
           aria-invalid={Boolean(error)}
           autoCapitalize="characters"
           spellCheck={false}
-          className="h-12 flex-1 rounded-xl border-2 border-darkroom/12 bg-overexpose px-4 text-sm font-semibold uppercase tracking-wide text-darkroom transition-colors placeholder:font-normal placeholder:normal-case placeholder:tracking-normal placeholder:text-darkroom/35 focus:border-bluehour focus:outline-none aria-[invalid=true]:border-red-400"
+          className="h-12 flex-1 rounded-xl border-2 border-darkroom/12 bg-overexpose px-4 text-base font-semibold md:text-sm uppercase tracking-wide text-darkroom transition-colors placeholder:font-normal placeholder:normal-case placeholder:tracking-normal placeholder:text-darkroom/35 focus:border-bluehour focus:outline-none aria-[invalid=true]:border-red-400"
         />
 
         <button

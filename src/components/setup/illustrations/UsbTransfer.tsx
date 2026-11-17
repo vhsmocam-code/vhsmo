@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { CAM3D, Camera3D, centerOn, frontPoint, poseCss, project, type Pose } from "./Camera3D";
 import { SceneLabel } from "./SceneLabel";
 import { Stage3D } from "./Stage3D";
@@ -45,7 +45,9 @@ function CableStroke({ d }: { d: string }) {
  */
 export function UsbTransfer({ label, paused }: { label: string; paused?: boolean }) {
   const uid = useSvgId("usb");
-  const probe = useRef<HTMLDivElement>(null);
+  // A callback ref: the 3D rig mounts later (near the screen), so measure
+  // when the stub appears, not on the first render.
+  const [probe, setProbe] = useState<HTMLDivElement | null>(null);
   const [end, setEnd] = useState(() => {
     const p = project(frontPoint(CABLE_END.x, CABLE_END.y), POSE);
     return { x: r1(p.x), y: r1(p.y) };
@@ -54,7 +56,7 @@ export function UsbTransfer({ label, paused }: { label: string; paused?: boolean
   // The cable stub is drawn in 3D; measure where its end actually lands so
   // the 2D cable joins it exactly.
   useEffect(() => {
-    const el = probe.current;
+    const el = probe;
     const world = el?.closest(`.${s.world3d}`) as HTMLElement | null;
     if (!el || !world) return;
     const measure = () => {
@@ -74,7 +76,7 @@ export function UsbTransfer({ label, paused }: { label: string; paused?: boolean
       cancelAnimationFrame(raf);
       ro.disconnect();
     };
-  }, []);
+  }, [probe]);
 
   // Down from the stub to the desk, along it, then up into the phone's port.
   const cable =
@@ -146,7 +148,7 @@ export function UsbTransfer({ label, paused }: { label: string; paused?: boolean
         rigStyle={{ "--pose": poseCss(POSE) } as CSSProperties}
         right={<UsbPortFace />}
       >
-        <UsbCable endRef={probe} />
+        <UsbCable endRef={setProbe} />
       </Camera3D>
     </Stage3D>
   );

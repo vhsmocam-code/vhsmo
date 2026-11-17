@@ -7,7 +7,6 @@ import { SmoothScroll } from "@/components/providers/SmoothScroll";
 import { FilmGrain } from "@/components/brand/FilmGrain";
 import { SiteChrome } from "@/components/layout/SiteChrome";
 import { CartDrawer } from "@/components/cart/CartDrawer";
-import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 
 import { getProducts } from "@/lib/get-products";
@@ -20,7 +19,6 @@ import { SITE_URL } from "@/lib/site";
  */
 const sequel = Inter_Tight({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
   variable: "--font-sequel",
   display: "swap",
 });
@@ -134,10 +132,6 @@ export default async function RootLayout({
           <FilmGrain />
         </CartProvider>
         </ProductsProvider>
-        <Script
-          src="https://checkout.razorpay.com/v1/checkout.js"
-          strategy="beforeInteractive"
-        />
       </body>
     </html>
   );

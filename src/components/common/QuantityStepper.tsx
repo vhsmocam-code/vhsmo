@@ -27,7 +27,7 @@ export function QuantityStepper({
 
   const btn =
     "flex items-center justify-center rounded-full text-ink transition-colors hover:bg-ink/[0.06] disabled:opacity-30 disabled:hover:bg-transparent";
-  const dims = size === "sm" ? "size-8" : "size-10";
+  const dims = size === "sm" ? "tap-target size-8" : "tap-target size-10";
 
   return (
     <div

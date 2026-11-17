@@ -32,7 +32,7 @@ export function ShowcasePhone({
       {/* Glow that takes on each screen's colour */}
       <div
         aria-hidden
-        className={cn(s.glow, "absolute -inset-[22%] rounded-full opacity-35 blur-3xl")}
+        className={cn(s.glow, "absolute -inset-[22%] opacity-35")}
         style={{ backgroundColor: screen.glow }}
       />
 
@@ -54,7 +54,6 @@ export function ShowcasePhone({
                     src={sc.src}
                     alt={on ? sc.alt : ""}
                     fill
-                    priority={i === 0}
                     draggable={false}
                     sizes="(min-width: 1024px) 20rem, 68vw"
                     className="select-none object-cover"

@@ -1,9 +1,10 @@
 "use client";
 
-import type { CSSProperties, ReactNode } from "react";
+import { useContext, type CSSProperties, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { CameraFront, FRONT, FRONT_BODY } from "./CameraFront";
 import { SILVER, TONES, type Tone } from "./geometry";
+import { Detail3D } from "./Stage3D";
 import s from "./illustrations.module.css";
 
 /**
@@ -138,8 +139,8 @@ function flattenPath(d: string, steps = 5) {
  * The body's side walls: one plane per edge of the traced outline, standing
  * front → back. Each is shaded by how much it faces the light (top-left).
  */
-const SIDE_FACES = (() => {
-  const pts = flattenPath(FRONT_BODY);
+function sideFaces(steps: number) {
+  const pts = flattenPath(FRONT_BODY, steps);
   // Winding (shoelace): positive = clockwise on screen (y down).
   let area = 0;
   pts.forEach((p, i) => {
@@ -165,7 +166,10 @@ const SIDE_FACES = (() => {
       lit: r2(lit),
     };
   }).filter((f) => f.len > 0.5);
-})();
+}
+const SIDE_FACES = sideFaces(5);
+/** Phones: fewer steps round the corners; the same shape at that size. */
+const SIDE_FACES_LITE = sideFaces(3);
 
 
 /**
@@ -265,7 +269,7 @@ const ring = (ro: number, ri: number) =>
   `M${-ro} 0a${ro} ${ro} 0 1 0 ${ro * 2} 0a${ro} ${ro} 0 1 0 ${-ro * 2} 0Z` +
   `M${-ri} 0a${ri} ${ri} 0 1 0 ${ri * 2} 0a${ri} ${ri} 0 1 0 ${-ri * 2} 0Z`;
 
-function Lens3D({ face, tone }: { face: number; tone: Tone }) {
+function Lens3D({ face, tone, facets }: { face: number; tone: Tone; facets: number }) {
   const t = TONES[tone];
   const L = LENS;
   const black = (lit: number) => mix("#050404", "#3d393a", lit * 0.9);
@@ -273,12 +277,12 @@ function Lens3D({ face, tone }: { face: number; tone: Tone }) {
   const pink = (lit: number) => mix(t.edge, t.light, 0.15 + lit * 0.7);
   return (
     <div className={s.plane3d}>
-      <LensWall {...L.gasket} facets={28} face={face} color={black} />
+      <LensWall {...L.gasket} facets={facets} face={face} color={black} />
       <LensCap r={L.gasket.r} z={L.gasket.z1} face={face}>
         <path d={ring(L.gasket.r, L.trim.r)} fill="#141112" fillRule="evenodd" />
       </LensCap>
 
-      <LensWall {...L.trim} facets={28} face={face} color={silver} />
+      <LensWall {...L.trim} facets={facets} face={face} color={silver} />
       <LensCap r={L.trim.r} z={L.trim.z1} face={face}>
         <defs>
           <linearGradient id="lens3d-trim" x1="0.1" y1="0" x2="0.9" y2="1">
@@ -291,7 +295,7 @@ function Lens3D({ face, tone }: { face: number; tone: Tone }) {
         <path d={ring(L.trim.r, L.housing.r)} fill="url(#lens3d-trim)" fillRule="evenodd" />
       </LensCap>
 
-      <LensWall {...L.housing} facets={28} face={face} color={pink} />
+      <LensWall {...L.housing} facets={facets} face={face} color={pink} />
       <LensCap r={L.housing.r} z={L.housing.z1} face={face}>
         <defs>
           <radialGradient id={`lens3d-housing-${tone}`} cx="0.38" cy="0.32" r="0.85">
@@ -308,7 +312,7 @@ function Lens3D({ face, tone }: { face: number; tone: Tone }) {
       </LensCap>
 
       {/* The black lens, just inside the shield: a short dark inner wall, then the glass */}
-      <LensWall r={L.opening.r} z0={L.glass.z} z1={L.housing.z1} facets={28} face={face} color={black} inward />
+      <LensWall r={L.opening.r} z0={L.glass.z} z1={L.housing.z1} facets={facets} face={face} color={black} inward />
       <LensCap r={L.opening.r} z={L.glass.z} face={face}>
         <defs>
           <radialGradient id="lens3d-glass" cx="0.4" cy="0.35" r="0.8">
@@ -330,7 +334,7 @@ function Lens3D({ face, tone }: { face: number; tone: Tone }) {
   );
 }
 
-const SHUTTER = { x: 240, r: 56, top: -32, bodyTop: 6, facets: 20 } as const;
+const SHUTTER = { x: 240, r: 56, top: -32, bodyTop: 6 } as const;
 
 export function Camera3D({
   tone = "pink",
@@ -356,6 +360,9 @@ export function Camera3D({
   const rightH = FACES.right.y1 - FACES.right.y0;
   const bottomW = FACES.bottom.x1 - FACES.bottom.x0;
   const band = FACES.band;
+  const lite = useContext(Detail3D) === "lite";
+  const sides = lite ? SIDE_FACES_LITE : SIDE_FACES;
+  const shutterFacets = lite ? 12 : 20;
 
   return (
     <div
@@ -369,7 +376,7 @@ export function Camera3D({
             className={s.slice}
             style={{ clipPath: `path('${FRONT_BODY}')`, background: t.shade, transform: `translateZ(${-d / 2}px)` }}
           />
-          {SIDE_FACES.map((f, i) => (
+          {sides.map((f, i) => (
             <div
               key={i}
               className={s.plane3d}
@@ -389,10 +396,10 @@ export function Camera3D({
 
           {/* Shutter: a short silver cylinder on top, centred in the depth */}
           <div className={s.plane3d}>
-            {Array.from({ length: SHUTTER.facets }, (_, i) => {
-              const ang = (i / SHUTTER.facets) * 360;
+            {Array.from({ length: shutterFacets }, (_, i) => {
+              const ang = (i / shutterFacets) * 360;
               const shade = r2(0.5 + 0.5 * Math.cos(((ang - 40) * Math.PI) / 180));
-              const w2 = r2((2 * Math.PI * SHUTTER.r) / SHUTTER.facets + 1);
+              const w2 = r2((2 * Math.PI * SHUTTER.r) / shutterFacets + 1);
               return (
                 <div
                   key={i}
@@ -449,7 +456,7 @@ export function Camera3D({
           </svg>
 
           {/* The lens, built in 3D on the front face */}
-          <Lens3D face={d / 2} tone={tone} />
+          <Lens3D face={d / 2} tone={tone} facets={lite ? 16 : 28} />
 
           {/* Right face band: local x runs front (0) → back (band) */}
           {right != null && (

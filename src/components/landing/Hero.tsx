@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
 import { useRef } from "react";
 import {
   motion,
@@ -18,6 +18,16 @@ import { hero, RESERVE_HREF, YEAR_MARK, TAGLINE } from "@/lib/landing";
  * is sprayed across it larger than the viewport, drifting against the
  * cursor like a print floating over the scene.
  */
+/* One <picture> for the backdrop, so each device downloads only its own
+   photo (two <Image>s hidden by CSS would make phones fetch both). */
+const heroCommon = { alt: hero.image.alt, fill: true, sizes: "100vw", quality: 75 } as const;
+const {
+  props: { srcSet: heroDesktopSet },
+} = getImageProps({ ...heroCommon, src: hero.image.src });
+const {
+  props: { srcSet: heroMobileSet, ...heroImgProps },
+} = getImageProps({ ...heroCommon, src: hero.imageMobile.src, fetchPriority: "high", loading: "eager" });
+
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
   const reduceMotion = useReducedMotion();
@@ -63,24 +73,14 @@ export function Hero() {
           className="relative h-full w-full"
           style={reduceMotion ? undefined : { y: scrollImgY }}
         >
-          <Image
-            src={hero.imageMobile.src}
-            alt={hero.imageMobile.alt}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-[center_30%] sm:hidden"
-          />
-          <Image
-            src={hero.image.src}
-            alt={hero.image.alt}
-            fill
-            priority
-            sizes="100vw"
-            className="hidden object-cover object-[center_30%] sm:block"
-          />
+          <picture>
+            <source media="(min-width: 640px)" srcSet={heroDesktopSet} sizes="100vw" />
+            <source srcSet={heroMobileSet} sizes="100vw" />
+            {/* eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text -- alt comes from heroImgProps */}
+            <img {...heroImgProps} className="object-cover object-[center_30%]" />
+          </picture>
           {/* Brown wash + a light blur to soften the collage behind the type */}
-          <div className="pointer-events-none absolute inset-0 bg-[#5A4332]/30 mix-blend-multiply backdrop-blur-[2px]" />
+          <div className="pointer-events-none absolute inset-0 bg-[#5A4332]/30 mix-blend-multiply sm:backdrop-blur-[2px]" />
           {/* <div className="absolute inset-0 bg-[#5A4332]/35 mix-blend-multiply" /> */}
           {/* <div className="absolute inset-0 bg-[#163B38]/45 mix-blend-multiply pointer-events-none" />{" "} */}
         </motion.div>
@@ -106,6 +106,7 @@ export function Hero() {
             width={2258}
             height={589}
             priority
+            sizes="(min-width: 1556px) 1400px, 90vw"
             className="block h-auto w-full"
           />
         </motion.span>
@@ -132,6 +133,7 @@ export function Hero() {
                 width={2258}
                 height={589}
                 priority
+                sizes="(min-width: 1556px) 1400px, 90vw"
                 className="block h-auto w-full"
               />
             </span>

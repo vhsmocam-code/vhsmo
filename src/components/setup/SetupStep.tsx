@@ -20,7 +20,7 @@ export function SetupStep({
 }) {
   const text = (
     <Reveal className={cn(wide && "mx-auto max-w-2xl text-center")}>
-      <span className="font-marker block text-6xl leading-none tabular-nums text-kodak sm:text-7xl">
+      <span className="font-marker block text-5xl leading-none tabular-nums text-kodak sm:text-7xl">
         {step.number}
       </span>
       <h2

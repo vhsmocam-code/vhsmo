@@ -214,6 +214,7 @@ function GalleryTrack({
           alt={photo.alt}
           width={480}
           height={320}
+          sizes="(min-width: 768px) 420px, (min-width: 640px) 330px, 240px"
           draggable={false}
           className="block h-[160px] w-auto object-contain sm:h-[220px] md:h-[280px]"
         />
@@ -253,11 +254,11 @@ export function ShotOn() {
       <Marquee text={`shot on VHSMO · ${shotOn.marquee}`} variant="kodak" />
 
       {/* Running head - matches the eyebrow pattern used across the site */}
-      <div className=" relative mb-14 mt-16  text-center ">
+      <div className="shell relative mb-14 mt-16 text-center">
    
 
         <Reveal delay={0.05}>
-          <h2 className="display mt-12 max-w-4xl text-[clamp(2.2rem,4.5vw,4.25rem)] leading-[0.95] text-overexpose">
+          <h2 className="display mx-auto mt-12 max-w-4xl text-[clamp(2.2rem,4.5vw,4.25rem)] leading-[0.95] text-overexpose">
             Real moments.{" "}
             <span className="relative inline-block text-kodak">
               No filters.

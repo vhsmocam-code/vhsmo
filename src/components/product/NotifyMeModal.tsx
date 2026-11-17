@@ -122,7 +122,7 @@ export function NotifyMeModal({
             role="dialog"
             aria-modal="true"
             aria-label={`Notify me when ${variant.color} is back`}
-            className="relative w-full max-w-md rounded-3xl bg-halide p-6 shadow-2xl sm:p-8"
+            className="relative max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-3xl bg-halide p-6 shadow-2xl sm:p-8"
             initial={{ opacity: 0, y: 24, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.98 }}
@@ -132,7 +132,7 @@ export function NotifyMeModal({
               type="button"
               onClick={onClose}
               aria-label="Close"
-              className="absolute right-4 top-4 flex size-9 items-center justify-center rounded-full text-darkroom/50 transition-colors hover:bg-darkroom/10 hover:text-darkroom"
+              className="absolute right-3 top-3 flex size-11 items-center justify-center rounded-full text-darkroom/50 transition-colors hover:bg-darkroom/10 hover:text-darkroom"
             >
               <X className="size-5" />
             </button>

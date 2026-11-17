@@ -9,7 +9,7 @@ import { Clock } from "lucide-react";
 export function ReservationBanner({ label }: { label: string }) {
   return (
     <div className="sticky top-16 z-20 border-b border-kodak/30 bg-darkroom text-halide shadow-sm">
-      <div className="container-px mx-auto flex h-11 max-w-[90rem] items-center justify-center gap-2 text-center text-sm font-semibold">
+      <div className="container-px mx-auto flex min-h-11 max-w-[90rem] items-center justify-center gap-2 py-2 text-center text-sm font-semibold leading-snug">
         <Clock className="size-4 shrink-0 text-kodak" />
         <span>
           VHSMO is reserved for you - complete your order within{" "}

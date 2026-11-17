@@ -133,7 +133,7 @@ export function Footer() {
                     target="_blank"
                     rel="noreferrer noopener"
                     aria-label={label}
-                    className="flex h-9 w-9 items-center justify-center rounded-full border border-darkroom/20 text-darkroom transition-colors hover:border-darkroom/60 hover:bg-darkroom hover:text-kodak"
+                    className="tap-target flex h-9 w-9 items-center justify-center rounded-full border border-darkroom/20 text-darkroom transition-colors hover:border-darkroom/60 hover:bg-darkroom hover:text-kodak"
                   >
                     <Icon aria-hidden className="h-4 w-4" />
                   </a>

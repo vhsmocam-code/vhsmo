@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { createContext, useEffect, useRef, useState } from "react";
 import { LabelFrame } from "./SceneLabel";
 import { IllustrationStage } from "./Stage";
 import s from "./illustrations.module.css";
@@ -12,7 +12,13 @@ import s from "./illustrations.module.css";
  *
  * Keep `overflow`, `filter` and partial opacity off anything between the
  * perspective container and the cube: they flatten preserve-3d in WebKit.
+ *
+ * The 3D rig is heavy (a few hundred planes), so it only mounts once the
+ * scene comes within a screen of view, and phones get a lighter build of it.
  */
+/** "lite" on phones: fewer facets on the curved parts; looks the same at that size. */
+export const Detail3D = createContext<"full" | "lite">("full");
+
 export function Stage3D({
   label,
   paused,
@@ -27,6 +33,31 @@ export function Stage3D({
 }) {
   const wrap = useRef<HTMLDivElement>(null);
   const [fit, setFit] = useState({ k: 0.5, x: 0, y: 0 });
+  const [near, setNear] = useState(false);
+  const [lite, setLite] = useState(false);
+
+  // Read the screen size after mount (server and first render match), then
+  // mount the rig once it's within a screen of view, and keep it.
+  useEffect(() => {
+    setLite(window.matchMedia("(max-width: 639px)").matches);
+    const el = wrap.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setNear(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setNear(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "100% 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
     const el = wrap.current;
@@ -51,7 +82,7 @@ export function Stage3D({
           className={s.world3d}
           style={{ transform: `translate(${fit.x}px, ${fit.y}px) scale(${fit.k})` }}
         >
-          {children}
+          <Detail3D.Provider value={lite ? "lite" : "full"}>{near ? children : null}</Detail3D.Provider>
         </div>
       </div>
       {labels && (

@@ -9,8 +9,12 @@
   50% { transform: translateY(-8px); }
 }
 
+/* A soft colour pool behind the phone. A radial mask instead of a blur
+   filter, which is cheap to draw on phones. */
 .glow {
   transition: background-color 900ms var(--ease-out-expo);
+  -webkit-mask-image: radial-gradient(closest-side, #000 20%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 20%, transparent 100%);
 }
 
 /* A yellow ring around an important button. Hollow, so the button under

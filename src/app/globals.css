@@ -56,6 +56,13 @@
     overscroll-behavior-y: none;
   }
 
+  /* Nothing should ever make the page scroll sideways on a phone.
+     `clip` (not `hidden`) keeps position: sticky working. */
+  html,
+  body {
+    overflow-x: clip;
+  }
+
   body {
     background-color: var(--color-darkroom);
     color: var(--color-halide);
@@ -109,6 +116,21 @@
     margin-inline: auto;
     padding-inline: clamp(1.375rem, 4vw, 5rem);
   }
+  /* Grows a small button's touch area to at least 44px without changing
+     how it looks. The element must not already use ::before. */
+  .tap-target {
+    position: relative;
+  }
+  .tap-target::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 2.75rem);
+    height: max(100%, 2.75rem);
+    transform: translate(-50%, -50%);
+  }
+
   /* Narrow reading measure for text-led moments (kept inside .shell). */
   .measure {
     max-width: 42rem;
@@ -157,10 +179,15 @@
 
   /* Microtext - "/2026", captions, running heads */
   .eyebrow {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     letter-spacing: 0.22em;
     text-transform: uppercase;
     font-weight: 600;
+  }
+  @media (min-width: 640px) {
+    .eyebrow {
+      font-size: 0.7rem;
+    }
   }
 
   .hairline {
@@ -275,6 +302,15 @@
 @media (prefers-reduced-motion: reduce) {
   .grain-animate {
     animation: none;
+  }
+}
+/* Phones: a still grain with no blend mode. Looks nearly the same and saves
+   repainting the whole screen on every frame while scrolling. */
+@media (pointer: coarse) {
+  .grain-animate {
+    animation: none;
+    mix-blend-mode: normal;
+    opacity: 0.045;
   }
 }
 

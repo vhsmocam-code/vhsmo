@@ -49,7 +49,7 @@ export function LandingFaq() {
                 className="border-b border-darkroom/25"
               >
                 <Accordion.Header>
-                  <Accordion.Trigger className="group flex w-full items-baseline gap-6 py-6 text-left text-darkroom transition-colors hover:text-bluehour">
+                  <Accordion.Trigger className="group flex w-full items-baseline gap-4 py-6 sm:gap-6 text-left text-darkroom transition-colors hover:text-bluehour">
                     <span className="eyebrow shrink-0 opacity-50">
                       {String(i + 1).padStart(2, "0")}
                     </span>
@@ -63,7 +63,7 @@ export function LandingFaq() {
                   </Accordion.Trigger>
                 </Accordion.Header>
                 <Accordion.Content className="overflow-hidden data-[state=closed]:animate-[acc-up_0.25s_ease-out] data-[state=open]:animate-[acc-down_0.3s_ease-out]">
-                  <p className="max-w-prose whitespace-pre-line pb-8 pl-14 pr-8 text-base leading-relaxed text-darkroom/80">
+                  <p className="max-w-prose whitespace-pre-line pb-8 pl-9 pr-1 text-base sm:pl-14 sm:pr-8 leading-relaxed text-darkroom/80">
                     {item.a}
                   </p>
                 </Accordion.Content>

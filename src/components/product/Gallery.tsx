@@ -133,7 +133,7 @@ export function Gallery() {
             style={{ background: MODEL_BACKGROUND }}
           >
             <Rotate3d className="size-5" strokeWidth={1.75} />
-            <span className="text-[0.6rem] font-bold uppercase tracking-wide">
+            <span className="text-[0.7rem] font-bold uppercase tracking-wide lg:text-[0.6rem]">
               3D
             </span>
           </button>
@@ -175,7 +175,6 @@ export function Gallery() {
                     src={image.src}
                     alt={image.alt}
                     fill
-                    priority={i === 0}
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     className={cn(
                       // The renders are 4:3 studio shots on white - cropping

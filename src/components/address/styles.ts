@@ -5,7 +5,7 @@ export const fieldCard =
   "group rounded-xl border-2 border-darkroom/12 bg-overexpose px-4 py-2.5 shadow-[0_1px_2px_rgba(31,26,24,0.05)] transition-all duration-200 hover:border-darkroom/25 focus-within:border-bluehour focus-within:shadow-[0_8px_24px_-10px_rgba(16,147,255,0.5)]";
 
 export const fieldLabel =
-  "block text-[0.62rem] font-bold uppercase tracking-[0.15em] text-darkroom/45 transition-colors group-focus-within:text-bluehour";
+  "block text-xs md:text-[0.62rem] font-bold uppercase tracking-[0.15em] text-darkroom/45 transition-colors group-focus-within:text-bluehour";
 
 export const fieldControl =
   // text-base on mobile (16px) stops iOS Safari from auto-zooming on focus;

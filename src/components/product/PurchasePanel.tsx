@@ -8,8 +8,14 @@ import { formatCurrency } from "@/lib/utils";
 import { useCart } from "@/lib/cart-context";
 import { flyToCart } from "@/lib/fly-to-cart";
 import { Scribble } from "@/components/brand/Scribble";
-import { NotifyMeModal } from "@/components/product/NotifyMeModal";
+import dynamic from "next/dynamic";
 import { instantTransfer } from "@/lib/landing";
+
+// Only loaded when someone opens it (it carries the country list).
+const NotifyMeModal = dynamic(
+  () => import("@/components/product/NotifyMeModal").then((m) => m.NotifyMeModal),
+  { ssr: false },
+);
 import { track } from "@vercel/analytics";
 
 /** Apple logo, for the App Store badge. */
@@ -38,6 +44,8 @@ export function PurchasePanel() {
   const { color, setColor, variants, variant } = useColor();
   const [adding, setAdding] = useState(false);
   const [notifyOpen, setNotifyOpen] = useState(false);
+  // Stays true once opened, so the modal can animate out when closed.
+  const [notifyUsed, setNotifyUsed] = useState(false);
 
   // Nothing active in the products table - say so rather than render a
   // buy button that can't be honoured.
@@ -103,7 +111,7 @@ export function PurchasePanel() {
       </p>
 
       {/* Price */}
-      <div className="mt-6 flex items-baseline gap-3">
+      <div className="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <span className="relative inline-block">
           <span className="display text-4xl text-darkroom">
             {formatCurrency(variant.price)}
@@ -227,6 +235,7 @@ export function PurchasePanel() {
             <button
               onClick={() => {
                 track("notify_me_clicked", { source: "product_page" });
+                setNotifyUsed(true);
                 setNotifyOpen(true);
               }}
               className="flex w-full items-center justify-center gap-2 rounded-full bg-darkroom px-8 py-4 text-base font-bold tracking-tight text-overexpose transition-all duration-300 ease-[var(--ease-out-expo)] hover:shadow-[0_0_0_5px_rgba(31,26,24,0.18)] active:scale-[0.98]"
@@ -253,11 +262,13 @@ export function PurchasePanel() {
       </div>
 
       {/* Restock signup - only meaningful for the sold-out finish */}
-      <NotifyMeModal
-        variant={variant}
-        open={notifyOpen}
-        onClose={() => setNotifyOpen(false)}
-      />
+      {notifyUsed && (
+        <NotifyMeModal
+          variant={variant}
+          open={notifyOpen}
+          onClose={() => setNotifyOpen(false)}
+        />
+      )}
 
       {/* Refundable note */}
       <p className="mt-4 flex items-start gap-2.5 border-l-2 border-kodak bg-kodak/10 px-4 py-3 text-sm text-darkroom/80">

@@ -102,7 +102,7 @@ export function TapedPhoto({
 
       {/* Minimalist Gallery Caption */}
       {caption && (
-        <figcaption className="mt-2 text-center font-mono text-[9px] sm:text-[10px] tracking-widest text-zinc-400 uppercase">
+        <figcaption className="mt-2 text-center font-mono text-[11px] sm:text-[10px] tracking-widest text-zinc-400 uppercase">
           {caption}
         </figcaption>
       )}

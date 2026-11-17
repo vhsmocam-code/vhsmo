@@ -13,7 +13,7 @@ export function SetupTips() {
     >
       <div className="shell">
         <Reveal className="max-w-2xl">
-          <span className="font-marker block text-6xl leading-none tabular-nums text-kodak sm:text-7xl">
+          <span className="font-marker block text-5xl leading-none tabular-nums text-kodak sm:text-7xl">
             {tips.number}
           </span>
           <h2

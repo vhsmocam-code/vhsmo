@@ -179,7 +179,7 @@ export function CouponPopup() {
                   type="button"
                   onClick={collapse}
                   aria-label="Hide offer"
-                  className="flex size-8 items-center justify-center rounded-full text-darkroom transition-colors hover:bg-darkroom/10"
+                  className="tap-target flex size-8 items-center justify-center rounded-full text-darkroom transition-colors hover:bg-darkroom/10"
                 >
                   <X className="size-4" />
                 </button>
@@ -197,7 +197,7 @@ export function CouponPopup() {
                 {/* Code - a torn ticket stub */}
                 <div className="mt-4 flex items-stretch overflow-hidden rounded-xl border-2 border-dashed border-darkroom/35">
                   <div className="flex flex-1 flex-col justify-center px-4 py-2.5">
-                    <span className="text-[0.65rem] uppercase tracking-[0.18em] text-darkroom/50">
+                    <span className="text-xs uppercase tracking-[0.18em] text-darkroom/50 sm:text-[0.65rem]">
                       Use code
                     </span>
                     <span className=" text-xl leading-tight tracking-wide text-darkroom">
@@ -265,7 +265,7 @@ false ? (
             animate={reduceMotion ? { opacity: 1 } : { x: 0 }}
             exit={reduceMotion ? { opacity: 0 } : { x: "110%" }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="group fixed right-0 top-1/2 z-[90] flex -translate-y-1/2 flex-col items-center gap-2 rounded-l-2xl bg-kodak py-4 pl-3.5 pr-3 text-darkroom shadow-[0_0.6rem_1.5rem_rgba(31,26,24,0.4)] ring-1 ring-darkroom/15 transition-[padding] hover:pr-3.5"
+            className="group fixed right-0 top-1/2 z-[45] flex -translate-y-1/2 flex-col items-center gap-2 rounded-l-2xl bg-kodak py-4 pl-3.5 pr-3 text-darkroom shadow-[0_0.6rem_1.5rem_rgba(31,26,24,0.4)] ring-1 ring-darkroom/15 transition-[padding] hover:pr-3.5"
           >
             {/* attention pulse */}
             <span className="absolute -left-1 -top-1 flex size-3">
@@ -289,7 +289,7 @@ function TimeCell({ value, label }: { value: number; label: string }) {
       <span className="flex min-w-[3rem] items-center justify-center rounded-lg bg-darkroom px-2 py-1.5 text-lg font-bold tabular-nums text-kodak">
         {String(value).padStart(2, "0")}
       </span>
-      <span className="mt-1 text-[0.6rem] uppercase tracking-[0.12em] text-darkroom/50">
+      <span className="mt-1 text-[0.7rem] sm:text-[0.6rem] uppercase tracking-[0.12em] text-darkroom/50">
         {label}
       </span>
     </div>

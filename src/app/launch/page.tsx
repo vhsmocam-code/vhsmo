@@ -90,7 +90,7 @@ export default function LaunchPage() {
           className="object-cover object-[center_30%]"
         />
         {/* Brown wash + a light blur to soften the collage behind the type - matches the hero */}
-        <div className="pointer-events-none absolute inset-0 bg-[#5A4332]/30 mix-blend-multiply backdrop-blur-[2px]" />
+        <div className="pointer-events-none absolute inset-0 bg-[#5A4332]/30 mix-blend-multiply sm:backdrop-blur-[2px]" />
         {/* Darkroom gradient for type legibility - matches the hero */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-darkroom/85 via-darkroom/10 to-darkroom/65" />
       </div>
@@ -124,6 +124,7 @@ export default function LaunchPage() {
               width={2311}
               height={679}
               priority
+              sizes="(min-width: 768px) 42rem, 90vw"
               className="mx-auto w-[min(90vw,42rem)] drop-shadow-[0.4rem_0.6rem_0_rgba(31,26,24,0.4)]"
             />
           </Link>
@@ -293,7 +294,7 @@ function TimePrint({
           {value === undefined ? "--" : String(value).padStart(2, "0")}
         </span>
       </div>
-      <p className="font-marker py-1 text-center text-[0.65rem] leading-none text-darkroom sm:text-xs">
+      <p className="font-marker py-1 text-center text-[0.7rem] leading-none text-darkroom sm:text-xs">
         {label}
       </p>
     </div>
