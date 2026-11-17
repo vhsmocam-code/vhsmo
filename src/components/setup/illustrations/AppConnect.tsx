@@ -38,14 +38,11 @@ export function AppConnect({ label, paused }: { label: string; paused?: boolean 
         </defs>
 
         <g transform={`translate(${tx} ${ty}) scale(${k})`}>
-          <CameraBack />
+          <CameraBack wifiLit />
         </g>
         {/* Camera is on, Wi-Fi is on */}
         <circle cx={lx} cy={ly} r="22" fill={`url(#${uid}-halo)`} />
         <circle cx={lx} cy={ly} r="5" fill="#fff" stroke={INK} strokeOpacity="0.5" strokeWidth="1" />
-        <circle cx={wx} cy={wy} r={BACK.wifi.r * k + 2} fill="none" stroke="#fff" strokeWidth="3" />
-        <circle cx={wx} cy={wy} r={BACK.wifi.r * k + 5} fill="none" stroke="#fff" strokeOpacity="0.5" strokeWidth="8" />
-        <circle cx={wx} cy={wy} r={BACK.wifi.r * k + 10} fill="none" stroke={INK} strokeOpacity="0.35" strokeWidth="1" />
 
         {/* Signal towards the phone */}
         <g fill="none" stroke="#e3e3e1" strokeWidth="6" strokeLinecap="round">

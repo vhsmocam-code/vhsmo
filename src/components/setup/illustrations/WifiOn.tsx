@@ -5,7 +5,7 @@ import { arcPath, INK } from "./geometry";
 import { IllustrationStage } from "./Stage";
 import s from "./illustrations.module.css";
 
-/** Step 04 - the whole back: a press on the Wi-Fi button, then it lights up. */
+/** Step 04 - the whole back: a press on the Wi-Fi button, then its symbol glows. */
 export function WifiOn({ label, paused }: { label: string; paused?: boolean }) {
   const k = 0.8;
   const tx = (800 - BACK.w * k) / 2;
@@ -18,15 +18,9 @@ export function WifiOn({ label, paused }: { label: string; paused?: boolean }) {
     <IllustrationStage label={label} paused={paused}>
       <svg viewBox="0 0 800 800" preserveAspectRatio="xMidYMid meet" aria-hidden>
         <g transform={`translate(${tx} ${ty}) scale(${k})`}>
-          <CameraBack wifiClassName={s.press} />
+          <CameraBack wifiClassName={s.press} wifiLit wifiLitClassName={s.wifiGlow} />
         </g>
 
-        {/* White light round the button */}
-        <g className={s.wifiGlow}>
-          <circle cx={cx} cy={cy} r={r + 9} fill="none" stroke="#fff" strokeOpacity="0.55" strokeWidth="18" />
-          <circle cx={cx} cy={cy} r={r + 4} fill="none" stroke="#fff" strokeWidth="5" />
-          <circle cx={cx} cy={cy} r={r + 19} fill="none" stroke={INK} strokeOpacity="0.35" strokeWidth="1.5" />
-        </g>
 
         {/* Signal: white pulses, with a faint dark under-stroke so they read on the pink body */}
         {[

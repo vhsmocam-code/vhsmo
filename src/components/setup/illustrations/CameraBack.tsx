@@ -31,6 +31,8 @@ export function CameraBack({
   thumbClassName,
   onLabelClassName,
   wifiClassName,
+  wifiLit = false,
+  wifiLitClassName,
   shadow = true,
   children,
 }: {
@@ -40,6 +42,11 @@ export function CameraBack({
   /** Ink highlight drawn over the ON label. */
   onLabelClassName?: string;
   wifiClassName?: string;
+  /** Wi-Fi on: the symbol on the button glows steadily (backlit, like an
+      old MacBook logo). */
+  wifiLit?: boolean;
+  /** Optional class on the glow, e.g. to fade it on after a press. */
+  wifiLitClassName?: string;
   /** Soft contact shadow behind the body. */
   shadow?: boolean;
   children?: React.ReactNode;
@@ -83,6 +90,9 @@ export function CameraBack({
           <stop offset="0.55" stopColor="#d7d7db" />
           <stop offset="1" stopColor="#a9a9af" />
         </radialGradient>
+        <filter id={`${id}-soft`} x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="3.5" />
+        </filter>
         <linearGradient id={`${id}-glass`} x1="0" y1="0" x2="0.4" y2="1">
           <stop offset="0" stopColor="#3b3837" />
           <stop offset="1" stopColor="#161414" />
@@ -182,6 +192,23 @@ export function CameraBack({
           ))}
         </g>
         <circle cx={wx} cy={wy + 12} r="4" fill="#3a3a3e" />
+        {wifiLit && (
+          <g className={wifiLitClassName}>
+            {/* soft backlight, then the lit symbol */}
+            <g fill="none" stroke="#9fd6ff" strokeWidth="10" strokeLinecap="round" filter={`url(#${id}-soft)`}>
+              {[10, 19, 28].map((r) => (
+                <path key={r} d={arcPath(wx, wy + 12, r, 225, 315)} />
+              ))}
+              <circle cx={wx} cy={wy + 12} r="3" />
+            </g>
+            <g fill="none" stroke="#fff" strokeWidth="4.5" strokeLinecap="round">
+              {[10, 19, 28].map((r) => (
+                <path key={r} d={arcPath(wx, wy + 12, r, 225, 315)} />
+              ))}
+            </g>
+            <circle cx={wx} cy={wy + 12} r="3.8" fill="#fff" />
+          </g>
+        )}
       </g>
 
       {children}
