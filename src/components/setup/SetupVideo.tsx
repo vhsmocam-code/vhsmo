@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Play } from "lucide-react";
 import { Reveal } from "@/components/brand/Reveal";
 import { setupVideo } from "@/lib/setup";
 
 /**
- * The setup walkthrough, hosted on YouTube. Only the thumbnail loads until
+ * The setup walkthrough, hosted on YouTube. Only our own thumbnail loads until
  * the visitor presses play, then the privacy-enhanced player replaces it
  * and starts. Nothing autoplays and no YouTube script runs before that.
  */
@@ -47,20 +48,14 @@ export function SetupVideo() {
               />
             ) : (
               <>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={`https://i.ytimg.com/vi/${id}/maxresdefault.jpg`}
-                  onError={(e) => {
-                    const img = e.currentTarget;
-                    const fallback = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
-                    if (img.src !== fallback) img.src = fallback;
-                  }}
+                <Image
+                  src={setupVideo.thumbnail}
                   alt=""
-                  loading="lazy"
-                  decoding="async"
-                  className="absolute inset-0 h-full w-full object-cover"
+                  fill
+                  sizes="(min-width: 1024px) 64rem, 100vw"
+                  className="object-cover"
                 />
-                <div className="absolute inset-0 bg-darkroom/30" aria-hidden />
+                <div className="absolute inset-0 bg-darkroom/10" aria-hidden />
                 <button
                   type="button"
                   onClick={() => setPlaying(true)}

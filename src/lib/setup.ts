@@ -60,6 +60,8 @@ export const setupVideo = {
   body: "The whole setup, start to finish: switch on, shoot, connect and charge.",
   /** https://www.youtube.com/watch?v=6cSZLFauFJo */
   youtubeId: "6cSZLFauFJo",
+  /** Our own thumbnail (YouTube has no full-size one for this video). */
+  thumbnail: "/setup/video-thumbnail.webp",
   alt: "VHSMO setup walkthrough video",
 } as const;
 
