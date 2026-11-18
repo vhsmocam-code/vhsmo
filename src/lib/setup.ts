@@ -58,8 +58,8 @@ export const setupVideo = {
   eyebrow: "Watch",
   title: "Prefer watching? We've got you.",
   body: "The whole setup, start to finish: switch on, shoot, connect and charge.",
-  /** https://www.youtube.com/watch?v=bC3Oyn1y418 */
-  youtubeId: "bC3Oyn1y418",
+  /** https://www.youtube.com/watch?v=6cSZLFauFJo */
+  youtubeId: "6cSZLFauFJo",
   alt: "VHSMO setup walkthrough video",
 } as const;
 
