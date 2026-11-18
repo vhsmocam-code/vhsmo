@@ -6,6 +6,7 @@ import { CartProvider } from "@/lib/cart-context";
 import { SmoothScroll } from "@/components/providers/SmoothScroll";
 import { FilmGrain } from "@/components/brand/FilmGrain";
 import { SiteChrome } from "@/components/layout/SiteChrome";
+import { RestockBanner } from "@/components/landing/RestockBanner";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
@@ -129,6 +130,7 @@ export default async function RootLayout({
           >
             Skip to content
           </a>
+          <RestockBanner />
           <SiteChrome>{children}</SiteChrome>
           <CartDrawer />
           <FilmGrain />

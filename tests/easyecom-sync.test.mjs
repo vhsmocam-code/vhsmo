@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { isAllowedSku, parseEasyEcomResponse, postOrder, reconciliationUpdate, shouldCreateOrder } from "../scripts/easyecom-sync.mjs";
+import { easyEcomOrderItemId, easyEcomOrderNumber, isAllowedSku, parseEasyEcomResponse, postOrder, reconciliationUpdate, shouldCreateOrder } from "../scripts/easyecom-sync.mjs";
 
 const successBody = {
   code: 200,
@@ -106,5 +106,11 @@ test("inventory eligibility remains limited to the three confirmed SKUs", () => 
   assert.equal(isAllowedSku("VHSMO Vol. 1_Cherry Red"), true);
   assert.equal(isAllowedSku("VHSMO Vol. 1_Cosmic Black"), true);
   assert.equal(isAllowedSku("VHSMO Vol. 1_Unknown"), false);
+});
+
+test("maps Razorpay order IDs to VHSMO EasyEcom order numbers", () => {
+  assert.equal(easyEcomOrderNumber("order_THk58ch0pfaSZ1"), "VHSMO-THk58ch0pfaSZ1");
+  assert.equal(easyEcomOrderNumber("custom-order"), "custom-order");
+  assert.equal(easyEcomOrderItemId("order_THk58ch0pfaSZ1-1"), "VHSMO-THk58ch0pfaSZ1-1");
 });
 

@@ -22,8 +22,10 @@ function parseArgs(argv) {
     else if (arg.startsWith("--batch-size=")) result.batchSize = arg.slice(13);
     else if (arg.startsWith("--max-retries=")) result.maxRetries = arg.slice(14);
     else if (arg.startsWith("--timeout-ms=")) result.timeoutMs = arg.slice(13);
+    else if (arg.startsWith("--order-date-format=")) result.orderDateFormat = arg.slice(20);
+    else if (arg.startsWith("--interval-ms=")) result.intervalMs = arg.slice(14);
     else if (arg === "--help" || arg === "-h") {
-      console.log(`Usage: npm run easyecom:sync -- [--dry-run|--execute] [--limit=N] [--order-number=ORDER] [--sku=SKU]`);
+      console.log(`Usage: npm run easyecom:sync -- [--dry-run|--execute] [--limit=N] [--order-number=ORDER] [--sku=SKU] [--order-date-format=iso|offset|local|date-only] [--interval-ms=N]`);
       process.exit(0);
     } else {
       throw new Error(`Unknown argument: ${arg}`);
@@ -37,6 +39,15 @@ function positiveInt(value, fallback) {
   const parsed = Number(value);
   if (!Number.isInteger(parsed) || parsed < 1) {
     throw new Error(`Expected a positive integer, received: ${value}`);
+  }
+  return parsed;
+}
+
+function nonnegativeInt(value, fallback) {
+  if (value == null || value === "") return fallback;
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed < 0) {
+    throw new Error(`Expected a nonnegative integer, received: ${value}`);
   }
   return parsed;
 }
@@ -78,6 +89,15 @@ function isAllowedSku(value) {
   return ALLOWED_SKUS.has(text(value));
 }
 
+function easyEcomOrderNumber(value) {
+  const source = text(value);
+  return source.replace(/^order_/i, "VHSMO-");
+}
+
+function easyEcomOrderItemId(value) {
+  return easyEcomOrderNumber(value);
+}
+
 function validEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text(value));
 }
@@ -102,9 +122,23 @@ function validateAddress(address, label) {
   return errors;
 }
 
-function validateOrder(row, seenOrderNumbers) {
+function formatOrderDate(format = "offset") {
+  const now = new Date();
+  if (format === "iso") return now.toISOString();
+  if (format === "offset" || format === "local" || format === "date-only") {
+    const india = new Date(now.getTime() + 330 * 60 * 1000);
+    const date = india.toISOString().slice(0, 10);
+    if (format === "date-only") return date;
+    const time = india.toISOString().slice(11, 19);
+    return format === "offset" ? `${date}T${time}+05:30` : `${date} ${time}`;
+  }
+  throw new Error(`--order-date-format must be iso, offset, local, or date-only`);
+}
+
+function validateOrder(row, seenOrderNumbers, orderDateFormat = "offset") {
   const errors = [];
   const orderNumber = text(row.orderNumber);
+  const outboundOrderNumber = easyEcomOrderNumber(orderNumber);
   if (!orderNumber) errors.push("orderNumber is missing");
   if (seenOrderNumbers.has(orderNumber)) errors.push("orderNumber is duplicated in this batch");
 
@@ -136,7 +170,7 @@ function validateOrder(row, seenOrderNumbers) {
     }
   }
 
-  const payload = row.request_payload ?? {
+  let payload = row.request_payload ?? {
     orderType: row.orderType,
     marketplaceId: row.marketplaceId,
     orderNumber: row.orderNumber,
@@ -147,8 +181,15 @@ function validateOrder(row, seenOrderNumbers) {
   };
   if (!isObject(payload)) errors.push("request_payload must be a JSON object");
   else {
-    if (text(payload.orderNumber) !== orderNumber) errors.push("request_payload.orderNumber does not match orderNumber");
     if (JSON.stringify(payload.items) !== JSON.stringify(row.items)) errors.push("request_payload.items does not match items");
+    // EasyEcom should receive the current order creation timestamp, even for
+    // queue rows whose request_payload was created earlier.
+    const outboundItems = row.items.map((item) => ({
+      ...item,
+      OrderItemId: easyEcomOrderItemId(item.OrderItemId),
+    }));
+    payload = { ...payload, orderNumber: outboundOrderNumber, items: outboundItems, orderDate: formatOrderDate(orderDateFormat) };
+    if (text(payload.orderNumber) !== outboundOrderNumber) errors.push("request_payload.orderNumber does not match outbound order number");
     if (JSON.stringify(payload.customer) !== JSON.stringify(row.customer)) errors.push("request_payload.customer does not match customer");
   }
 
@@ -263,7 +304,7 @@ function reconciliationUpdate(row, expectedOrderId, now = new Date().toISOString
   };
 }
 
-export { isAllowedSku, parseEasyEcomResponse, postOrder, reconciliationUpdate, shouldCreateOrder };
+export { easyEcomOrderItemId, easyEcomOrderNumber, isAllowedSku, parseEasyEcomResponse, postOrder, reconciliationUpdate, shouldCreateOrder };
 
 function shouldCreateOrder({ dryRun }) {
   return !dryRun;
@@ -274,9 +315,11 @@ async function main() {
   const dryRun = !args.execute;
   const batchSize = positiveInt(args.batchSize ?? process.env.EASYECOM_BATCH_SIZE, 10);
   const timeoutMs = positiveInt(args.timeoutMs ?? process.env.EASYECOM_REQUEST_TIMEOUT_MS, 30_000);
+  const intervalMs = nonnegativeInt(args.intervalMs ?? process.env.EASYECOM_INTERVAL_MS, 2_000);
   const limit = args.limit == null ? null : positiveInt(args.limit, 0);
   const orderNumberFilter = args.orderNumber?.trim() || null;
   const skuFilter = args.sku?.trim() || null;
+  const orderDateFormat = args.orderDateFormat ?? process.env.EASYECOM_ORDER_DATE_FORMAT ?? "offset";
   if (skuFilter && !isAllowedSku(skuFilter)) throw new Error(`--sku must be one of the confirmed EasyEcom SKUs`);
   const config = getConfig(dryRun);
   const client = makeClient(config);
@@ -293,7 +336,7 @@ async function main() {
   for (let batchStart = 0; batchStart < rows.length; batchStart += batchSize) {
     const batch = rows.slice(batchStart, batchStart + batchSize);
     for (const row of batch) {
-    const validation = validateOrder(row, seen);
+    const validation = validateOrder(row, seen, orderDateFormat);
     if (validation.errors.length === 0) seen.add(text(row.orderNumber));
     if (validation.errors.length) {
       summary.skipped += 1;
@@ -338,6 +381,9 @@ async function main() {
             : "EasyEcom returned an API-level failure; automatic retry is disabled";
       await updateRow(client, row.id, { status: "failed", response_payload: responsePayload, error_message: reason, processed_at: new Date().toISOString() }, "processing");
       logOutcome(row, "failed", { httpStatus: result.response.status, error: reason });
+    }
+    if (intervalMs > 0 && batchStart + batch.length < rows.length) {
+      await new Promise((resolve) => setTimeout(resolve, intervalMs));
     }
     }
   }
