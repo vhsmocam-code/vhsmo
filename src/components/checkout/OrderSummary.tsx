@@ -157,7 +157,7 @@ track("pay_securely_clicked", {
         amount: order.amount,
         currency: order.currency,
         name: "VHSMO",
-        description: "VHSMO Camera Preorder",
+        description: "VHSMO Camera",
         order_id: order.id,
         prefill: {
           name: fullName,
@@ -518,41 +518,15 @@ track("pay_securely_clicked", {
                     Why Cash on Delivery isn&apos;t available
                   </h3>
                   <p className="text-xs text-darkroom/50">
-                    A quick note for our early supporters
+                    A quick note
                   </p>
                 </div>
               </div>
 
               <div className="mt-5 space-y-3.5 text-sm leading-relaxed text-darkroom/70">
                 <p>
-                  VHSMO is currently in its first production run, which means we
-                  aren&apos;t shipping from existing inventory in a warehouse.
-                  Every pre-order helps fund manufacturing, quality checks,
-                  certifications, and getting your camera ready to ship.
-                </p>
-                <p>
-                  As a thank you to all our early supporters, we wanted to
-                  justify the wait. We&apos;re offering the exclusive pre-order
-                  price of{" "}
-                  <span className="font-bold text-darkroom">₹5,999</span> while
-                  first-batch stock lasts. Once pre-orders end, VHSMO will
-                  return to its regular retail price of{" "}
-                  <span className="font-semibold text-darkroom">₹6,999</span>.
-                </p>
-              </div>
-
-              {/* Refund guarantee */}
-              <div className="mt-4 flex items-start gap-3 rounded-xl bg-bluehour/[0.08] p-4">
-                <ShieldCheck className="mt-0.5 size-5 shrink-0 text-bluehour" />
-                <p className="text-sm leading-relaxed text-darkroom/75">
-                  <span className="font-bold text-darkroom">
-                    No risk attached.
-                  </span>{" "}
-                  If your order isn&apos;t shipped by{" "}
-                  <span className="font-semibold text-darkroom">
-                    15 September 2026
-                  </span>
-                  , you&apos;re eligible for a full refund - no questions asked.
+                  We currently accept online payments only (UPI, cards and net
+                  banking), so Cash on Delivery isn&apos;t available right now.
                 </p>
               </div>
 

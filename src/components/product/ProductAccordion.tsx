@@ -3,6 +3,7 @@
 import * as Accordion from "@radix-ui/react-accordion";
 import { Cable, Camera, Gift, MemoryStick, Plus } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { DELIVERY_ETA } from "@/lib/shipping";
 
 type Item = {
   title: string;
@@ -58,29 +59,15 @@ const items: Item[] = [
     ),
   },
   {
-    title: "Reservation & Shipping Policy",
+    title: "Shipping Policy",
     body: (
       <div className="space-y-4">
-        <p className="font-semibold text-darkroom">
-          Lock in the first-batch price.
-        </p>
-        <p>
-          Reserve your VHSMO at the exclusive pre-order price while first-batch
-          stock lasts. VHSMO is currently in production, and all reserved units
-          are scheduled to ship by 15 September 2026.
-        </p>
-        <p>
-          Since each VHSMO is reserved as part of the first production batch,
-          we’re unable to offer cancellations or refunds once an order is
-          placed. However, if your order hasn’t shipped by 15 September 2026,
-          you’ll still be eligible for a full refund.
-        </p>
         <p className="font-semibold text-darkroom">
           Free standard shipping across India.
         </p>
         <p>
-          We&apos;ll send you a production update before dispatch, followed by
-          tracking details once your VHSMO is on the way.
+          Delivery takes {DELIVERY_ETA}, depending on your address. We&apos;ll
+          send you tracking details once your VHSMO is on the way.
         </p>
       </div>
     ),
@@ -106,7 +93,7 @@ const items: Item[] = [
         </div>
         <div>
           <p className="font-semibold text-darkroom">
-            Limited-time pre-order bonus:
+            Also included:
           </p>
           <ul className="mt-2.5 space-y-2">
             <BoxItem icon={Gift}>VHSMO lanyard</BoxItem>

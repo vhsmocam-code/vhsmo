@@ -1,9 +1,11 @@
 /**
  * Policy content for the footer legal pages. Editorial placeholder copy
- * written for VHSMO - a pre-order pocket camera brand shipping in India via
+ * written for VHSMO - a pocket camera brand shipping in India via
  * Razorpay (payments) and WARIQ Logistics (fulfilment). Review with counsel
  * before launch.
  */
+
+import { DELIVERY_ETA } from "./shipping";
 
 /**
  * A paragraph, or - when an array - a bullet list rendered under the
@@ -35,9 +37,9 @@ export const LEGAL_DOCS: LegalDoc[] = [
   {
     slug: "terms",
     title: "Terms of Service",
-    updated: "July 2026",
+    updated: "November 2026",
     intro:
-      "These terms govern your use of the VHSMO website and your purchase or pre-order of VHSMO products. By placing an order, you agree to them.",
+      "These terms govern your use of the VHSMO website and your purchase of VHSMO products. By placing an order, you agree to them.",
     sections: [
       {
         heading: "1. About VHSMO",
@@ -110,16 +112,13 @@ export const LEGAL_DOCS: LegalDoc[] = [
         ],
       },
       {
-        heading: "6. Pre-orders and reservations",
+        heading: "6. Dispatch and delivery timing",
         body: [
-          "VHSMO products may be offered before they are ready for immediate shipment.",
-          "A pre-order reserves a unit from the stated production batch at the price displayed during checkout, while allocated stock lasts.",
-          "The amount and payment timing displayed at checkout form part of your order. Unless checkout expressly states otherwise, the full displayed amount will be charged when the pre-order is placed.",
-          "VHSMO is currently in production. Reserved units are scheduled to begin shipping by late August 2026.",
-          "If your reserved camera has not shipped by 15 September 2026, you may request a full refund of the amount paid, with no cancellation fee and no questions asked.",
+          "The amount and payment timing displayed at checkout form part of your order. Unless checkout expressly states otherwise, the full displayed amount is charged when the order is placed.",
+          `Orders are dispatched after your order is confirmed. Delivery typically takes ${DELIVERY_ETA}, depending on your delivery address.`,
           "A product is considered shipped when it has been handed to our delivery partner and tracking information has been generated.",
-          "We will send a production or dispatch update before your camera ships and tracking details after dispatch.",
-          "Production and dispatch estimates may be affected by manufacturing, certification, component, logistics or other circumstances outside our reasonable control. Nothing in this section limits your rights under applicable consumer law.",
+          "We will send tracking details after dispatch.",
+          "Dispatch and delivery estimates may be affected by logistics, courier operations, stock availability or other circumstances outside our reasonable control. Nothing in this section limits your rights under applicable consumer law.",
         ],
       },
       {
@@ -127,7 +126,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
         body: [
           "Prices are displayed in Indian Rupees.",
           "Unless expressly stated otherwise, prices shown at checkout include applicable Indian taxes. Any delivery fee, if applicable, will be disclosed before payment.",
-          "Promotional and pre-order prices may be available only for a limited period or quantity. A later price change will not affect an order that has already been accepted.",
+          "Promotional prices may be available only for a limited period or quantity. A later price change will not affect an order that has already been accepted.",
           "We may correct an obvious pricing error. If such an error affects an accepted order, we will contact you and allow you to reconfirm the order at the correct price or receive a full refund.",
         ],
       },
@@ -144,7 +143,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
         heading: "9. Shipping and delivery",
         body: [
           "VHSMO currently provides free standard shipping across India, unless checkout states otherwise.",
-          "Delivery estimates begin after dispatch and are not guaranteed arrival dates. Delays may occur because of carrier operations, weather, regional restrictions, incorrect addresses or circumstances outside our reasonable control.",
+          "Delivery estimates are not guaranteed arrival dates. Delays may occur because of carrier operations, weather, regional restrictions, incorrect addresses or circumstances outside our reasonable control.",
           "Please provide a complete and accurate delivery address. Additional shipping costs caused by an incorrect or incomplete address may be charged to you where permitted by law.",
           "Responsibility for the product remains with VHSMO until delivery is completed at the address provided in the order.",
           `If a shipment is confirmed lost or materially damaged in transit, contact ${LEGAL_CONTACT} so we can investigate and arrange an appropriate replacement or refund.`,
@@ -154,7 +153,6 @@ export const LEGAL_DOCS: LegalDoc[] = [
         heading: "10. Cancellations, returns and refunds",
         body: [
           "Cancellations, returns and refunds are governed by the Refund Policy displayed on our website.",
-          "The refund right for delayed pre-orders described in Section 6 applies in addition to the Refund Policy.",
           "Approved refunds will generally be sent to the original payment method. Processing times after approval may depend on your bank, card issuer or payment provider.",
           "Nothing in these Terms excludes any refund, replacement or other remedy that must be provided under applicable Indian consumer law.",
         ],
@@ -487,20 +485,12 @@ export const LEGAL_DOCS: LegalDoc[] = [
     slug: "refund",
     title: "Refund, Replacement & Warranty Policy",
     navLabel: "Refund Policy",
-    updated: "July 2026",
+    updated: "November 2026",
     intro:
       "We want to keep this simple. This policy applies to VHSMO products purchased directly from vhsmo.com.",
     sections: [
       {
-        heading: "1. Pre-order refunds",
-        body: [
-          "VHSMO is currently in production, with reserved units scheduled to ship by late August 2026.",
-          "Since each VHSMO is reserved as part of the first production batch, orders cannot be cancelled or refunded once placed, including after dispatch or in cases of a change of mind.",
-           "If your order has not shipped by 15 September 2026, you may request a full refund-no questions asked.",
-        ],
-      },
-      {
-        heading: "2. Damaged, defective or incorrect orders",
+        heading: "1. Damaged, defective or incorrect orders",
         body: [
           `Contact us at ${LEGAL_CONTACT} if your VHSMO:`,
           [
@@ -514,7 +504,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
         ],
       },
       {
-        heading: "3. One-year warranty",
+        heading: "2. One-year warranty",
         body: [
           "Every VHSMO camera includes a one-year limited warranty from the date of delivery covering manufacturing defects and hardware malfunctions under normal use.",
           [
@@ -525,14 +515,14 @@ export const LEGAL_DOCS: LegalDoc[] = [
         ],
       },
       {
-        heading: "4. Returns",
+        heading: "3. Returns",
         body: [
           "We do not accept returns for change of mind, colour preference or ordinary cosmetic variation after the product has shipped.",
           "This does not affect your rights where a product is defective, damaged, incorrectly supplied or materially different from its description.",
         ],
       },
       {
-        heading: "5. Refund processing",
+        heading: "4. Refund processing",
         body: [
           "Approved refunds will be issued to the original payment method. After processing, the amount may take 5–10 business days to appear, depending on your bank or payment provider.",
           `For assistance, contact ${LEGAL_CONTACT} with your order number.`,
@@ -544,7 +534,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
   {
     slug: "shipping",
     title: "Shipping Policy",
-    updated: "July 2026",
+    updated: "November 2026",
     intro: "This policy applies to orders placed directly through vhsmo.com.",
     sections: [
       {
@@ -555,11 +545,10 @@ export const LEGAL_DOCS: LegalDoc[] = [
         ],
       },
       {
-        heading: "2. Pre-order dispatch",
+        heading: "2. Dispatch and delivery time",
         body: [
-          "VHSMO’s first pre-order batch is currently in production and is scheduled to begin shipping by late August 2026.",
-          "If your order has not shipped by 15 September 2026, you may request a full refund—no questions asked.",
-          "We will send you an update before dispatch and tracking details once your VHSMO is on the way.",
+          `Delivery typically takes ${DELIVERY_ETA}, depending on your delivery address.`,
+          "We will send you tracking details once your VHSMO is on the way.",
         ],
       },
       {
@@ -573,7 +562,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
       {
         heading: "4. Delivery estimates",
         body: [
-          "Delivery estimates begin after dispatch and will appear in your tracking information. They are estimates, not guaranteed arrival dates.",
+          "Delivery estimates are measured from the date your order is placed and will also appear in your tracking information. They are estimates, not guaranteed arrival dates.",
           "Delays may occur because of courier operations, weather, regional restrictions, public holidays, transport disruptions or other circumstances outside our reasonable control. We will assist with delayed shipments and provide updates where available.",
         ],
       },

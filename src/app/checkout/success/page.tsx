@@ -18,7 +18,7 @@ import {
   Truck,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
-import { shipEtaWeeks } from "@/lib/shipping";
+import { DELIVERY_ETA } from "@/lib/shipping";
 
 type OrderItem = {
   id?: string;
@@ -135,12 +135,6 @@ function SuccessContent() {
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading",
   );
-
-  // Live "ships in N–M weeks" estimate. Computed after mount so server and
-  // client render the same fallback first (no hydration mismatch), then the
-  // real, time-aware value takes over.
-  const [shipEta, setShipEta] = useState("6–7 weeks");
-  useEffect(() => setShipEta(shipEtaWeeks()), []);
 
   useEffect(() => {
     let active = true;
@@ -328,7 +322,7 @@ function SuccessContent() {
           <Notice
             icon={Truck}
             title="Getting your VHSMO ready"
-            body={`We're assembling, testing and packing your camera. Shipping begins in ${shipEta}.`}
+            body={`We're packing your camera. Delivery takes ${DELIVERY_ETA}, depending on your address.`}
           />
           <Notice
             icon={ShieldCheck}
@@ -633,7 +627,7 @@ function downloadInvoice(order: Order) {
   </div>
 
   <div class="foot">
-    Thank you for your order. Your VHSMO is hand-assembled to order and ships within ${shipEtaWeeks()}.
+    Thank you for your order. Your VHSMO should reach you within ${DELIVERY_ETA}, depending on your address.
      Questions? team@vhsmo.com
   
   </div>

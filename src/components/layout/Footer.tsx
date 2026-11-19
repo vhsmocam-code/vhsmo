@@ -20,7 +20,7 @@ const columns = [
     title: "Shop",
     Icon: ShoppingBag,
     links: [
-      { label: "Pre-order Now", href: RESERVE_HREF },
+      { label: "Order Now", href: RESERVE_HREF },
       { label: "International Orders", href: "/international-order" },
     ],
   },

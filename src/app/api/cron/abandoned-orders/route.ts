@@ -23,20 +23,17 @@ Beyond that window, the unit may be released and assigned to another buyer.
 </p>
 
 <p>
-As part of our limited pre-order batch, we're currently offering a
-<strong>one-time launch price of ₹5,999</strong>.
-Once pre-orders close, the price will revert to <strong>₹6,999</strong>.
-Availability is limited, so we'd recommend securing your unit while this offer is live.
+Availability is limited, so we'd recommend securing your unit soon.
 </p>
 
 <p>
 <a href="${checkoutUrl}">
-Complete your preorder
+Complete your order
     </a>
   </p>
 
 <p>
-If you have any questions or need help completing your pre-order, feel free to reply to this email—we're happy to assist.
+If you have any questions or need help completing your order, feel free to reply to this email—we're happy to assist.
 We're excited to get a VHSMO into your hands.
 </p>
 
@@ -96,7 +93,7 @@ const { data: orders, error } = await supabase
       try {
         await sendEmail({
           to: order.email,
-          subject: "Complete your VHSMO preorder before the price increases",
+          subject: "Complete your VHSMO order",
           html: abandonedCheckoutEmail({
             name: order.customer_name,
             checkoutUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/checkout`,

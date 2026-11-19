@@ -3,6 +3,8 @@
  * Voice: fashion campaign, never spec sheet. Edit copy here, not in sections.
  */
 
+import { DELIVERY_ETA } from "./shipping";
+
 export const RESERVE_HREF = "/#reserve";
 export const YEAR_MARK = "/2026";
 export const TAGLINE = ["Point.", "Shoot.", "Share."];
@@ -14,7 +16,7 @@ export const hero = {
   kicker: "Designed to be noticed · Built to last a lifetime",
   headline: "VHSMO",
   sub: "A screen-free pocket camera with the soul of 2000s.",
-  cta: "Pre Order Now",
+  cta: "Order Now",
   image: {
     src: "/heroLatest.webp",
     alt: "VHSMO camera in a cinematic scene",
@@ -130,7 +132,7 @@ export const instantTransfer = {
   app: {
     name: "VHSMO App",
     description:
-      "Your photos, on your phone in seconds - ready to view, organise, edit and share. Coming soon to iOS and Android.",
+      "Your photos, on your phone in seconds - ready to view, organise, edit and share.",
   },
   features: ["Film Filters", "Your Gallery", "Easy Sharing"],
   phone: {
@@ -268,7 +270,7 @@ export const showcase = {
     width: 1536,
     height: 1024,
   },
-  cta: "Pre Order Now",
+  cta: "Order Now",
 };
 
 export const faq = {
@@ -295,8 +297,8 @@ export const faq = {
       a: "Because the best moments happen when you're actually in them.\n\nNo stopping to check. No deleting the imperfect ones. No turning a memory into a photoshoot. Just take the picture, stay with your people, and let the moment keep moving.\n\nYou'll see what you caught later in the VHSMO app - and sometimes, the surprise is the best part.",
     },
     {
-      q: "Why is there a wait for the pre-order batch?",
-      a: "This is VHSMO's first production run - not stock sitting in a warehouse. We've spent too long building this to rush the part that matters most. Every camera is being manufactured, assembled, tested, and quality-checked to make sure VHSMO is genuinely worth the wait.\n\nReserved units are scheduled to ship by late August 2026. If your order has not shipped by 15 September 2026, you can request a full refund - no questions asked. We'll also send you an update before dispatch.",
+      q: "How soon will my VHSMO ship?",
+      a: `Shipping is free across India, and delivery takes ${DELIVERY_ETA} depending on your address.\n\nOnce your camera is on its way, you'll get tracking details by email so you can follow it to your door.`,
     },
     {
       q: "Does VHSMO record video?",
@@ -315,8 +317,8 @@ export const finalCta = {
   lineOne: "The world keeps moving.",
   lineTwo: "Stay in the moment.",
   lineThree: "Capture the memory.",
-  sub: "First batch - /2026. Reserve yours before it's gone.",
-  cta: "Pre Order Now",
+  sub: "Limited stock. Order yours before it's gone.",
+  cta: "Order Now",
   photo: {
     src: "/buyproduct/pinkFront.webp",
     alt: "Someone raising a pink VHSMO to their eye, mid-shot in the sun",

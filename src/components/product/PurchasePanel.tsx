@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Bell, Check, ShieldCheck, Truck } from "lucide-react";
 import { productCopy } from "@/lib/products";
 import { useColor } from "@/lib/color-context";
@@ -10,6 +11,7 @@ import { flyToCart } from "@/lib/fly-to-cart";
 import { Scribble } from "@/components/brand/Scribble";
 import dynamic from "next/dynamic";
 import { instantTransfer } from "@/lib/landing";
+import { ANDROID_STORE_URL, IOS_STORE_URL } from "@/lib/app-links";
 
 // Only loaded when someone opens it (it carries the country list).
 const NotifyMeModal = dynamic(
@@ -56,7 +58,7 @@ export function PurchasePanel() {
           VHSMO
         </h1>
         <p className="font-marker mt-2 text-xl text-darkroom/70">
-          Reservations are closed right now - check back shortly.
+          Orders are closed right now - check back shortly.
         </p>
       </div>
     );
@@ -215,7 +217,7 @@ export function PurchasePanel() {
             <>
               <span className="size-2.5 shrink-0 rounded-full bg-green-600" />
               <span className="font-medium text-darkroom/70">
-                In stock — ready to reserve.
+                In stock — ready to ship.
               </span>
             </>
           )}
@@ -256,7 +258,7 @@ export function PurchasePanel() {
             disabled={adding}
             className="flex w-full items-center justify-center gap-2 rounded-full bg-kodak px-8 py-4 text-base font-bold tracking-tight text-darkroom transition-all duration-300 ease-[var(--ease-out-expo)] hover:shadow-[0_0_0_5px_rgba(253,241,0,0.25)] active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-darkroom/15 disabled:text-darkroom/50 disabled:shadow-none"
           >
-            {adding ? "Adding…" : "Pre Order Now"}
+            {adding ? "Adding…" : "Order Now"}
           </button>
         )}
       </div>
@@ -270,34 +272,17 @@ export function PurchasePanel() {
         />
       )}
 
-      {/* Refundable note */}
-      <p className="mt-4 flex items-start gap-2.5 border-l-2 border-kodak bg-kodak/10 px-4 py-3 text-sm text-darkroom/80">
-        <span>
-          Pre-orders ship by{" "}
-          <strong className="font-bold text-darkroom">late August</strong> as
-          part of VHSMO&rsquo;s first production run. To thank our early
-          supporters, you can reserve yours for{" "}
-          <strong className="font-bold text-darkroom">₹5,999</strong> while
-          pre-order stock lasts. Once sold out, the price goes back to{" "}
-          <strong className="font-bold text-darkroom">₹6,999</strong>.
-        </span>
-      </p>
-
-      {/* Reserve CTA line */}
-      <p className="mt-2.5 flex items-start gap-2.5 rounded-xl border-l-2 border-bluehour bg-bluehour/[0.08] px-4 py-3 text-sm font-semibold text-darkroom">
-    
-        <span>
-          Lock in the launch price-
-          <strong className="font-bold">fully refundable</strong> if not shipped
-          by <strong className="font-bold">15th September 2026</strong>.
-        </span>
-      </p>
-
       {/* The app, in one breath - pairs with the camera instead of its own section */}
       <div className="mt-8 rounded-2xl bg-darkroom/[0.06] p-5">
         <div className="flex items-start gap-4">
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[22%] bg-darkroom-deep shadow-[0.15rem_0.3rem_0.6rem_rgba(31,26,24,0.35)]">
-            <span className="font-marker -rotate-3 text-[0.7rem] text-kodak">VHSMO</span>
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[22%] bg-darkroom-deep p-1.5 shadow-[0.15rem_0.3rem_0.6rem_rgba(31,26,24,0.35)]">
+            <Image
+              src="/yellowLogoIconBrown.png"
+              alt="VHSMO app icon"
+              width={48}
+              height={48}
+              className="h-full w-full"
+            />
           </span>
           <div>
             <h3 className="font-bold text-darkroom">{instantTransfer.app.name}</h3>
@@ -306,20 +291,31 @@ export function PurchasePanel() {
             </p>
           </div>
         </div>
-        {/* Badges are inert until the app ships - nothing to link to yet */}
         <div className="mt-4 flex flex-wrap items-center gap-2.5">
-          <span className="flex items-center gap-2 rounded-lg bg-darkroom-deep/60 px-3 py-3 text-overexpose/70">
+          <a
+            href={IOS_STORE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Download VHSMO on the App Store"
+            className="flex items-center gap-2 rounded-lg bg-darkroom-deep px-3 py-3 text-overexpose transition-transform hover:scale-[1.03]"
+          >
             <AppleLogo />
             <span className="leading-tight">
               <span className="block text-sm font-semibold">App Store</span>
             </span>
-          </span>
-          <span className="flex items-center gap-2 rounded-lg bg-darkroom-deep/60 px-3 py-3 text-overexpose/70">
+          </a>
+          <a
+            href={ANDROID_STORE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Get VHSMO on Google Play"
+            className="flex items-center gap-2 rounded-lg bg-darkroom-deep px-3 py-3 text-overexpose transition-transform hover:scale-[1.03]"
+          >
             <PlayLogo />
             <span className="leading-tight">
               <span className="block text-sm font-semibold">Google Play</span>
             </span>
-          </span>
+          </a>
         </div>
       </div>
     </div>

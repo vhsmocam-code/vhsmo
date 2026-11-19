@@ -221,7 +221,7 @@ export function Header() {
                   }}
                   className="font-marker inline-block -rotate-2 bg-kodak px-8 py-4 text-2xl text-darkroom"
                 >
-                  Pre Order Now →
+                  Order Now →
                 </button>
               </motion.div>
             </nav>

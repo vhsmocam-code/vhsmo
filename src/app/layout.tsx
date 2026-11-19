@@ -94,7 +94,7 @@ const productJsonLd = {
   brand: { "@type": "Brand", name: "VHSMO" },
   offers: {
     "@type": "Offer",
-    availability: "https://schema.org/PreOrder",
+    availability: "https://schema.org/InStock",
     url: `${SITE_URL}/product`,
     priceCurrency: "INR",
     price: "5999",

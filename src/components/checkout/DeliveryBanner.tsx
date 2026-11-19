@@ -1,4 +1,5 @@
 import { Truck } from "lucide-react";
+import { DELIVERY_ETA } from "@/lib/shipping";
 
 /** Reassurance strip below the shipping form. */
 export function DeliveryBanner() {
@@ -10,7 +11,7 @@ export function DeliveryBanner() {
       <div>
         <p className="text-sm font-bold text-darkroom">Fast &amp; Free Delivery</p>
         <p className="text-xs text-darkroom/60">
-          Orders are shipped within 24–48 hours.
+          Delivered in {DELIVERY_ETA}, depending on your address.
         </p>
       </div>
     </div>

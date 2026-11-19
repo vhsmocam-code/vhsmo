@@ -110,7 +110,7 @@ export function CartDrawer() {
                   Your cart is empty
                 </p>
                 <p className="mt-1.5 text-sm text-darkroom/60">
-                  Reserve your VHSMO to lock in the early price.
+                  Add your VHSMO to get started.
                 </p>
                 <Button onClick={closeCart} variant="outline" className="mt-6">
                   Continue browsing
