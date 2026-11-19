@@ -148,7 +148,7 @@ export function PurchasePanel() {
           Finish:{" "}
           <span className="font-normal text-darkroom/60">{variant.color}</span>
         </p>
-        <div className="mt-3 flex gap-3">
+        <div className="mt-3 flex flex-wrap gap-3">
           {variants.map((c) => {
             const isActive = color === c.id;
             const cSoldOut = c.stock <= 0;

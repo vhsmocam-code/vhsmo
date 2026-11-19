@@ -83,6 +83,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: "#2A2422",
   colorScheme: "light",
+  interactiveWidget: "resizes-content",
 };
 
 const productJsonLd = {

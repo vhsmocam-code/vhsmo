@@ -53,7 +53,7 @@ export function LandingFaq() {
                     <span className="eyebrow shrink-0 opacity-50">
                       {String(i + 1).padStart(2, "0")}
                     </span>
-                    <span className="flex-1 text-lg font-semibold leading-snug sm:text-xl">
+                    <span className="min-w-0 flex-1 text-lg font-semibold leading-snug sm:text-xl">
                       {item.q}
                     </span>
                     <Plus

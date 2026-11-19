@@ -35,8 +35,8 @@ export function SceneLabel({
   sub,
   titleSize = 40,
   subSize = 26,
-  minTitle = 13,
-  minSub = 11,
+  minTitle = 12,
+  minSub = 10,
   titleColor = "#fdf100",
   subColor = "#e3e3e1",
   tracking,
@@ -63,9 +63,16 @@ export function SceneLabel({
 }) {
   const shift = align === "start" ? "0%" : align === "middle" ? "-50%" : "-100%";
   const subs = Array.isArray(sub) ? sub : sub ? [sub] : [];
+  const xPct = (x / w) * 100;
+  // Room on the side the label grows toward, so it wraps inside the frame
+  // instead of running off the edge when the px font floors outgrow the scene.
+  const room =
+    align === "start" ? 100 - xPct : align === "end" ? xPct : 2 * Math.min(xPct, 100 - xPct);
   const style: CSSProperties = {
-    left: `${(x / w) * 100}%`,
+    left: `${xPct}%`,
     top: `${(y / h) * 100}%`,
+    width: "max-content",
+    maxWidth: `${Math.max(room, 10).toFixed(2)}%`,
     transform: `translate(${shift}, -50%)`,
     textAlign: align === "middle" ? "center" : align === "end" ? "right" : "left",
     letterSpacing: tracking,

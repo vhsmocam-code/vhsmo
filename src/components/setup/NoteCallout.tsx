@@ -19,7 +19,7 @@ export function NoteCallout({
   return (
     <div
       className={cn(
-        "flex max-w-md items-start gap-4 rounded-2xl border border-kodak/50 bg-kodak/10 p-5 text-left",
+        "flex max-w-md items-start gap-3 rounded-2xl border border-kodak/50 bg-kodak/10 p-4 text-left sm:gap-4 sm:p-5",
         className,
       )}
     >

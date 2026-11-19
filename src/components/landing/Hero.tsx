@@ -93,7 +93,7 @@ export function Hero() {
       {/* The wordmark - full width, centered inside the frame (desktop) */}
       <motion.h1
         aria-label="VHSMO"
-        className="pointer-events-none absolute left-1/2 top-1/2 hidden w-[90vw] max-w-[1400px] -translate-x-1/2 -translate-y-1/2 select-none text-center sm:block"
+        className="pointer-events-none absolute left-1/2 top-1/2 hidden w-[min(90vw,1400px,172svh)] -translate-x-1/2 -translate-y-1/2 select-none text-center sm:block"
         style={reduceMotion ? undefined : { x: logoX, y: logoY }}
       >
         <motion.span

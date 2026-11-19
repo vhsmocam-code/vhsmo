@@ -32,13 +32,13 @@ export function SetupHero() {
           <Reveal delay={0.05}>
             <h1
               id="setup-title"
-              className="display mt-6 text-[clamp(2.6rem,5.6vw,5rem)] text-halide"
+              className="display mt-6 text-[clamp(2.25rem,9vw,2.6rem)] text-halide sm:text-[clamp(2.6rem,5.6vw,5rem)]"
             >
               Your VHSMO.
               <br />
               <span className="relative inline-block text-kodak">
                 Ready for
-                <Scribble className="absolute -bottom-3 left-0 h-3 w-full" />
+                <Scribble className="absolute -bottom-1 left-0 h-2.5 w-full" />
               </span>
               <br />
               every moment.
@@ -69,7 +69,7 @@ export function SetupHero() {
         <div className="col-span-12 lg:col-span-6">
           <div
             id="video"
-            className="group relative mx-auto block aspect-video w-full max-w-[36rem] overflow-hidden rounded-[1.25rem] bg-darkroom-deep ring-1 ring-halide/15"
+            className="group relative mx-auto block aspect-video w-full max-w-[36rem] scroll-mt-24 overflow-hidden rounded-[1.25rem] bg-darkroom-deep ring-1 ring-halide/15"
           >
             {playing ? (
               <iframe
@@ -101,7 +101,7 @@ export function SetupHero() {
                     <Play className="ml-1 size-7 fill-current sm:size-8" aria-hidden />
                   </span>
                 </span>
-                <span className="absolute bottom-4 left-4 rounded-full bg-darkroom/85 px-3 py-1.5 text-xs font-semibold text-halide backdrop-blur-sm">
+                <span className="absolute bottom-4 left-4 hidden rounded-full bg-darkroom/85 sm:block px-3 py-1.5 text-xs font-semibold text-halide backdrop-blur-sm">
                   Watch the setup walkthrough
                 </span>
               </button>

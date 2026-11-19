@@ -82,11 +82,11 @@ export function SetupProgress({ items }: { items: Item[] }) {
                 href={`#${it.id}`}
                 aria-label={`Step ${it.number}: ${it.label}`}
                 aria-current={active === i ? "step" : undefined}
-                className="group flex items-center gap-3"
+                className="group relative flex items-center gap-3"
               >
                 <span
                   className={cn(
-                    "text-xs font-semibold text-halide opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100",
+                    "pointer-events-none absolute right-full top-1/2 mr-3 -translate-y-1/2 whitespace-nowrap rounded-full bg-darkroom-deep px-3 py-1.5 text-xs font-semibold text-halide opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100",
                   )}
                 >
                   {it.label}

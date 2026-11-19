@@ -46,13 +46,13 @@ export function MagneticButton({
       ref={ref}
       onMouseMove={onMouseMove}
       onMouseLeave={onMouseLeave}
-      className="inline-block p-3 -m-3"
+      className="inline-block shrink-0 p-3 -m-3"
     >
       <motion.div style={{ x: sx, y: sy }} whileTap={{ scale: 0.95 }}>
         <Link
           href={href}
           className={cn(
-            "inline-flex items-center gap-3 rounded-full px-8 py-4 text-base font-bold tracking-tight transition-shadow sm:px-10 sm:py-5 sm:text-lg",
+            "inline-flex items-center gap-3 whitespace-nowrap rounded-full px-8 py-4 text-base font-bold tracking-tight transition-shadow sm:px-10 sm:py-5 sm:text-lg",
             variant === "kodak"
               ? "bg-kodak text-darkroom shadow-[0_0_0_0_rgba(253,241,0,0.4)] hover:shadow-[0_0_0_6px_rgba(253,241,0,0.25)]"
               : "border-2 border-current text-current hover:bg-halide/10",

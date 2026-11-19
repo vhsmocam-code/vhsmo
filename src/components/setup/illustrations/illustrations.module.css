@@ -230,7 +230,7 @@
 }
 .label {
   position: absolute;
-  white-space: nowrap;
+  text-wrap: balance;
   font-family: var(--font-display), system-ui, sans-serif;
   line-height: 1.18;
 }

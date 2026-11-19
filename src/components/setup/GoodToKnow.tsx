@@ -31,7 +31,7 @@ export function GoodToKnow() {
             <div
               key={item.id}
               id={item.id}
-              className="grid scroll-mt-20 grid-cols-12 items-center gap-y-10 lg:gap-x-16"
+              className="grid scroll-mt-20 grid-cols-12 items-center gap-y-10 lg:gap-x-10 xl:gap-x-16"
             >
               <div
                 className={cn(

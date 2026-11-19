@@ -61,7 +61,7 @@ const socials = [
 /** Official card / rail logos for the "We accept" row (public/payments). */
 function PaymentMarks() {
   return (
-    <span className="flex items-center gap-4">
+    <span className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
       <Image
         src="/payments/visa.svg"
         alt="Visa"
@@ -193,13 +193,13 @@ export function Footer() {
         <div className="flex flex-col items-center gap-5 py-7 text-sm text-darkroom/60 lg:flex-row lg:justify-between">
           <p>© {year} VHSMO. All rights reserved.</p>
 
-          <p className="flex items-center gap-2">
+          <p className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center">
             <ShieldCheck className="size-4 text-darkroom/70" />
             Secure payments powered by
             <RazorpayLogo className="h-4 w-auto" />
           </p>
 
-          <p className="flex items-center gap-3">
+          <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
             <span className="text-darkroom/50">We accept</span>
             <PaymentMarks />
           </p>

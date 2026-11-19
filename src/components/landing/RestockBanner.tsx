@@ -41,7 +41,7 @@ export function RestockBanner() {
           initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25 }}
-          className="relative z-40 flex min-h-14 w-full flex-col items-center justify-center gap-2 overflow-hidden border-b-2 border-darkroom bg-kodak px-4 py-3.5 text-center text-darkroom shadow-[0_3px_0_rgba(42,36,34,0.14)] sm:min-h-16 sm:flex-row sm:gap-x-4 sm:gap-y-2 sm:px-12 sm:py-4"
+          className="relative z-40 flex min-h-14 w-full flex-col items-center justify-center gap-2 overflow-hidden border-b-2 border-darkroom bg-kodak px-4 py-3.5 text-center text-darkroom shadow-[0_3px_0_rgba(42,36,34,0.14)] sm:min-h-16 sm:flex-row sm:flex-wrap sm:gap-x-4 sm:gap-y-2 sm:px-12 sm:py-4"
           role="status"
           aria-label="Restock announcement"
         >
@@ -54,8 +54,8 @@ export function RestockBanner() {
             />
             Restock alert
           </span>
-          <span className="flex items-center gap-2">
-            <span className="whitespace-nowrap text-xs font-semibold leading-tight tracking-tight sm:text-base">
+          <span className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+            <span className="text-xs font-semibold leading-tight tracking-tight sm:whitespace-nowrap sm:text-base">
               New stock lands <span className="font-marker text-base sm:text-xl">25 Nov 2026</span>
             </span>
             <span

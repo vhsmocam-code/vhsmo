@@ -72,7 +72,12 @@ export function StoreBadges({
   ];
 
   return (
-    <div className={cn("flex flex-wrap items-center gap-3", className)}>
+    <div
+      className={cn(
+        "grid grid-cols-1 gap-3 min-[360px]:grid-cols-2 sm:flex sm:flex-wrap sm:items-center",
+        className,
+      )}
+    >
       {badges.map(({ key, href, label, top, bottom, Logo }) => {
         const mine = platform === key;
         return (
@@ -83,7 +88,7 @@ export function StoreBadges({
             rel="noreferrer"
             aria-label={label}
             className={cn(
-              "group relative flex min-w-[9.5rem] items-center gap-2.5 rounded-xl px-3.5 py-2.5 sm:min-w-[10.5rem] sm:px-4 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5",
+              "group relative flex min-w-0 items-center gap-2.5 rounded-xl px-3.5 py-2.5 sm:min-w-[10.5rem] sm:px-4 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5",
               tone === "dark"
                 ? "bg-overexpose text-darkroom ring-1 ring-overexpose/10"
                 : "bg-darkroom-deep text-overexpose",
@@ -92,10 +97,10 @@ export function StoreBadges({
           >
             <Logo />
             <span className="leading-tight">
-              <span className="block text-[0.6rem] uppercase tracking-wide opacity-70">
+              <span className="block text-[0.65rem] uppercase tracking-wide opacity-70">
                 {top}
               </span>
-              <span className="block text-lg font-semibold">{bottom}</span>
+              <span className="block text-base font-semibold sm:text-lg">{bottom}</span>
             </span>
           </a>
         );

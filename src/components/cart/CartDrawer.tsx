@@ -117,7 +117,10 @@ export function CartDrawer() {
                 </Button>
               </div>
             ) : (
-              <ul className="flex-1 divide-y divide-darkroom/10 overflow-y-auto px-6 [scrollbar-width:thin]">
+              <ul
+                data-lenis-prevent
+                className="min-h-[7.5rem] flex-1 divide-y divide-darkroom/10 overflow-y-auto overscroll-contain px-6 [scrollbar-width:thin]"
+              >
                 {items.map((item) => {
                   const soldOut = soldOutIds.has(item.id);
                   return (
@@ -187,7 +190,10 @@ export function CartDrawer() {
 
             {/* Summary */}
             {items.length > 0 && (
-              <div className="border-t border-darkroom/12 bg-overexpose/60 px-6 py-5">
+              <div
+                data-lenis-prevent
+                className="max-h-[55dvh] overflow-y-auto overscroll-contain border-t border-darkroom/12 bg-overexpose/60 px-6 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-5"
+              >
                 <div className="space-y-2 text-sm">
                   <Row label="Subtotal" value={formatCurrency(subtotal)} />
                   <Row

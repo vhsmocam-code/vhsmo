@@ -18,7 +18,7 @@ export function AppConnectionGuide() {
       className="section scroll-mt-16"
     >
       <div className="shell">
-        <div className="grid grid-cols-12 items-center gap-y-10 lg:gap-x-16">
+        <div className="grid grid-cols-12 items-center gap-y-10 lg:gap-x-10 xl:gap-x-16">
           <div className="col-span-12 lg:order-2 lg:col-span-5 lg:col-start-8">
             <Reveal>
               <span className="font-marker block text-5xl leading-none tabular-nums text-kodak sm:text-7xl">

@@ -105,7 +105,7 @@ export function NotifyMeModal({
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[100] flex items-end justify-center p-4 sm:items-center"
+          className="fixed inset-0 z-[100] flex items-center justify-center px-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:p-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -122,7 +122,8 @@ export function NotifyMeModal({
             role="dialog"
             aria-modal="true"
             aria-label={`Notify me when ${variant.color} is back`}
-            className="relative max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-3xl bg-halide p-6 shadow-2xl sm:p-8"
+            data-lenis-prevent
+            className="relative max-h-[calc(100dvh-2.5rem)] w-full max-w-md overflow-y-auto overscroll-contain rounded-3xl bg-halide p-5 pt-6 shadow-2xl sm:p-8"
             initial={{ opacity: 0, y: 24, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.98 }}
@@ -132,7 +133,7 @@ export function NotifyMeModal({
               type="button"
               onClick={onClose}
               aria-label="Close"
-              className="absolute right-3 top-3 flex size-11 items-center justify-center rounded-full text-darkroom/50 transition-colors hover:bg-darkroom/10 hover:text-darkroom"
+              className="absolute right-2 top-2 flex size-10 items-center justify-center rounded-full text-darkroom/50 sm:right-3 sm:top-3 sm:size-11 transition-colors hover:bg-darkroom/10 hover:text-darkroom"
             >
               <X className="size-5" />
             </button>
@@ -159,12 +160,12 @@ export function NotifyMeModal({
               </div>
             ) : (
               <>
-                <div className="flex items-center gap-3">
+                <div className="flex items-start gap-3 pr-8">
                   <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-kodak text-darkroom">
                     <Bell className="size-5" aria-hidden />
                   </span>
-                  <div>
-                    <h2 className="display text-2xl text-darkroom">
+                  <div className="min-w-0">
+                    <h2 className="display text-balance text-[1.375rem] leading-[1.05] text-darkroom sm:text-2xl">
                       Notify me when in stock
                     </h2>
                     <p className="text-sm text-darkroom/65">

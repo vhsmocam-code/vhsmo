@@ -62,7 +62,7 @@ export function AppShowcase() {
       <div className="text-center lg:hidden">{heading}</div>
 
       <div ref={ref} className="relative" style={{ height: `${n * PER_SCREEN + 100}svh` }}>
-        <div className="sticky top-0 flex h-svh flex-col justify-center pb-4 pt-16 lg:pt-0 lg:pb-0">
+        <div className="sticky top-0 flex h-svh flex-col justify-center pb-4 pt-16 sm:pt-20 lg:pb-8 lg:pt-24">
           <div className="grid w-full grid-cols-12 items-center gap-y-3 lg:gap-x-16">
             {/* Laptops: heading and the four steps */}
             <div className="col-span-5 hidden lg:block">
@@ -110,7 +110,7 @@ export function AppShowcase() {
 
             {/* Phones: caption and progress under the phone */}
             <div className="col-span-12 mx-auto w-full max-w-sm text-center lg:hidden">
-              <div className="relative min-h-[5.25rem]" aria-live="polite">
+              <div className="relative min-h-[6.5rem]" aria-live="polite">
                 <AnimatePresence mode="wait" initial={false}>
                   <motion.div
                     key={screen.id}

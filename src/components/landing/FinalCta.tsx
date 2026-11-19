@@ -20,7 +20,7 @@ export function FinalCta() {
             {/* Top row - blue welcome + yellow manifesto */}
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5">
               {/* Blue panel */}
-              <div className="relative flex flex-col justify-center gap-6 overflow-hidden bg-bluehour p-6 sm:p-8 md:aspect-[16/10]">
+              <div className="relative flex flex-col justify-center gap-6 overflow-hidden bg-bluehour p-6 sm:p-8 md:min-h-[18rem] lg:aspect-[16/10]">
                 <svg
                   aria-hidden
                   className="pointer-events-none absolute inset-0 h-full w-full"
@@ -111,7 +111,7 @@ export function FinalCta() {
               </div>
 
               {/* Yellow panel */}
-              <div className="flex flex-col justify-between bg-kodak p-8 md:aspect-[16/10]">
+              <div className="flex flex-col justify-between bg-kodak p-6 sm:p-8 md:min-h-[18rem] lg:aspect-[16/10]">
                 <div className="flex max-w-xl flex-col gap-4 text-[clamp(1.15rem,1.9vw,1.7rem)] font-semibold leading-[1.2] tracking-tight text-darkroom">
                   <p>{finalCta.population}</p>
                   <p>

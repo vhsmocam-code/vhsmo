@@ -67,7 +67,7 @@ export function SetupStep({
             <MediaSlot config={step.media} sizes="(min-width: 1280px) 1200px, 100vw" />
           </div>
         ) : (
-          <div className="grid grid-cols-12 items-center gap-y-10 lg:gap-x-16">
+          <div className="grid grid-cols-12 items-center gap-y-10 lg:gap-x-10 xl:gap-x-16">
             <div
               className={cn(
                 "col-span-12 lg:col-span-5",

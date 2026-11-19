@@ -91,7 +91,7 @@ function CommunityNote({ note, hideOnMobile }: { note: Note; hideOnMobile?: bool
           alt="A message from the VHSMO community"
           width={IW}
           height={note.ih}
-          sizes="(min-width: 1280px) 19vw, (min-width: 1024px) 24vw, (min-width: 768px) 31vw, 47vw"
+          sizes="(min-width: 1280px) 19vw, (min-width: 1024px) 24vw, (min-width: 768px) 31vw, (min-width: 480px) 47vw, 90vw"
           className="block h-auto w-full"
         />
       </motion.div>
@@ -102,8 +102,8 @@ function CommunityNote({ note, hideOnMobile }: { note: Note; hideOnMobile?: bool
 // Mobile-only paging so the wall doesn't scroll forever on phones:
 // first MOBILE_LIMIT show up front, "See all" expands to MOBILE_MAX, and the
 // remaining notes stay in the normal (sm+) desktop view.
-const MOBILE_LIMIT = 11;
-const MOBILE_MAX = 23;
+const MOBILE_LIMIT = 6;
+const MOBILE_MAX = 14;
 
 export function Community() {
   const [showAll, setShowAll] = useState(false);
@@ -118,7 +118,7 @@ export function Community() {
       <div className="shell relative z-10">
         <div className="flex items-start justify-between gap-6">
           <Reveal className="min-w-0">
-            <h2 className="display text-[clamp(2.3rem,5.6vw,4.75rem)] leading-[0.92] text-darkroom">
+            <h2 className="display text-[clamp(2rem,5.6vw,4.75rem)] leading-[0.92] text-darkroom">
               Built by us.{" "}
               <span className="font-marker inline-block -rotate-2 bg-kodak px-3 leading-none text-darkroom shadow-[0.15rem_0.25rem_0_rgba(31,26,24,0.25)]">
                 Backed by you.
@@ -140,9 +140,10 @@ export function Community() {
         </div>
 
         {/* The wall - a clean, evenly-spaced scrapbook masonry. Mobile-first:
-            2 readable columns on phones, scaling 2 → 3 → 4 → 5 with the gap
-            (column-gap) matched to each note's mb so spacing stays uniform. */}
-        <div className="mt-12 columns-2 [column-gap:0.75rem] md:columns-3 lg:mt-16 lg:columns-4 lg:[column-gap:1rem] xl:columns-5">
+            1 column on small phones so each screenshot's text is legible,
+            then 2 → 3 → 4 → 5 with the gap (column-gap) matched to each
+            note's mb so spacing stays uniform. */}
+        <div className="mt-12 columns-1 [column-gap:0.75rem] min-[480px]:columns-2 md:columns-3 lg:mt-16 lg:columns-4 lg:[column-gap:1rem] xl:columns-5">
           {notes.map((note, i) => (
             <CommunityNote
               key={note.src}
@@ -167,7 +168,7 @@ export function Community() {
 
         {/* Sign-off - marker highlight bar */}
         <Reveal className="mt-10 flex justify-center">
-          <span className="font-marker inline-block -rotate-1 bg-kodak px-6 py-2 text-lg uppercase tracking-wide text-darkroom shadow-[0.2rem_0.35rem_0_rgba(31,26,24,0.3)] sm:text-xl">
+          <span className="font-marker inline-block max-w-full text-balance -rotate-1 bg-kodak px-4 py-2 text-center text-base uppercase tracking-wide text-darkroom shadow-[0.2rem_0.35rem_0_rgba(31,26,24,0.3)] sm:px-6 sm:text-xl">
             tag @vhsmo.cam_ — we print our favourites
           </span>
         </Reveal>

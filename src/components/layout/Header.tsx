@@ -167,7 +167,8 @@ export function Header() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 flex flex-col bg-darkroom md:hidden"
+            className="fixed inset-x-0 top-0 z-50 flex h-dvh flex-col overflow-y-auto overscroll-contain bg-darkroom md:hidden"
+            data-lenis-prevent
           >
             <div className="container-px flex h-16 items-center justify-between">
               <Image
@@ -189,8 +190,9 @@ export function Header() {
             </div>
             <nav
               aria-label="Mobile"
-              className="container-px flex flex-1 flex-col justify-center gap-2"
+              className="container-px flex flex-1 flex-col py-4 pb-[max(2rem,env(safe-area-inset-bottom))]"
             >
+              <div className="my-auto flex flex-col gap-2">
               {navLinks.map((link, i) => (
                 <motion.div
                   key={link.label}
@@ -201,7 +203,7 @@ export function Header() {
                   <Link
                     href={link.href}
                     onClick={() => setMenuOpen(false)}
-                    className="display block py-3 text-4xl text-overexpose transition-colors hover:text-kodak"
+                    className="display block py-3 text-[clamp(1.75rem,9vw,2.25rem)] text-overexpose transition-colors hover:text-kodak"
                   >
                     {link.label}
                   </Link>
@@ -224,6 +226,7 @@ export function Header() {
                   Order Now →
                 </button>
               </motion.div>
+              </div>
             </nav>
           </motion.div>
         )}

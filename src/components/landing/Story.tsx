@@ -151,7 +151,7 @@ export function Story() {
           <div className="relative col-span-12 lg:col-span-8">
             <AsteriskDoodle className="absolute -top-8 right-0 z-10 h-8 w-8 rotate-12 text-darkroom" />
 
-            <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 sm:gap-8">
+            <div className="mx-auto grid max-w-[20rem] grid-cols-1 gap-8 min-[480px]:max-w-none min-[480px]:grid-cols-2 min-[480px]:gap-5 sm:grid-cols-3 sm:gap-8">
               {corkboard.map(({ photo, seed, from, circle, offset }, i) =>
                 photo ? (
                   <Reveal
@@ -163,7 +163,7 @@ export function Story() {
                     <PinnedPrint
                       photo={photo}
                       rotate={seededRotation(seed, 1.6)}
-                      sizes="(min-width: 1024px) 18vw, 45vw"
+                      sizes="(min-width: 1024px) 18vw, (min-width: 480px) 45vw, 80vw"
                       circle={circle}
                     />
                   </Reveal>

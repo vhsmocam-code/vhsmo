@@ -93,7 +93,7 @@ export function Gallery() {
     <div className="flex flex-col gap-4 lg:sticky lg:top-28">
       <div className="flex flex-col gap-4 lg:flex-row">
         {/* Thumbnails - photos, then the 3D tile */}
-        <div className="order-2 flex gap-3 overflow-x-auto lg:order-1 lg:flex-col lg:overflow-visible">
+        <div className="order-2 -mx-1.5 flex gap-3 overflow-x-auto px-1.5 py-1.5 lg:order-1 lg:mx-0 lg:flex-col lg:overflow-visible lg:p-0">
           {images.map((image, i) => (
             <button
               key={image.src}
@@ -209,7 +209,7 @@ export function Gallery() {
 
             {/* Control hint - retires after the first grab */}
             {showModel && !interacted && (
-              <p className="font-marker pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap rotate-[-1deg] text-sm text-darkroom/50">
+              <p className="font-marker pointer-events-none absolute bottom-4 left-1/2 w-max max-w-[90%] -translate-x-1/2 rotate-[-1deg] text-balance text-center text-xs text-darkroom/50 sm:text-sm">
                 drag to spin · pinch or scroll to zoom
               </p>
             )}
