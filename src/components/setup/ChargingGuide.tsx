@@ -3,7 +3,7 @@ import { charging } from "@/lib/setup";
 import { MediaSlot } from "./MediaSlot";
 
 /**
- * Step 06. The two charging LED states, then one big number.
+ * Step 06. The charging LED states, then one big number.
  */
 export function ChargingGuide() {
   return (
@@ -47,22 +47,6 @@ export function ChargingGuide() {
           <div className="col-span-12 mx-auto w-full max-w-xl lg:col-span-6 lg:col-start-7 lg:max-w-none">
             <MediaSlot config={charging.media} />
           </div>
-        </div>
-
-        {/* The two LED states, side by side */}
-        <div className="mt-14 grid grid-cols-1 gap-6 sm:mt-20 sm:grid-cols-2 sm:gap-8">
-          {charging.states.map((s) => (
-            <figure key={s.id}>
-              <MediaSlot config={s.media} sizes="(min-width: 640px) 45vw, 100vw" />
-              <figcaption className="mt-4 flex items-center gap-3 text-sm">
-                <span aria-hidden className={`size-3 rounded-full ${s.dot}`} />
-                <span className="font-semibold uppercase tracking-wide text-halide">
-                  {s.label}
-                </span>
-                <span className="text-halide/60">{s.meaning}</span>
-              </figcaption>
-            </figure>
-          ))}
         </div>
 
         {/* The number */}

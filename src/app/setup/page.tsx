@@ -10,7 +10,6 @@ import { SetupProgress } from "@/components/setup/SetupProgress";
 import { SetupStep } from "@/components/setup/SetupStep";
 import { SetupTips } from "@/components/setup/SetupTips";
 import { SetupTroubleshooting } from "@/components/setup/SetupTroubleshooting";
-import { SetupVideo } from "@/components/setup/SetupVideo";
 import { RESERVE_HREF } from "@/lib/landing";
 import { progressSteps, setupSteps } from "@/lib/setup";
 
@@ -36,7 +35,6 @@ export default function SetupPage() {
   return (
     <div className="relative overflow-x-clip bg-darkroom text-halide">
       <SetupHero />
-      <SetupVideo />
 
       <SetupProgress items={progressSteps} />
       <SetupStep step={setupSteps[0]!} />

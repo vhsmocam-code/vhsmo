@@ -46,9 +46,11 @@ export function GoodToKnow() {
                   <p className="mt-5 max-w-md text-lg leading-relaxed text-halide/75">
                     {item.body}
                   </p>
-                  <NoteCallout icon={item.noteIcon} className="mt-8">
-                    {item.note}
-                  </NoteCallout>
+                  {item.note && item.noteIcon && (
+                    <NoteCallout icon={item.noteIcon} className="mt-8">
+                      {item.note}
+                    </NoteCallout>
+                  )}
                 </Reveal>
               </div>
               <div

@@ -132,7 +132,7 @@ export const setupSteps: SetupStepContent[] = [
     id: "step-4",
     number: "04",
     label: "Wi-Fi",
-    title: "Want to see your moments? Connect.",
+    title: "Want to see your memories? Connect.",
     body: "When you want to view or, more importantly, offload your photos, press the Wi-Fi button on your VHSMO. The button will light up to indicate that Wi-Fi is enabled.",
     note: "Wi-Fi is only needed when you access your photos through the VHSMO app.",
     noteIcon: "wifi",
@@ -214,7 +214,7 @@ export const appGuide = {
     {
       id: "live",
       title: "Live Gallery",
-      caption: "Your shots land here as you take them. Tap the yellow button to take a photo from your phone.",
+      caption: "Your shots land here as you take them. Tap the Remote Capture button to take a photo from your phone.",
       src: "/setup/step-05/tour-live.webp",
       alt: "The VHSMO app's Live Gallery showing photos from the connected camera in a film strip",
       glow: "#ff5fa2",
@@ -307,8 +307,6 @@ export const goodToKnow = {
       id: "usb",
       title: "Prefer a cable? Use USB.",
       body: "Connect your VHSMO to your computer or phone with a USB data cable, open the camera's storage and copy your photos across. When you're done, safely eject the storage before you unplug it.",
-      note: "Handy when you have lots of photos to back up.",
-      noteIcon: "usb" as const,
       media: {
         slot: "good-to-know/usb",
         illustration: "usb-transfer",
