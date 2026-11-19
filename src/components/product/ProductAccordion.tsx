@@ -90,15 +90,7 @@ const items: Item[] = [
             <BoxItem icon={MemoryStick}>
               4GB microSD card, pre-installed
             </BoxItem>
-          </ul>
-        </div>
-        <div>
-          <p className="font-semibold text-darkroom">
-            Also included:
-          </p>
-          <ul className="mt-2.5 space-y-2">
             <BoxItem icon={Gift}>VHSMO lanyard</BoxItem>
-            <BoxItem icon={Gift}>Exclusive VHSMO sticker pack</BoxItem>
           </ul>
         </div>
         <p className="font-marker text-darkroom">

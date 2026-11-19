@@ -97,7 +97,7 @@ const productJsonLd = {
     availability: "https://schema.org/InStock",
     url: `${SITE_URL}/product`,
     priceCurrency: "INR",
-    price: "5999",
+    price: "6999",
   },
 };
 

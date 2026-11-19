@@ -85,10 +85,6 @@ export function PurchasePanel() {
     });
     setAdding(false);
   };
-  const discount =
-    variant.mrp > variant.price
-      ? Math.round(((variant.mrp - variant.price) / variant.mrp) * 100)
-      : 0;
 
   return (
     <div className="lg:sticky lg:top-28">
@@ -120,16 +116,6 @@ export function PurchasePanel() {
           </span>
           <Scribble className="absolute -bottom-2 left-0 h-2.5 w-full" />
         </span>
-        {variant.mrp > variant.price && (
-          <span className="text-lg text-darkroom/45 line-through">
-            {formatCurrency(variant.mrp)}
-          </span>
-        )}
-        {discount > 0 && (
-          <span className="font-marker -rotate-2 bg-kodak px-2 py-0.5 text-sm text-darkroom">
-            {discount}% off
-          </span>
-        )}
       </div>
 
       {/* Free shipping / returns */}
