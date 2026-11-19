@@ -5,7 +5,7 @@
  * before launch.
  */
 
-import { DELIVERY_ETA, DISPATCH_ETA } from "./shipping";
+import { DELIVERY_NOTE, DISPATCH_ETA } from "./shipping";
 
 /**
  * A paragraph, or - when an array - a bullet list rendered under the
@@ -115,7 +115,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
         heading: "6. Dispatch and delivery timing",
         body: [
           "The amount and payment timing displayed at checkout form part of your order. Unless checkout expressly states otherwise, the full displayed amount is charged when the order is placed.",
-          `Orders ship within ${DISPATCH_ETA} of confirmation. Delivery typically takes ${DELIVERY_ETA}, depending on your delivery address.`,
+          `Orders ship within ${DISPATCH_ETA} of confirmation. Delivery typically takes ${DELIVERY_NOTE}, depending on your delivery address.`,
           "A product is considered shipped when it has been handed to our delivery partner and tracking information has been generated.",
           "We will send tracking details after dispatch.",
           "Dispatch and delivery estimates may be affected by logistics, courier operations, stock availability or other circumstances outside our reasonable control. Nothing in this section limits your rights under applicable consumer law.",
@@ -547,7 +547,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
       {
         heading: "2. Dispatch and delivery time",
         body: [
-          `Orders ship within ${DISPATCH_ETA} of confirmation. Delivery typically takes ${DELIVERY_ETA}, depending on your delivery address.`,
+          `Orders ship within ${DISPATCH_ETA} of confirmation. Delivery typically takes ${DELIVERY_NOTE}, depending on your delivery address.`,
           "We will send you tracking details once your VHSMO is on the way.",
         ],
       },

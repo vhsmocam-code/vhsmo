@@ -3,7 +3,7 @@
  * Voice: fashion campaign, never spec sheet. Edit copy here, not in sections.
  */
 
-import { DELIVERY_ETA, DISPATCH_ETA } from "./shipping";
+import { DELIVERY_NOTE, DISPATCH_ETA } from "./shipping";
 
 export const RESERVE_HREF = "/#reserve";
 export const YEAR_MARK = "/2026";
@@ -298,7 +298,7 @@ export const faq = {
     },
     {
       q: "How soon will my VHSMO ship?",
-      a: `Shipping is free across India. Orders ship within ${DISPATCH_ETA}, and delivery takes ${DELIVERY_ETA} depending on your address.\n\nOnce your camera is on its way, you'll get tracking details by email so you can follow it to your door.`,
+      a: `Shipping is free across India. Orders ship within ${DISPATCH_ETA}, with delivery taking ${DELIVERY_NOTE}.\n\nOnce your camera is on its way, you'll get tracking details by email so you can follow it to your door.`,
     },
     {
       q: "Does VHSMO record video?",

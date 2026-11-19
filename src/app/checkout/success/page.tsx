@@ -18,7 +18,7 @@ import {
   Truck,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
-import { DELIVERY_ETA, DISPATCH_ETA } from "@/lib/shipping";
+import { DELIVERY_ETA, DELIVERY_NOTE, DISPATCH_ETA } from "@/lib/shipping";
 
 type OrderItem = {
   id?: string;
@@ -322,7 +322,7 @@ function SuccessContent() {
           <Notice
             icon={Truck}
             title="Getting your VHSMO ready"
-            body={`We're packing your camera and it ships within ${DISPATCH_ETA}. Delivery takes ${DELIVERY_ETA}, depending on your address.`}
+            body={`We're packing your camera and it ships within ${DISPATCH_ETA}. Delivery takes ${DELIVERY_NOTE}.`}
           />
           <Notice
             icon={ShieldCheck}

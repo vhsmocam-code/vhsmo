@@ -3,7 +3,7 @@
 import * as Accordion from "@radix-ui/react-accordion";
 import { Cable, Camera, Gift, MemoryStick, Plus } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { DELIVERY_ETA, DISPATCH_ETA } from "@/lib/shipping";
+import { DELIVERY_NOTE, DISPATCH_ETA } from "@/lib/shipping";
 
 type Item = {
   title: string;
@@ -66,9 +66,9 @@ const items: Item[] = [
           Free standard shipping across India.
         </p>
         <p>
-          Orders ship within {DISPATCH_ETA}, and delivery takes {DELIVERY_ETA},
-          depending on your address. We&apos;ll send you tracking details once
-          your VHSMO is on the way.
+          Orders ship within {DISPATCH_ETA}, with delivery taking{" "}
+          {DELIVERY_NOTE}. We&apos;ll send you tracking details once your
+          VHSMO is on the way.
         </p>
       </div>
     ),
