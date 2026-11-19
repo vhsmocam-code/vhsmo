@@ -2,7 +2,7 @@ import { revalidateTag } from "next/cache";
 import { supabase } from "@/lib/supabase";
 import { sendEmail } from "@/lib/email";
 import { redeemCoupon } from "@/lib/coupons/redeemCoupon";
-import { DELIVERY_ETA } from "@/lib/shipping";
+import { DELIVERY_ETA, DISPATCH_ETA } from "@/lib/shipping";
 
 /** Thrown when no order exists for a verified payment - lets the route map it
  *  to a 404 rather than a generic 500. */
@@ -135,7 +135,7 @@ export function orderConfirmationEmail({
 
           <!-- closing -->
           <tr><td style="padding:18px 32px 0;">
-            <p style="margin:0;font-size:14px;line-height:1.7;color:${INK};">Your VHSMO will be on its way soon. Delivery takes ${DELIVERY_ETA}, depending on your address, and we'll send tracking details once it ships.</p>
+            <p style="margin:0;font-size:14px;line-height:1.7;color:${INK};">Your VHSMO ships within ${DISPATCH_ETA}. Delivery takes ${DELIVERY_ETA}, depending on your address, and we'll send tracking details once it ships.</p>
           </td></tr>
 
           <!-- view order cta -->

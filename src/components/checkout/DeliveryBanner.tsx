@@ -1,5 +1,5 @@
 import { Truck } from "lucide-react";
-import { DELIVERY_ETA } from "@/lib/shipping";
+import { DELIVERY_ETA, DISPATCH_ETA } from "@/lib/shipping";
 
 /** Reassurance strip below the shipping form. */
 export function DeliveryBanner() {
@@ -11,7 +11,8 @@ export function DeliveryBanner() {
       <div>
         <p className="text-sm font-bold text-darkroom">Fast &amp; Free Delivery</p>
         <p className="text-xs text-darkroom/60">
-          Delivered in {DELIVERY_ETA}, depending on your address.
+          Ships within {DISPATCH_ETA}. Delivered in {DELIVERY_ETA}, depending on
+          your address.
         </p>
       </div>
     </div>

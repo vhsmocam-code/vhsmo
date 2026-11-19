@@ -4,7 +4,7 @@ import { City, Country, State } from "country-state-city";
 import { Building2, Globe, Home, Landmark, MapPin, User } from "lucide-react";
 import type { Address } from "@/components/address/types";
 import type { CheckoutErrors, CheckoutField } from "@/lib/checkout-validation";
-import { DELIVERY_ETA } from "@/lib/shipping";
+import { DELIVERY_ETA, DISPATCH_ETA } from "@/lib/shipping";
 import { Field } from "./Field";
 import { LocationSelect, type LocationOption } from "./LocationSelect";
 import { PincodeField } from "./PincodeField";
@@ -134,7 +134,7 @@ export function ShippingSection({
       <SectionHeader
         title="Shipping address"
         subtitle="Where should we deliver your VHSMO Camera?"
-        secondarySubtitle={`Delivery takes ${DELIVERY_ETA}, depending on your address.`}
+        secondarySubtitle={`Ships within ${DISPATCH_ETA}. Delivery takes ${DELIVERY_ETA}, depending on your address.`}
       />
       <div className="mt-5 space-y-3.5">
         <div className="grid items-start gap-3.5 sm:grid-cols-2">
