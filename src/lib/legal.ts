@@ -5,7 +5,7 @@
  * before launch.
  */
 
-import { DELIVERY_NOTE, DISPATCH_ETA } from "./shipping";
+import { DELIVERY_ETA, DELIVERY_ETA_REMOTE, DISPATCH_ETA } from "./shipping";
 
 /**
  * A paragraph, or - when an array - a bullet list rendered under the
@@ -82,7 +82,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
         body: [
           "We make reasonable efforts to display product descriptions, specifications, photographs, colours and pricing accurately.",
           "However, colours may appear differently depending on your screen, lighting and device settings. Product photographs and renders are illustrative, and minor production variations may occur.",
-          "We may make reasonable technical, manufacturing or packaging changes before shipment where they do not materially reduce the product’s core functionality or value.",
+          "We make reasonable efforts to ensure that all product specifications, features and packaging accurately reflect the product being sold. Minor variations may occur, provided they do not materially affect the product’s functionality or value.",
           "If a material change affects your order before shipment, we will notify you and provide the option to continue with the order or receive a full refund.",
         ],
       },
@@ -115,7 +115,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
         heading: "6. Dispatch and delivery timing",
         body: [
           "The amount and payment timing displayed at checkout form part of your order. Unless checkout expressly states otherwise, the full displayed amount is charged when the order is placed.",
-          `Orders ship within ${DISPATCH_ETA} of confirmation. Delivery typically takes ${DELIVERY_NOTE}, depending on your delivery address.`,
+          `Orders are typically dispatched within ${DISPATCH_ETA} of order confirmation. Once dispatched, delivery generally takes ${DELIVERY_ETA}, or ${DELIVERY_ETA_REMOTE} for remote locations across India.`,
           "A product is considered shipped when it has been handed to our delivery partner and tracking information has been generated.",
           "We will send tracking details after dispatch.",
           "Dispatch and delivery estimates may be affected by logistics, courier operations, stock availability or other circumstances outside our reasonable control. Nothing in this section limits your rights under applicable consumer law.",
@@ -250,14 +250,14 @@ export const LEGAL_DOCS: LegalDoc[] = [
       {
         heading: "19. Events outside our control",
         body: [
-          "We will not be responsible for delay or failure caused by events beyond our reasonable control, including natural disasters, government restrictions, strikes, transport interruptions, supply shortages, certification delays, network outages or manufacturing disruptions.",
+          "We will not be responsible for delay or failure caused by events beyond our reasonable control, including natural disasters, government restrictions, strikes, transport interruptions, courier disruptions, network outages or other unforeseen circumstances.",
           "Where such an event materially affects an accepted order, we will provide reasonable updates and any cancellation or refund remedy required by law or our published policies.",
         ],
       },
       {
         heading: "20. Electronic communications",
         body: [
-          "By placing an order, you agree to receive transactional communications relating to payment, production, dispatch, delivery, warranty and customer support.",
+          "By placing an order, you agree to receive transactional communications relating to order confirmation, payment, dispatch, delivery, warranty and customer support.",
           "Marketing messages will be sent only where permitted and may be unsubscribed from using the option provided.",
           "Electronic order confirmations, notices and policy communications satisfy any requirement for written communication to the extent permitted by law.",
         ],
@@ -309,7 +309,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
   {
     slug: "privacy",
     title: "Privacy Policy",
-    updated: "July 2026",
+    updated: "November 2026",
     intro:
       "VHSMO respects your privacy. This Privacy Policy explains what personal information we collect, why we collect it, how we use it, and the choices available to you when you visit our website, place an order, contact us, or use the VHSMO app.",
     sections: [
@@ -332,7 +332,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
           [
             "Order information: Your name, email address, phone number, billing and delivery address, order details and transaction status.",
             "Payment information: Payments are processed by Razorpay or another authorised payment provider. VHSMO does not directly store your complete card, UPI or banking credentials.",
-            "Communications: Information you provide when contacting customer support, submitting a warranty claim, joining the mailing list or responding to a survey.",
+            "Communications and subscriptions: Information you provide when contacting customer support, submitting a warranty claim, subscribing to product updates, signing up for restock notifications or responding to a survey.",
             "Technical information: Your IP address, browser type, device type, operating system, referring pages and general website activity.",
             "App and camera information: Device connection status, camera storage, battery status, app diagnostics and other information required to operate or improve the VHSMO app.",
             "Cookies: Small files used to operate the website, remember preferences, understand site performance and, where you agree, measure marketing activity.",
@@ -352,14 +352,14 @@ export const LEGAL_DOCS: LegalDoc[] = [
         body: [
           "We use personal information to:",
           [
-            "process payments, reservations and orders;",
+            "process payments, confirm orders and fulfil purchases;",
             "deliver products and provide tracking updates;",
             "operate and improve our website, camera and app;",
             "respond to questions and provide customer support;",
             "process cancellations, refunds and warranty claims;",
             "prevent fraud, misuse and security threats;",
             "send transactional messages about your order;",
-            "send marketing updates where you have chosen to receive them; and",
+            "send restock notifications, promotional offers, discount codes and product announcements where you have chosen to receive them; and",
             "comply with tax, accounting and legal obligations.",
           ],
           "We process personal information only for lawful purposes, based on your consent, your request for a product or service, or another basis permitted by applicable law.",
@@ -393,9 +393,9 @@ export const LEGAL_DOCS: LegalDoc[] = [
       {
         heading: "7. Marketing messages",
         body: [
-          "We may send product updates, launch announcements and other marketing messages when you subscribe or otherwise agree to receive them.",
-          `You can unsubscribe at any time using the link in an email or by contacting ${LEGAL_CONTACT}.`,
-          "You may still receive essential messages relating to orders, payments, shipping, refunds, warranty claims or security.",
+          "We may send product updates, restock notifications, exclusive discount codes, new product announcements and other marketing communications when you subscribe or agree to receive them.",
+          `You can unsubscribe at any time using the link provided in our emails or by contacting ${LEGAL_CONTACT}.`,
+          "You may still receive essential communications relating to your orders, payments, shipping, refunds, warranty claims or security.",
         ],
       },
       {
@@ -455,10 +455,11 @@ export const LEGAL_DOCS: LegalDoc[] = [
         ],
       },
       {
-        heading: "14. Testing photography",
+        heading: "14. Photography and Community Content",
         body: [
-          "During VHSMO’s testing phase, participants consented to being photographed and to the images being used for product testing, our website, and VHSMO social media. Approved images are stored securely and used only for these purposes.",
-          `To withdraw your consent or request the removal of a photograph featuring you, email ${LEGAL_CONTACT} with a screenshot, link, or description of the image. After verifying the request, we will remove it from our website and future promotional use within a reasonable period. Withdrawal does not affect uses made before the request was received.`,
+          "During VHSMO’s product testing phase, participants consented to being photographed and to approved images being used for product testing, our website and VHSMO social media.",
+          "We may also feature photographs, reviews and other content voluntarily shared by our community on our website, social media or promotional materials, with the appropriate permission.",
+          `To withdraw your consent or request the removal of a photograph or content featuring you, email ${LEGAL_CONTACT} with a screenshot, link or description. After verifying your request, we will remove the content from channels under our control within a reasonable period, where required by applicable law and the terms of your consent. Withdrawal does not affect uses made before the request was received.`,
         ],
       },
       {
@@ -499,8 +500,8 @@ export const LEGAL_DOCS: LegalDoc[] = [
             "is dead on arrival; or",
             "has a manufacturing defect.",
           ],
-          "Please include your order number and a clear photo or video showing the issue. Once verified, we will arrange a repair or replacement at no additional cost.",
-          "Where a replacement is unavailable, we may provide a full refund instead.",
+          "Please include your order number and a clear photo or video showing the issue, where possible. Once verified, we will arrange an appropriate repair or replacement at no additional cost.",
+          "Where repair or replacement is unavailable, or a refund is required under applicable law, we will provide a refund.",
         ],
       },
       {
@@ -512,21 +513,24 @@ export const LEGAL_DOCS: LegalDoc[] = [
             "Not covered: Damage caused by drops, impact, water or other liquids, misuse, improper charging, unauthorized repairs or modifications, theft, loss, cosmetic damage or normal wear and tear.",
           ],
           "Depending on the issue, VHSMO may repair or replace the camera after verifying the claim.",
+          `To request warranty assistance, email ${LEGAL_CONTACT} with your order number and details of the issue. Our support team will review your request and guide you through the next steps.`,
         ],
       },
       {
-        heading: "3. Returns",
+        heading: "3. Cancellations and returns",
         body: [
-          "We do not accept returns for change of mind, colour preference or ordinary cosmetic variation after the product has shipped.",
-          "This does not affect your rights where a product is defective, damaged, incorrectly supplied or materially different from its description.",
+          "Once an order has been placed, it cannot be cancelled for change of mind, colour preference or other personal reasons, including before dispatch.",
+          "We also do not accept returns for change of mind, colour preference or ordinary cosmetic variation after the product has shipped.",
+          "If VHSMO is unable to fulfil an accepted order, we will notify you and issue a full refund of the amount paid.",
+          "These restrictions do not affect your rights under applicable Indian consumer law, including remedies where a product is defective, damaged, incorrectly supplied or materially different from its description.",
         ],
       },
       {
         heading: "4. Refund processing",
         body: [
-          "Approved refunds will be issued to the original payment method. After processing, the amount may take 5–10 business days to appear, depending on your bank or payment provider.",
+          "Approved refunds will be processed to the original payment method. Once initiated, refunds typically take 5–10 business days to reflect in your account, depending on your bank or payment provider.",
           `For assistance, contact ${LEGAL_CONTACT} with your order number.`,
-          "Indian consumer law preserves remedies for defective or incorrectly supplied goods, including repair, replacement or refund where applicable; a store policy cannot remove statutory consumer rights.",
+          "Nothing in this policy limits any refund, replacement, repair or other remedy available under applicable Indian consumer law.",
         ],
       },
     ],
@@ -540,44 +544,51 @@ export const LEGAL_DOCS: LegalDoc[] = [
       {
         heading: "1. Shipping within India",
         body: [
-          "VHSMO currently offers free standard shipping across India. Any additional delivery charge, if applicable, will be shown before payment.",
+          "VHSMO offers free standard shipping across India to serviceable PIN codes. Any additional delivery charges, if applicable, will be disclosed before payment.",
           "Orders are delivered only to serviceable Indian PIN codes.",
         ],
       },
       {
         heading: "2. Dispatch and delivery time",
         body: [
-          `Orders ship within ${DISPATCH_ETA} of confirmation. Delivery typically takes ${DELIVERY_NOTE}, depending on your delivery address.`,
-          "We will send you tracking details once your VHSMO is on the way.",
+          `Orders are dispatched within ${DISPATCH_ETA} of order confirmation.`,
+          `Once dispatched, delivery typically takes ${DELIVERY_ETA}, or ${DELIVERY_ETA_REMOTE} for remote locations across India, depending on your delivery address.`,
+          "We will send you tracking details once your VHSMO has been dispatched.",
         ],
       },
       {
         heading: "3. Fulfilment and delivery partners",
         body: [
           "We use third-party warehousing, fulfilment and courier providers to store, pack and deliver orders. The delivery partner may vary depending on your location, serviceability and operational availability.",
-          "The information required to complete delivery—such as your name, phone number, address and order details—may be shared with these providers in accordance with our Privacy Policy.",
-          "Although third-party providers handle fulfilment and last-mile delivery, your purchase remains with VHSMO. Contact us directly if something goes wrong, and we will coordinate tracking, claims and issue resolution. This reflects VHSMO’s current fulfilment arrangement, which provides for outbound shipping, last-mile delivery, tracking and claims coordination through logistics partners.",
+          "Information required to complete delivery, such as your name, phone number, address and order details, may be shared with these providers in accordance with our Privacy Policy.",
+          "Once your order has been handed over to our courier partner, the courier manages transportation and delivery. VHSMO does not directly control courier operations, delivery attempts or delays after dispatch.",
+          "However, if you experience any shipping or delivery issues, we will make every reasonable effort to assist you, coordinate with the courier partner and work towards a resolution.",
+          "Nothing in this section limits any rights or remedies available under applicable Indian consumer law.",
         ],
       },
       {
         heading: "4. Delivery estimates",
         body: [
-          "Delivery estimates are measured from the date your order is placed and will also appear in your tracking information. They are estimates, not guaranteed arrival dates.",
-          "Delays may occur because of courier operations, weather, regional restrictions, public holidays, transport disruptions or other circumstances outside our reasonable control. We will assist with delayed shipments and provide updates where available.",
+          "Delivery timelines are calculated from the date of dispatch, not the date the order is placed. Estimated delivery dates may also appear in your tracking information.",
+          "Delivery timelines are estimates and not guaranteed arrival dates.",
+          "Delays may occur due to courier operations, weather conditions, regional restrictions, public holidays, transport disruptions or other circumstances outside our reasonable control.",
+          "We will assist with delayed shipments and provide updates where available.",
         ],
       },
       {
         heading: "5. Delivery address and failed attempts",
         body: [
-          "Please provide a complete and accurate delivery address and an active phone number.",
-          "VHSMO is not responsible for delays caused by incorrect or incomplete information. If a parcel is returned because of an incorrect address, refusal of delivery or repeated failed attempts, actual re-shipping charges may apply.",
+          "Please provide a complete and accurate delivery address and an active phone number when placing your order.",
+          "Incorrect or incomplete delivery information may result in delays or failed delivery attempts.",
+          "If a parcel is returned due to an incorrect address, refusal of delivery or repeated failed delivery attempts, actual re-shipping charges may apply where permitted by law.",
         ],
       },
       {
         heading: "6. Lost, damaged or incorrect shipments",
         body: [
-          `If your order arrives visibly damaged, contains the wrong product or appears to be lost in transit, email ${LEGAL_CONTACT} with your order number and supporting photographs or video.`,
-          "We will investigate the issue with our fulfilment and courier partners and arrange an appropriate replacement or refund where applicable. Your rights regarding defective, damaged or incorrectly supplied goods remain protected under applicable Indian consumer law.",
+          `If your order arrives visibly damaged, contains the wrong product or appears to be lost in transit, email ${LEGAL_CONTACT} with your order number and details of the issue. Please include supporting photographs or videos where available.`,
+          "We will investigate the issue with our fulfilment and courier partners and arrange an appropriate replacement or refund where applicable.",
+          "Your rights regarding defective, damaged, lost or incorrectly supplied goods remain protected under applicable Indian consumer law.",
         ],
       },
       {
