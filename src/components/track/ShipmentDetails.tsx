@@ -211,7 +211,12 @@ function LiveBody({ shipment }: { shipment: Shipment }) {
               aria-hidden
             />
           </summary>
-          <div className="max-h-96 overflow-y-auto border-t-2 border-darkroom/10 px-4 py-3">
+          {/* data-lenis-prevent: the site's Lenis smooth scroll otherwise eats
+              the wheel/touch events and this inner list never scrolls. */}
+          <div
+            data-lenis-prevent
+            className="max-h-96 overflow-y-auto overscroll-contain border-t-2 border-darkroom/10 px-4 py-3"
+          >
             {groupByDay(live.updates).map((g) => (
               <div key={g.day} className="mb-4 last:mb-0">
                 <p className="text-[0.65rem] font-bold uppercase tracking-wider text-darkroom/45">
