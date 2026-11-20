@@ -126,7 +126,7 @@ function LiveBody({ shipment }: { shipment: Shipment }) {
           <MetaLine shipment={shipment} />
         </div>
         {live.eta && (
-          <div className="shrink-0 rounded-xl border-2 border-darkroom/10 bg-halide/60 px-4 py-3 sm:max-w-[14rem] sm:text-right">
+          <div className="flex shrink-0 items-center justify-between gap-3 rounded-xl border-2 border-darkroom/10 bg-halide/60 px-4 py-2.5 sm:block sm:max-w-[14rem] sm:py-3 sm:text-right">
             <p className="text-[0.65rem] font-bold uppercase tracking-wider text-darkroom/50">
               {delivered ? "Delivered" : live.eta.label === "ETA" ? "Expected by" : live.eta.label}
             </p>
@@ -305,7 +305,7 @@ export function ShipmentDetails({
 }) {
   if (!collapsible) {
     return (
-      <article className="rounded-2xl border-2 border-darkroom/10 bg-overexpose p-5 sm:p-6">
+      <article className="rounded-2xl border-2 border-darkroom/10 bg-overexpose p-4 sm:p-6">
         <Body shipment={shipment} />
       </article>
     );
@@ -315,7 +315,7 @@ export function ShipmentDetails({
       open={defaultOpen}
       className="group/order rounded-2xl border-2 border-darkroom/10 bg-overexpose"
     >
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 [&::-webkit-details-marker]:hidden">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-4 sm:p-5 [&::-webkit-details-marker]:hidden">
         <span className="min-w-0">
           <span className="block break-all text-sm font-bold text-darkroom">
             {shipment.orderId}
@@ -330,7 +330,7 @@ export function ShipmentDetails({
           aria-hidden
         />
       </summary>
-      <div className="border-t-2 border-darkroom/10 p-5 sm:p-6">
+      <div className="border-t-2 border-darkroom/10 p-4 sm:p-6">
         <Body shipment={shipment} />
       </div>
     </details>

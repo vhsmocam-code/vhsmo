@@ -137,7 +137,7 @@ export function TrackOrderForm() {
             }}
             disabled={searching}
             required
-            placeholder="order_XXXXXXXXXXXXXX or 98765 43210"
+            placeholder="order_XXXX or 98765 43210"
             autoComplete="off"
             autoCapitalize="none"
             spellCheck={false}
@@ -178,9 +178,9 @@ export function TrackOrderForm() {
           ref={resultsRef}
           aria-live="polite"
           aria-busy={searching}
-          className="status-rise rounded-2xl bg-halide p-4 sm:p-8"
+          className="status-rise rounded-2xl bg-halide p-3 sm:p-8"
         >
-          <div className="flex items-center gap-2 px-1 text-darkroom sm:px-0">
+          <div className="flex items-center gap-2 px-2 pt-1 text-darkroom sm:px-0 sm:pt-0">
             <Package className="size-5" aria-hidden />
             <h2 className="font-marker text-2xl">
               {searching
