@@ -290,7 +290,7 @@ export const faq = {
     },
     {
       q: "What is the battery life of a VHSMO?",
-      a: "Built for days out, not battery anxiety. The 1000mAh battery is designed for everyday shooting and recharges over USB-C in around 90 minutes. Actual use will vary depending on how often you use the flash and wireless transfer.",
+      a: "Built for days out, not battery anxiety. The 1000mAh battery is designed for up to 8 hours of everyday shooting and recharges over USB-C in around 90 minutes. Actual use will vary depending on how often you use the flash and wireless transfer.",
     },
     {
       q: "Why doesn't VHSMO have a screen?",
