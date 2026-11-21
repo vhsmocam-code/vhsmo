@@ -49,7 +49,7 @@ export const features: Feature[] = [
   {
     icon: Battery,
     title: "All-day battery",
-    description: "540 frames per charge, topped up over USB-C in 90 minutes.",
+    description: "540 frames per charge, fully charged over USB-C in up to 8 hours.",
   },
   {
     icon: ShieldCheck,
