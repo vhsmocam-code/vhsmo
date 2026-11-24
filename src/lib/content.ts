@@ -206,6 +206,11 @@ export const faqs: FaqItem[] = [
       "All payments are processed over encrypted, PCI-compliant infrastructure. We never store your full card details on our servers.",
   },
   {
+    question: "Do you offer Cash on Delivery?",
+    answer:
+      "Yes, on PIN codes where our courier supports it. A ₹100 COD fee is added and shown at checkout, and we verify your email address with a one-time code. Pay the full amount in cash or UPI when your VHSMO arrives. Coupons apply to online payment only.",
+  },
+  {
     question: "What's covered by the warranty?",
     answer:
       "Every VHSMO includes a 1-year limited warranty covering manufacturing defects, with optional extension to three years available at checkout closer to shipping.",

@@ -5,14 +5,20 @@ export async function sendEmail({
   to,
   subject,
   html,
+  text,
+  from = "VHSMO <team@vhsmo.com>",
 }: {
   to: string;
   subject: string;
   html: string;
+  /** Plain-text alternative, sent alongside the HTML. */
+  text?: string;
+  /** Sender; defaults to the team address. OTP emails use no-reply@. */
+  from?: string;
 }) {
   try {
     const command = new SendEmailCommand({
-      FromEmailAddress: "VHSMO <team@vhsmo.com>",
+      FromEmailAddress: from,
       Destination: {
         ToAddresses: [to],
       },
@@ -25,6 +31,7 @@ export async function sendEmail({
             Html: {
               Data: html,
             },
+            ...(text ? { Text: { Data: text } } : {}),
           },
         },
       },

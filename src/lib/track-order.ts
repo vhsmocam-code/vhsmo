@@ -75,7 +75,7 @@ export function queryError(input: string): string {
   const raw = input.trim();
   if (!raw) return "Enter your order ID or phone number.";
   if (/^[\d\s+()-]+$/.test(raw)) return "Enter a valid 10-digit phone number.";
-  return "That doesn't look like an order ID - it starts with order_ and is in your confirmation email.";
+  return "That doesn't look like an order ID - it's in your confirmation email.";
 }
 
 export function trackingUrl(awb: string): string {

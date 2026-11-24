@@ -14,6 +14,9 @@
 export const ORDER_TYPE = "retailorder";
 export const MARKETPLACE_ID = 10;
 export const PAYMENT_MODE_PREPAID = 5;
+/** Cash on Delivery: WareIQ ships it as COD and the courier collects the total. */
+export const PAYMENT_MODE_COD = 2;
+const PAYMENT_MODES = new Set([PAYMENT_MODE_PREPAID, PAYMENT_MODE_COD]);
 export const SHIPPING_METHOD = 1;
 
 /** The only SKUs that exist in EasyEcom. Anything else is a permanent failure. */
@@ -82,12 +85,15 @@ export interface OrderRow {
   items: unknown;
   discount?: number | null;
   payment_status?: string;
+  payment_method?: string | null;
+  cod_fee?: number | string | null;
 }
 
 export interface QueueRow {
   id: number | string;
   source_order_id: string | null;
   orderNumber: string;
+  paymentMode?: number | null;
   items: EasyEcomItem[];
   customer: { billing: Address; shipping: Address }[];
   request_payload: Record<string, unknown> | null;
@@ -151,7 +157,12 @@ export function buildQueueRow(
     return Number(o.price) * Math.max(1, Math.floor(Number(o.quantity) || 1));
   });
   const grand = lineTotals.reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0);
-  const discount = opts.sendDiscount ? Math.max(0, Number(order.discount) || 0) : 0;
+  const isCod = text(order.payment_method).toLowerCase() === "cod";
+  const paymentMode = isCod ? PAYMENT_MODE_COD : PAYMENT_MODE_PREPAID;
+  const codFee = isCod ? Math.max(0, Number(order.cod_fee) || 0) : 0;
+  // A COD courier collects exactly what EasyEcom computes, so a COD order must
+  // always carry its real discount (0 today: coupons are online-only).
+  const discount = opts.sendDiscount || isCod ? Math.max(0, Number(order.discount) || 0) : 0;
   let allocated = 0;
 
   const items: EasyEcomItem[] = [];
@@ -203,7 +214,7 @@ export function buildQueueRow(
       orderType: ORDER_TYPE,
       marketplaceId: MARKETPLACE_ID,
       orderNumber,
-      paymentMode: PAYMENT_MODE_PREPAID,
+      paymentMode,
       shippingMethod: SHIPPING_METHOD,
       items,
       customer,
@@ -211,8 +222,11 @@ export function buildQueueRow(
         orderType: ORDER_TYPE,
         marketplaceId: MARKETPLACE_ID,
         orderNumber,
-        paymentMode: PAYMENT_MODE_PREPAID,
+        paymentMode,
         shippingMethod: SHIPPING_METHOD,
+        // The COD fee rides as a shipping charge so the collectable amount
+        // equals the site total (item prices - discounts + fee).
+        ...(codFee > 0 ? { shippingCost: codFee } : {}),
         items,
         customer,
       },
@@ -239,9 +253,14 @@ function validateAddress(a: unknown, label: string): string[] {
 }
 
 /** Returns the list of problems; an empty list means the row is safe to send. */
-export function validateRow(row: Pick<QueueRow, "orderNumber" | "items" | "customer">): string[] {
+export function validateRow(
+  row: Pick<QueueRow, "orderNumber" | "items" | "customer"> & Partial<Pick<QueueRow, "paymentMode">>,
+): string[] {
   const errors: string[] = [];
   if (!text(row.orderNumber)) errors.push("orderNumber is missing");
+  if (row.paymentMode != null && !PAYMENT_MODES.has(Number(row.paymentMode))) {
+    errors.push(`paymentMode ${row.paymentMode} is not supported`);
+  }
   if (!Array.isArray(row.items) || row.items.length === 0) {
     errors.push("items must be a nonempty array");
   } else {
@@ -267,14 +286,31 @@ export function validateRow(row: Pick<QueueRow, "orderNumber" | "items" | "custo
   return errors;
 }
 
+/** paymentMode stored on the row (or its payload); prepaid for old rows. */
+export function rowPaymentMode(row: Pick<QueueRow, "paymentMode" | "request_payload">): number {
+  const fromRow = Number(row.paymentMode);
+  if (PAYMENT_MODES.has(fromRow)) return fromRow;
+  const fromPayload = Number(row.request_payload?.paymentMode);
+  if (PAYMENT_MODES.has(fromPayload)) return fromPayload;
+  return PAYMENT_MODE_PREPAID;
+}
+
+/** COD fee carried in the stored payload (0 for prepaid). */
+export function rowShippingCost(row: Pick<QueueRow, "request_payload">): number {
+  const n = Number(row.request_payload?.shippingCost);
+  return Number.isFinite(n) && n > 0 ? n : 0;
+}
+
 /** The exact body POSTed to EasyEcom (outbound order number + fresh date). */
 export function buildOutboundPayload(row: QueueRow, now: Date = new Date()) {
+  const shippingCost = rowShippingCost(row);
   return {
     orderType: ORDER_TYPE,
     marketplaceId: MARKETPLACE_ID,
     orderNumber: easyEcomOrderNumber(row.orderNumber),
-    paymentMode: PAYMENT_MODE_PREPAID,
+    paymentMode: rowPaymentMode(row),
     shippingMethod: SHIPPING_METHOD,
+    ...(shippingCost > 0 ? { shippingCost } : {}),
     orderDate: formatOrderDate(now),
     items: row.items.map((it) => ({ ...it, OrderItemId: easyEcomOrderNumber(it.OrderItemId) })),
     customer: row.customer,

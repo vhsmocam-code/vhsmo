@@ -22,6 +22,8 @@ import { useEmailVerification } from "@/components/checkout/useEmailVerification
 import { usePincodeServiceability } from "@/components/checkout/usePincodeServiceability";
 import { useCheckoutReservation } from "@/components/checkout/useCheckoutReservation";
 import { ReservationBanner } from "@/components/checkout/ReservationBanner";
+import type { CodAvailability } from "@/components/checkout/PaymentMethodSelect";
+import { codEnabled } from "@/lib/cod/config";
 
 export default function CheckoutPage() {
   const { items, subtotal, shipping, tax, isHydrated, clear } = useCart();
@@ -68,6 +70,30 @@ export default function CheckoutPage() {
   const { status: pincodeStatus, info: pincodeInfo } = usePincodeServiceability(
     address.postalCode,
   );
+
+  // Cash on Delivery: offered only when switched on, in India, and when
+  // Delhivery confirms the courier collects cash at this PIN.
+  const cod = useMemo<CodAvailability | null>(() => {
+    if (!codEnabled()) return null;
+    if (address.country.trim().toLowerCase() !== "india") {
+      return { available: false, reason: "Only available for delivery in India" };
+    }
+    if (pincodeStatus === "serviceable" && pincodeInfo) {
+      return pincodeInfo.cod
+        ? { available: true }
+        : { available: false, reason: "Not available for this PIN code" };
+    }
+    if (pincodeStatus === "checking") {
+      return { available: false, reason: "Checking your PIN code…" };
+    }
+    if (pincodeStatus === "error") {
+      return { available: false, reason: "Couldn't check this PIN code right now" };
+    }
+    if (pincodeStatus === "unserviceable") {
+      return { available: false, reason: "We don't deliver to this PIN code yet" };
+    }
+    return { available: false, reason: "Enter your PIN code to check availability" };
+  }, [address.country, pincodeStatus, pincodeInfo]);
 
   // Validation - a field's error only shows once it's been touched or the
   // user has attempted checkout.
@@ -180,6 +206,7 @@ export default function CheckoutPage() {
           customer={{ firstName, lastName, email, phone }}
           address={address}
           soldOutIds={soldOutIds}
+          cod={cod}
           onOrderStart={reservation.pause}
           onOrderCancelled={reservation.resume}
           onSuccess={handleSuccess}

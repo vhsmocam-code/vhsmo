@@ -6,8 +6,9 @@ import {
   RECOVERY_QUANTITY,
 } from "@/lib/recovery";
 import { sendEmail } from "@/lib/email";
-import { orderConfirmationEmail } from "@/lib/orders/finalizeOrder";
+import { orderConfirmationMessage } from "@/lib/orders/finalizeOrder";
 import { ORDERS_TABLE } from "@/lib/orders/table";
+import { displayOrderId } from "@/lib/order-id";
 
 /**
  * POST /api/complete-order - the write side of the one-time order-recovery
@@ -161,11 +162,14 @@ export async function POST(req: Request) {
 
  await sendEmail({
    to: order.email,
-   subject: `Your VHSMO order ${order.razorpay_order_id} is confirmed`,
-   html: orderConfirmationEmail({
+   subject: `Your VHSMO order ${displayOrderId(order.razorpay_order_id)} is confirmed`,
+   ...orderConfirmationMessage({
      name: order.customer_name,
      orderId: order.razorpay_order_id,
      paymentId: order.razorpay_payment_id,
+     items: Array.isArray(order.items) ? order.items : [],
+     subtotal: order.subtotal,
+     discount: order.discount,
      total: order.total,
      orderUrl: `https://vhsmo.com/checkout/success?order_id=${order.razorpay_order_id}`,
      shipping: {

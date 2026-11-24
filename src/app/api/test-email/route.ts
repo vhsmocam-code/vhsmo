@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { sendEmail } from "@/lib/email";
-import { orderConfirmationEmail } from "@/lib/orders/finalizeOrder";
+import { orderConfirmationMessage } from "@/lib/orders/finalizeOrder";
+import { displayOrderId } from "@/lib/order-id";
 
 /**
  * Manual test route for the order-confirmation email. Not part of the checkout
- * flow — it just renders orderConfirmationEmail() with sample (or overridden)
+ * flow — it just renders orderConfirmationMessage() with sample (or overridden)
  * values and sends it to whatever address you pass, so you can eyeball the
  * template in a real inbox.
  *
@@ -65,8 +66,8 @@ async function handle(params: {
   try {
     const res = await sendEmail({
       to,
-      subject: `Your VHSMO order ${orderId} is confirmed`,
-      html: orderConfirmationEmail({
+      subject: `Your VHSMO order ${displayOrderId(orderId)} is confirmed`,
+      ...orderConfirmationMessage({
         name,
         orderId,
         paymentId,

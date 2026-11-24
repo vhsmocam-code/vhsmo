@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { sendEmail } from "@/lib/email";
-import { orderConfirmationEmail } from "@/lib/orders/finalizeOrder";
+import { orderConfirmationMessage } from "@/lib/orders/finalizeOrder";
 import { ORDERS_TABLE } from "@/lib/orders/table";
+import { displayOrderId } from "@/lib/order-id";
 
 /**
  * Manually resend the REAL order-confirmation email for a single existing order.
@@ -77,18 +78,28 @@ async function handle(params: {
 
   const origin =
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://vhsmo.com";
-  const orderUrl = `${origin}/checkout/success?order=${encodeURIComponent(
-    order.razorpay_order_id,
-  )}&payment=${encodeURIComponent(order.razorpay_payment_id ?? "")}`;
+  const isCod = order.payment_method === "cod";
+  const orderUrl = isCod
+    ? `${origin}/checkout/success?order=${encodeURIComponent(order.razorpay_order_id)}&method=cod`
+    : `${origin}/checkout/success?order=${encodeURIComponent(
+        order.razorpay_order_id,
+      )}&payment=${encodeURIComponent(order.razorpay_payment_id ?? "")}`;
 
   try {
     const res = await sendEmail({
       to,
-      subject: `Your VHSMO order ${order.razorpay_order_id} is confirmed`,
-      html: orderConfirmationEmail({
+      subject: isCod
+        ? `Your VHSMO order ${displayOrderId(order.razorpay_order_id)} is placed (Cash on Delivery)`
+        : `Your VHSMO order ${displayOrderId(order.razorpay_order_id)} is confirmed`,
+      ...orderConfirmationMessage({
         name: order.customer_name,
         orderId: order.razorpay_order_id,
         paymentId: order.razorpay_payment_id ?? "",
+        paymentMethod: isCod ? "cod" : "prepaid",
+        codFee: Number(order.cod_fee) || 0,
+        items: Array.isArray(order.items) ? order.items : [],
+        subtotal: order.subtotal,
+        discount: order.discount,
         total: order.total,
         orderUrl,
         shipping: {
