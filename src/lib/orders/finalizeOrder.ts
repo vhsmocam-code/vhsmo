@@ -1,7 +1,7 @@
 import { revalidateTag } from "next/cache";
 import { after } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { sendEmail } from "@/lib/email";
+import { emailAssetBase, sendEmail } from "@/lib/email";
 import { redeemCoupon } from "@/lib/coupons/redeemCoupon";
 import { DELIVERY_NOTE, DISPATCH_ETA } from "@/lib/shipping";
 import { enqueueEasyEcomOrder, processOrder } from "@/lib/easyecom";
@@ -46,7 +46,7 @@ async function decrementStock(productId: string, quantity: number) {
   return false;
 }
 
-type ConfirmationInput = Omit<ConfirmationArgs, "dispatchEta" | "deliveryNote">;
+type ConfirmationInput = Omit<ConfirmationArgs, "dispatchEta" | "deliveryNote" | "assetBase">;
 
 /**
  * The confirmation email: HTML, plain text and the sender (no-reply@). Spread it
@@ -60,6 +60,7 @@ export function orderConfirmationMessage(input: ConfirmationInput) {
       orderId: displayOrderId(input.orderId),
       dispatchEta: DISPATCH_ETA,
       deliveryNote: DELIVERY_NOTE,
+      assetBase: emailAssetBase(),
     }),
     from: NO_REPLY_FROM,
   };
@@ -226,6 +227,7 @@ async function runConfirmedOrderSideEffects(
         subtotal: order.subtotal,
         discount: order.discount,
         total: order.total,
+        orderDate: order.paid_at ?? order.created_at ?? new Date().toISOString(),
         orderUrl,
         shipping: {
           address1: order.address_line1,

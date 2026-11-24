@@ -101,6 +101,7 @@ async function handle(params: {
         subtotal: order.subtotal,
         discount: order.discount,
         total: order.total,
+        orderDate: order.paid_at ?? order.created_at,
         orderUrl,
         shipping: {
           address1: order.address_line1,

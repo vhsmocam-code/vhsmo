@@ -1,6 +1,11 @@
 import { SendEmailCommand } from "@aws-sdk/client-sesv2";
 import { ses } from "./email/ses";
 
+/** Site origin that serves the email images in public/email/ (emails need full links). */
+export function emailAssetBase(): string {
+  return (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://www.vhsmo.com").replace(/\/+$/, "");
+}
+
 export async function sendEmail({
   to,
   subject,

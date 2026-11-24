@@ -1,4 +1,4 @@
-import { sendEmail } from "@/lib/email";
+import { emailAssetBase, sendEmail } from "@/lib/email";
 import { OTP_TTL_MINUTES } from "./core";
 import { OTP_FROM, renderOtpEmail } from "@/lib/email/templates";
 
@@ -8,7 +8,7 @@ export async function sendOtpEmail(to: string, code: string): Promise<boolean> {
     if (process.env.NODE_ENV !== "production") {
       console.log(`[cod][dev] email OTP for ${to}: ${code}`);
     }
-    const { html, text } = renderOtpEmail(code, OTP_TTL_MINUTES);
+    const { html, text } = renderOtpEmail(code, OTP_TTL_MINUTES, emailAssetBase());
     await sendEmail({
       to,
       from: OTP_FROM,

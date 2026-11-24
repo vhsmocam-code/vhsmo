@@ -171,6 +171,7 @@ export async function POST(req: Request) {
      subtotal: order.subtotal,
      discount: order.discount,
      total: order.total,
+     orderDate: order.paid_at ?? order.created_at,
      orderUrl: `https://vhsmo.com/checkout/success?order_id=${order.razorpay_order_id}`,
      shipping: {
        address1: order.address_line1,
