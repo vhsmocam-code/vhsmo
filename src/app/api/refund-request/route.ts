@@ -4,6 +4,7 @@ import { areRefundRequestsOpen } from "@/lib/refund-status";
 import {
   NOTES_MAX,
   REFUND_FIELDS,
+  normalizeOrderIdInput,
   validateRefundField,
 } from "@/lib/refund-validation";
 import { ORDERS_TABLE } from "@/lib/orders/table";
@@ -43,7 +44,7 @@ export async function POST(req: Request) {
     const str = (v: unknown) => (typeof v === "string" ? v.trim() : "");
 
     const values = {
-      orderId: str(body?.orderId),
+      orderId: normalizeOrderIdInput(str(body?.orderId)),
       name: str(body?.name),
       email: str(body?.email),
     };

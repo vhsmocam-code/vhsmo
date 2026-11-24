@@ -5,7 +5,6 @@ import {
   BadgeCheck,
   Clock,
   Headphones,
-  Info,
   Loader2,
   Lock,
   PackageX,
@@ -18,7 +17,15 @@ import { formatCurrency } from "@/lib/utils";
 import { loadRazorpay } from "@/lib/load-razorpay";
 import type { CartItem } from "@/lib/cart-context";
 import type { Address } from "@/components/address/types";
+import { COD_FEE_DISPLAY } from "@/lib/cod/fee";
+import { otpChannel } from "@/lib/cod/config";
 import { CouponInput } from "./CouponInput";
+import { CodOtpDialog } from "./CodOtpDialog";
+import {
+  PaymentMethodSelect,
+  type CodAvailability,
+  type PaymentChoice,
+} from "./PaymentMethodSelect";
 
 type RazorpayResponse = {
   razorpay_order_id: string;
@@ -46,6 +53,8 @@ type OrderSummaryProps = {
   /** Cart-line product ids whose live backend stock is 0 - checkout is blocked
    *  until they're removed from the cart. */
   soldOutIds: Set<string>;
+  /** Whether Cash on Delivery can be offered; null hides the option entirely. */
+  cod: CodAvailability | null;
   /** Fired once order creation begins - used to pause the reservation timer. */
   onOrderStart?: () => void;
   /** Fired if the shopper backs out (dismisses Razorpay / order fails). */
@@ -64,6 +73,7 @@ export function OrderSummary({
   customer,
   address,
   soldOutIds,
+  cod,
   onOrderStart,
   onOrderCancelled,
   onSuccess,
@@ -71,7 +81,10 @@ export function OrderSummary({
   const hasSoldOut = soldOutIds.size > 0;
   const router = useRouter();
   const [processing, setProcessing] = useState(false);
-  const [showCodInfo, setShowCodInfo] = useState(false);
+  const [method, setMethod] = useState<PaymentChoice>("prepaid");
+  const [otpOpen, setOtpOpen] = useState(false);
+  const [codError, setCodError] = useState("");
+  const isCod = method === "cod";
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [coupon, setCoupon] = useState<{
     code: string;
@@ -88,6 +101,23 @@ export function OrderSummary({
     loadRazorpay().catch(() => {});
   }, []);
 
+  // If COD stops being available (PIN changed), fall back to online payment.
+  useEffect(() => {
+    if (isCod && !cod?.available) setMethod("prepaid");
+  }, [isCod, cod]);
+
+  const chooseMethod = (next: PaymentChoice) => {
+    if (next === method) return;
+    setCodError("");
+    if (next === "cod") {
+      track("cod_selected", { source: "checkout" });
+      // Coupons are online-only - drop any applied one.
+      setCoupon(null);
+      setCouponError("");
+    }
+    setMethod(next);
+  };
+
   const handleCheckout = async () => {
     if (processing) return;
 
@@ -102,6 +132,12 @@ export function OrderSummary({
         ?.closest("form")
         ?.querySelector<HTMLElement>('[aria-invalid="true"]')
         ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
+    if (isCod) {
+      setCodError("");
+      setOtpOpen(true);
       return;
     }
 
@@ -251,6 +287,85 @@ track("pay_securely_clicked", {
     }
   };
 
+  /** Places the COD order once the phone OTP is verified. */
+  const placeCodOrder = async (otpToken: string) => {
+    setProcessing(true);
+    onOrderStart?.();
+
+    const fullName = `${customer.firstName.trim()} ${customer.lastName.trim()}`.trim();
+    const shippingInfo = {
+      address1: address.street,
+      address2: address.apartment,
+      city: address.city,
+      state: address.state,
+      country: address.country,
+      postalCode: address.postalCode,
+    };
+
+    try {
+      const res = await fetch("/api/createOrder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          paymentMethod: "cod",
+          otpToken,
+          customer: { name: fullName, email: customer.email, phone: customer.phone },
+          shipping: shippingInfo,
+          items: items.map((item) => ({ productId: item.id, quantity: item.quantity })),
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.id) {
+        setOtpOpen(false);
+        setCodError(data.message ?? "We couldn't place your order. Please try again.");
+        setProcessing(false);
+        onOrderCancelled?.();
+        return;
+      }
+
+      track("cod_order_placed", { source: "checkout", total: data.total });
+      try {
+        sessionStorage.setItem(
+          "vhsmo:lastOrder",
+          JSON.stringify({
+            orderId: data.id,
+            paymentId: "",
+            paymentMethod: "cod",
+            placedAt: Date.now(),
+            customer: { name: fullName, email: customer.email, phone: customer.phone },
+            address: shippingInfo,
+            items: items.map((item) => ({
+              id: item.id,
+              name: item.name,
+              variant: item.variant,
+              quantity: item.quantity,
+              price: item.price,
+              image: item.image,
+            })),
+            subtotal,
+            shipping,
+            tax,
+            discount: 0,
+            couponCode: null,
+            codFee: data.codFee,
+            total: data.total,
+          }),
+        );
+      } catch {
+        // sessionStorage unavailable - page falls back to the API.
+      }
+
+      onSuccess();
+      router.push(`/checkout/success?order=${encodeURIComponent(data.id)}&method=cod`);
+    } catch (err) {
+      console.error(err);
+      setOtpOpen(false);
+      setCodError("We couldn't place your order. Please try again.");
+      setProcessing(false);
+      onOrderCancelled?.();
+    }
+  };
+
   const applyCoupon = async (code: string) => {
     // Require a valid email before any coupon can be applied - coupons are
     // tied to the shopper's email, so we can't validate one without it.
@@ -294,7 +409,9 @@ track("pay_securely_clicked", {
       setCouponLoading(false);
     }
   };
-  const finalTotal = total - (coupon?.discount ?? 0);
+  // Display only - the server recomputes every rupee.
+  const codTotal = total + COD_FEE_DISPLAY;
+  const finalTotal = isCod ? codTotal : total - (coupon?.discount ?? 0);
 
   return (
     <aside className="space-y-4 lg:sticky lg:top-8 lg:h-fit">
@@ -346,7 +463,11 @@ track("pay_securely_clicked", {
             );
           })}
         </ul>
-        {coupon ? (
+        {isCod ? (
+          <p className="mt-4 rounded-xl bg-darkroom/[0.04] p-3 text-xs text-darkroom/60">
+            Coupons apply to online payment only.
+          </p>
+        ) : coupon ? (
           <div className="mt-4 flex items-center gap-3 rounded-xl border-2 border-green-600/25 bg-green-600/[0.06] p-3.5">
             <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-green-600/15 text-green-700">
               <BadgeCheck className="size-5" />
@@ -378,14 +499,14 @@ track("pay_securely_clicked", {
             error={couponError}
           />
         )}
-        {coupon && (
+        {coupon && !isCod && (
           <CouponCountdown expiresAt={coupon.expiresAt} />
         )}
         {/* Totals */}
         <div className="space-y-2.5 pt-4 text-sm">
           <Row label="Subtotal" value={formatCurrency(subtotal)} />
 
-          {coupon && (
+          {coupon && !isCod && (
             <Row
               label={`Coupon (${coupon.code})`}
               value={`- ${formatCurrency(coupon.discount)}`}
@@ -395,12 +516,22 @@ track("pay_securely_clicked", {
             label="Shipping"
             value={shipping === 0 ? "Free" : formatCurrency(shipping)}
           />
+          {isCod && (
+            <Row
+              label="Cash on Delivery fee"
+              value={formatCurrency(COD_FEE_DISPLAY)}
+            />
+          )}
           <div className="my-3 h-px bg-darkroom/12" />
           <div className="flex items-end justify-between text-darkroom">
             <div>
-              <span className="text-base font-bold">Total</span>
+              <span className="text-base font-bold">
+                {isCod ? "Pay on delivery" : "Total"}
+              </span>
               <p className="text-xs font-normal text-darkroom/50">
-                Inclusive of all taxes.
+                {isCod
+                  ? `Includes ${formatCurrency(COD_FEE_DISPLAY)} COD fee. Inclusive of all taxes.`
+                  : "Inclusive of all taxes."}
               </p>
             </div>
             <span className="text-2xl font-bold tabular-nums">
@@ -427,6 +558,24 @@ track("pay_securely_clicked", {
             </div>
           </div>
         )}
+        {/* Payment method */}
+        {cod && (
+          <PaymentMethodSelect
+            value={method}
+            onChange={chooseMethod}
+            cod={cod}
+            codTotal={codTotal}
+            disabled={processing}
+          />
+        )}
+        {codError && (
+          <p
+            role="alert"
+            className="mt-3 rounded-xl border-2 border-red-500/30 bg-red-500/[0.06] p-3 text-xs font-semibold text-red-700"
+          >
+            {codError}
+          </p>
+        )}
         {/* Checkout button */}
         <button
           ref={buttonRef}
@@ -446,6 +595,13 @@ track("pay_securely_clicked", {
             </>
           ) : hasSoldOut ? (
             "Item unavailable"
+          ) : isCod ? (
+            <>
+              <Truck className="size-4" />
+              {canCheckout
+                ? `Place COD order · ${formatCurrency(finalTotal)}`
+                : "Continue"}
+            </>
           ) : (
             <>
               <Lock className="size-4" />
@@ -453,107 +609,13 @@ track("pay_securely_clicked", {
             </>
           )}
         </button>
-        {/* Cash on Delivery - currently unavailable (whole row opens modal) */}
-        <button
-          type="button"
-          onClick={() => {
-            track("cod_clicked", { source: "checkout" });
-            setShowCodInfo(true);
-          }}
-          aria-haspopup="dialog"
-          aria-expanded={showCodInfo}
-          aria-label="Why is Cash on Delivery unavailable?"
-          className="mt-2 flex w-full items-center gap-3 rounded-full border border-darkroom/12 bg-darkroom/[0.03] px-4 py-2.5 text-left transition-colors hover:bg-darkroom/[0.06]"
-        >
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-darkroom/[0.06] text-darkroom/40">
-            <Truck className="size-4" />
-          </span>
-          <span className="flex-1 leading-tight">
-            <span className="block text-sm font-bold text-darkroom/70">
-              Cash on Delivery
-            </span>
-            <span className="block text-xs text-darkroom/45">
-              Currently unavailable
-            </span>
-          </span>
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-full border border-darkroom/12 text-darkroom/45">
-            <Info className="size-4" />
-          </span>
-        </button>
-        {/* Cash on Delivery explainer modal */}
-        {showCodInfo && (
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="cod-modal-title"
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          >
-            {/* Backdrop */}
-            <button
-              type="button"
-              aria-label="Close"
-              onClick={() => setShowCodInfo(false)}
-              className="absolute inset-0 cursor-default bg-darkroom/60 backdrop-blur-sm"
-            />
-            {/* Panel */}
-            <div className="relative w-full max-w-md rounded-2xl border border-darkroom/10 bg-overexpose p-6 shadow-[0_30px_80px_-24px_rgba(31,26,24,0.6)]">
-              <button
-                type="button"
-                onClick={() => setShowCodInfo(false)}
-                aria-label="Close"
-                className="absolute right-4 top-4 flex size-8 items-center justify-center rounded-full text-darkroom/45 transition-colors hover:bg-darkroom/[0.06] hover:text-darkroom/70"
-              >
-                <X className="size-4" />
-              </button>
-
-              <div className="flex items-center gap-3">
-                <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-darkroom/[0.06] text-darkroom/50">
-                  <Truck className="size-5" />
-                </span>
-                <div>
-                  <h3
-                    id="cod-modal-title"
-                    className="text-base font-bold text-darkroom"
-                  >
-                    Why Cash on Delivery isn&apos;t available
-                  </h3>
-                  <p className="text-xs text-darkroom/50">
-                    A quick note
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-5 space-y-3.5 text-sm leading-relaxed text-darkroom/70">
-                <p>
-                  We currently accept online payments only (UPI, cards and net
-                  banking), so Cash on Delivery isn&apos;t available right now.
-                </p>
-              </div>
-
-              <div className="mt-5 flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    track("cod_back_to_home_clicked", { source: "checkout" });
-                    router.push("/");
-                  }}
-                  className="flex-1 rounded-full border border-darkroom/15 px-6 py-3 text-sm font-bold tracking-tight text-darkroom/70 transition-colors hover:bg-darkroom/[0.06]"
-                >
-                  Back to home
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    track("cod_got_it_clicked", { source: "checkout" });
-                    setShowCodInfo(false);
-                  }}
-                  className="flex-1 rounded-full bg-bluehour px-6 py-3 text-sm font-bold tracking-tight text-overexpose transition-all duration-300 ease-[var(--ease-out-expo)] hover:shadow-[0_0_0_5px_rgba(16,147,255,0.25)] active:scale-[0.98]"
-                >
-                  Proceed to Checkout
-                </button>
-              </div>
-            </div>
-          </div>
+        {otpOpen && (
+          <CodOtpDialog
+            contact={otpChannel() === "email" ? customer.email : customer.phone}
+            total={finalTotal}
+            onClose={() => setOtpOpen(false)}
+            onVerified={placeCodOrder}
+          />
         )}
         <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-darkroom/55">
           <Lock className="size-3.5" /> Encrypted &amp; secure. Your data is

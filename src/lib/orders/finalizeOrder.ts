@@ -6,6 +6,12 @@ import { redeemCoupon } from "@/lib/coupons/redeemCoupon";
 import { DELIVERY_NOTE, DISPATCH_ETA } from "@/lib/shipping";
 import { enqueueEasyEcomOrder, processOrder } from "@/lib/easyecom";
 import { ORDERS_TABLE } from "@/lib/orders/table";
+import { displayOrderId } from "@/lib/order-id";
+import {
+  NO_REPLY_FROM,
+  renderOrderConfirmation,
+  type ConfirmationArgs,
+} from "@/lib/email/templates";
 
 /** Thrown when no order exists for a verified payment - lets the route map it
  *  to a 404 rather than a generic 500. */
@@ -18,19 +24,6 @@ export class OrderNotFoundError extends Error {
 
 const UUID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-const money = (n: number) =>
-  `₹${Number(n ?? 0).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
-
-// The VHSMO wordmark (Kodak-yellow on transparent) sits on the brand darkroom
-// band in both the header and the footer so it stays legible; the message copy
-// between the two bands is dynamic HTML.
-const LOGO_IMG =
-  "https://res.cloudinary.com/jyejt2p3/image/upload/v1784963870/Frame_58_jtqo1t.png";
-const INK = "#2a2422"; // brand darkroom
-const ACCENT = "#1093ff"; // brand blue (bluehour) — the CTA
-const MUTE = "#6e6862"; // brand muted
-const LINE = "#e3e3e1"; // brand halide — divider hairlines
 
 async function decrementStock(productId: string, quantity: number) {
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -53,115 +46,28 @@ async function decrementStock(productId: string, quantity: number) {
   return false;
 }
 
-export function orderConfirmationEmail({
-  name,
-  orderId,
-  paymentId,
-  total,
-  orderUrl,
-  shipping,
-}: {
-  name: string;
-  orderId: string;
-  paymentId: string;
-  total: number;
-  orderUrl: string;
-  shipping?: {
-    address1?: string;
-    address2?: string;
-    city?: string;
-    state?: string;
-    country?: string;
-    postalCode?: string;
+type ConfirmationInput = Omit<ConfirmationArgs, "dispatchEta" | "deliveryNote">;
+
+/**
+ * The confirmation email: HTML, plain text and the sender (no-reply@). Spread it
+ * into sendEmail so every confirmation goes out from the same address. The ID is
+ * shown without `order_`.
+ */
+export function orderConfirmationMessage(input: ConfirmationInput) {
+  return {
+    ...renderOrderConfirmation({
+      ...input,
+      orderId: displayOrderId(input.orderId),
+      dispatchEta: DISPATCH_ETA,
+      deliveryNote: DELIVERY_NOTE,
+    }),
+    from: NO_REPLY_FROM,
   };
-}) {
-  const summaryRow = (label: string, value: string, strong = false) => `
-    <div style="font-size:14px;line-height:1.9;color:${INK};">
-      <span style="color:${MUTE};">${label}:</span> <span style="${strong ? "font-weight:700;" : ""}">${value}</span>
-    </div>`;
+}
 
-  const addressLines = [
-    name,
-    shipping?.address1,
-    shipping?.address2,
-    [shipping?.city, shipping?.state, shipping?.postalCode]
-      .filter(Boolean)
-      .join(", "),
-    shipping?.country,
-  ]
-    .filter(Boolean)
-    .join("<br>");
-
-  return `
-  <div style="margin:0;padding:0;background:#ffffff;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;padding:28px 12px;">
-      <tr><td align="center">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:18px;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
-
-          <!-- header band: wordmark + tagline -->
-          <tr><td style="background:${INK};padding:38px 32px 34px;" align="center">
-            <img src="${LOGO_IMG}" alt="VHSMO" width="190" style="display:block;width:190px;max-width:58%;height:auto;border:0;margin:0 auto 12px;" />
-            <div style="font-size:13px;letter-spacing:.4px;color:#e3e3e1;">Retro <em style="font-style:italic;">Instant</em> <strong style="font-weight:800;">Pocket</strong></div>
-          </td></tr>
-
-          <!-- greeting -->
-          <tr><td style="padding:34px 32px 0;">
-            <div style="font-size:20px;font-weight:700;color:${INK};">Thank you, ${name}!</div>
-            <div style="margin-top:6px;font-size:16px;font-weight:600;color:${INK};">Your purchase is officially confirmed.</div>
-            <p style="margin:18px 0 0;font-size:14px;line-height:1.7;color:${MUTE};">Thanks for sticking with us and trusting VHSMO with the way you capture your memories.</p>
-
-          </td></tr>
-
-          <tr><td style="padding:26px 32px 4px;"><div style="border-top:1px solid ${LINE};"></div></td></tr>
-
-          <!-- order summary -->
-          <tr><td style="padding:16px 32px 0;">
-            <div style="font-size:13px;font-weight:700;letter-spacing:.6px;color:${INK};text-transform:uppercase;">Order Summary</div>
-          </td></tr>
-          <tr><td style="padding:10px 32px 0;">
-            ${summaryRow("Order ID", orderId)}
-            ${summaryRow("Payment ID", paymentId)}
-            ${summaryRow("Amount Paid", money(total), true)}
-          </td></tr>
-
-          <tr><td style="padding:24px 32px 4px;"><div style="border-top:1px solid ${LINE};"></div></td></tr>
-
-          <!-- shipping address -->
-          <tr><td style="padding:16px 32px 0;">
-            <div style="font-size:13px;font-weight:700;letter-spacing:.6px;color:${INK};text-transform:uppercase;">Shipping Address</div>
-          </td></tr>
-          <tr><td style="padding:10px 32px 0;">
-            <div style="font-size:14px;line-height:1.8;color:${INK};">${addressLines}</div>
-          </td></tr>
-
-          <tr><td style="padding:24px 32px 4px;"><div style="border-top:1px solid ${LINE};"></div></td></tr>
-
-          <!-- closing -->
-          <tr><td style="padding:18px 32px 0;">
-            <p style="margin:0;font-size:14px;line-height:1.7;color:${INK};">Your VHSMO ships within ${DISPATCH_ETA}. Delivery takes ${DELIVERY_NOTE}, and we'll send tracking details once it ships.</p>
-          </td></tr>
-
-          <!-- view order cta -->
-          <tr><td style="padding:22px 32px 32px;">
-            <a href="${orderUrl}" style="display:block;text-align:center;background:${ACCENT};color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:15px;border-radius:10px;">View order</a>
-          </td></tr>
-
-          <!-- footer band: socials + fine print -->
-          <tr><td style="background:${INK};padding:30px 32px 32px;" align="center">
-            <div style="font-size:13px;color:#b8b3ae;">
-              <a href="https://www.instagram.com/vhsmo.cam_/" style="color:#b8b3ae;text-decoration:none;">Instagram</a>
-              &nbsp;&nbsp;·&nbsp;&nbsp;
-              <a href="https://www.youtube.com/@vhsmo" style="color:#b8b3ae;text-decoration:none;">YouTube</a>
-              &nbsp;&nbsp;·&nbsp;&nbsp;
-              <a href="https://x.com/vhsmo_cam" style="color:#b8b3ae;text-decoration:none;">Twitter/X</a>
-            </div>
-            <p style="margin:16px 0 0;font-size:11px;line-height:1.6;color:#8a857f;">© ${new Date().getFullYear()} VHSMO · You're receiving this because you placed an order with us.</p>
-          </td></tr>
-
-        </table>
-      </td></tr>
-    </table>
-  </div>`;
+/** HTML only - kept so existing callers keep working. */
+export function orderConfirmationEmail(input: ConfirmationInput): string {
+  return orderConfirmationMessage(input).html;
 }
 
 interface StoredOrderItem {
@@ -224,6 +130,45 @@ export async function finalizeOrder({
     return;
   }
 
+  await runConfirmedOrderSideEffects(order, { paymentId: razorpayPaymentId, req });
+}
+
+/**
+ * Confirms a Cash on Delivery order right after it is created. Same side
+ * effects as a paid order (EasyEcom, stock, email), gated on its own
+ * pending -> cod_confirmed transition so it runs exactly once. Never throws:
+ * the order row already exists, so the shopper must still see success.
+ */
+export async function confirmCodOrder({ orderId, req }: { orderId: string; req: Request }) {
+  try {
+    const { data: claimed, error } = await supabase
+      .from(ORDERS_TABLE)
+      .update({ payment_status: "cod_confirmed" })
+      .eq("razorpay_order_id", orderId)
+      .eq("payment_method", "cod")
+      .eq("payment_status", "pending")
+      .select("*");
+    if (error) throw error;
+    const order = claimed?.[0];
+    if (!order) return;
+    await runConfirmedOrderSideEffects(order, { paymentId: null, req });
+  } catch (e) {
+    console.error(`COD confirmation failed for ${orderId}:`, e);
+  }
+}
+
+/**
+ * Everything that happens once an order is confirmed (paid online, or COD
+ * placed). Runs once per order - callers gate it on their own CAS.
+ */
+async function runConfirmedOrderSideEffects(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  order: any,
+  { paymentId, req }: { paymentId: string | null; req: Request },
+) {
+  const razorpayOrderId: string = order.razorpay_order_id;
+  const isCod = order.payment_method === "cod";
+
   // 3b. Queue the order for EasyEcom. This runs first, right after the claim,
   //     so a later failure (stock, email, coupon) can't stop a paid order from
   //     being queued. It never throws and is a no-op unless EASYECOM_ENABLED.
@@ -259,18 +204,27 @@ export async function finalizeOrder({
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
     new URL(req.url).origin;
 
-  const orderUrl = `${origin}/checkout/success?order=${encodeURIComponent(
-    razorpayOrderId,
-  )}&payment=${encodeURIComponent(razorpayPaymentId)}`;
+  const orderUrl = isCod
+    ? `${origin}/checkout/success?order=${encodeURIComponent(razorpayOrderId)}&method=cod`
+    : `${origin}/checkout/success?order=${encodeURIComponent(
+        razorpayOrderId,
+      )}&payment=${encodeURIComponent(paymentId ?? "")}`;
 
   try {
     await sendEmail({
       to: order.email,
-      subject: `Your VHSMO order ${razorpayOrderId} is confirmed`,
-      html: orderConfirmationEmail({
+      subject: isCod
+        ? `Your VHSMO order ${displayOrderId(razorpayOrderId)} is placed (Cash on Delivery)`
+        : `Your VHSMO order ${displayOrderId(razorpayOrderId)} is confirmed`,
+      ...orderConfirmationMessage({
         name: order.customer_name,
         orderId: razorpayOrderId,
-        paymentId: razorpayPaymentId,
+        paymentId: paymentId ?? "",
+        paymentMethod: isCod ? "cod" : "prepaid",
+        codFee: Number(order.cod_fee) || 0,
+        items: Array.isArray(order.items) ? order.items : [],
+        subtotal: order.subtotal,
+        discount: order.discount,
         total: order.total,
         orderUrl,
         shipping: {

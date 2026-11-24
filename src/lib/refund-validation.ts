@@ -49,19 +49,30 @@ const EMAIL_RE =
 /** A name has to contain at least one letter - "123" and "..." are not names. */
 const NAME_RE = /^[\p{L}][\p{L}\p{M} .'-]*$/u;
 
-export function validateOrderId(value: string): string | undefined {
+/**
+ * Customers now see their Order ID without the `order_` prefix (confirmation
+ * email, success page, invoice), so accept it with or without it. A bare ID
+ * (10-20 letters/digits, no underscore) gets the prefix back; anything else is
+ * returned trimmed and untouched so the checks below can explain what's wrong.
+ */
+export function normalizeOrderIdInput(value: string): string {
   const v = value.trim();
+  return /^[A-Za-z0-9]{10,20}$/.test(v) ? `order_${v}` : v;
+}
+
+export function validateOrderId(value: string): string | undefined {
+  const v = normalizeOrderIdInput(value);
   if (!v) return "Order ID is required.";
 
   const lower = v.toLowerCase();
   for (const [prefix, what] of Object.entries(WRONG_PREFIXES)) {
     if (lower.startsWith(prefix)) {
-      return `${what}, not your Order ID. Look for the ID starting with "order_".`;
+      return `${what}, not your Order ID. Look for "Order ID" in your confirmation email.`;
     }
   }
 
   if (!lower.startsWith("order_")) {
-    return 'Order IDs start with "order_" - check your confirmation email.';
+    return "That doesn't look like an Order ID - copy it from your confirmation email.";
   }
 
   if (/\s/.test(v)) return "Order ID shouldn't contain spaces.";

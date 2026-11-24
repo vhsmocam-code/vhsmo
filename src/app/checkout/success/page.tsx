@@ -18,6 +18,7 @@ import {
   Truck,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { displayOrderId } from "@/lib/order-id";
 import { DELIVERY_ETA, DELIVERY_NOTE, DISPATCH_ETA } from "@/lib/shipping";
 
 type OrderItem = {
@@ -53,6 +54,8 @@ type Order = {
   total: number;
   currency: string;
   paymentStatus: string;
+  paymentMethod: "prepaid" | "cod";
+  codFee: number;
 };
 
 /** Map a Supabase orders row into the shape the page renders. */
@@ -93,6 +96,8 @@ function fromApi(row: Record<string, any>): Order {
     total: Number(row.total ?? row.amount ?? 0),
     currency: row.currency ?? "INR",
     paymentStatus: String(row.payment_status ?? "pending").toLowerCase(),
+    paymentMethod: row.payment_method === "cod" ? "cod" : "prepaid",
+    codFee: Number(row.cod_fee ?? 0),
   };
 }
 
@@ -162,10 +167,7 @@ function SuccessContent() {
     };
   }, [orderId]);
 
-  const shortId = (orderId ?? order?.orderId ?? "")
-    .replace(/^order_/, "")
-    .slice(-8)
-    .toUpperCase();
+  const shortId = displayOrderId(orderId ?? order?.orderId ?? "");
 
   // No valid order behind this id - show a dedicated "not found" page and
   // never the thank-you / receipt.
@@ -184,7 +186,7 @@ function SuccessContent() {
             <>
               {" "}
               <span className="font-mono text-sm font-semibold text-darkroom">
-                ({orderId})
+                ({displayOrderId(orderId)})
               </span>
             </>
           ) : null}
@@ -214,7 +216,12 @@ function SuccessContent() {
   // customer's name, email and shipping details, and payment_status is still
   // "pending". We don't offer a retry from the site; instead we ask the buyer
   // to reach out so we can help them complete the purchase.
-  if (order && order.paymentStatus !== "paid") {
+  const isCod = order?.paymentMethod === "cod";
+  const confirmed =
+    order?.paymentStatus === "paid" ||
+    (isCod && order?.paymentStatus === "cod_confirmed");
+
+  if (order && !confirmed) {
     return (
       <div className="paper flex min-h-dvh flex-col items-center justify-center px-6 text-center">
         <span className="flex size-16 items-center justify-center rounded-full border-2 border-darkroom/15 bg-overexpose text-darkroom/60">
@@ -255,7 +262,7 @@ function SuccessContent() {
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <a
             href={`mailto:team@vhsmo.com?subject=${encodeURIComponent(
-              `Payment help for order ${orderId ?? order.orderId}`,
+              `Payment help for order ${displayOrderId(orderId ?? order.orderId)}`,
             )}`}
             className="flex items-center justify-center gap-2 rounded-full bg-darkroom px-7 py-4 text-sm font-bold text-halide transition-transform hover:scale-[1.02] active:scale-[0.98]"
           >
@@ -287,7 +294,7 @@ function SuccessContent() {
             <span className="flex size-4 items-center justify-center rounded-full bg-kodak">
               <Check className="size-2.5 text-darkroom" strokeWidth={4} />
             </span>
-            Payment Successful
+            {isCod ? "Order placed · Cash on Delivery" : "Payment Successful"}
           </span>
 
           <h1 className="display mt-6 text-[clamp(2.25rem,6vw,4rem)] text-darkroom">
@@ -310,6 +317,13 @@ function SuccessContent() {
             ) : null}
             .
           </p>
+          {isCod && order && (
+            <p className="mt-4 rounded-xl bg-kodak/40 px-4 py-3 text-sm font-semibold text-darkroom">
+              Please keep {formatCurrency(order.total)} ready in cash or UPI
+              for the delivery partner (includes{" "}
+              {formatCurrency(order.codFee)} COD fee).
+            </p>
+          )}
         </div>
 
         {/* ---------- What happens next ---------- */}
@@ -396,9 +410,23 @@ function SuccessContent() {
                 {order.tax > 0 && (
                   <Row label="Taxes" value={formatCurrency(order.tax)} />
                 )}
+                {order.discount > 0 && (
+                  <Row
+                    label={`Discount${order.couponCode ? ` (${order.couponCode})` : ""}`}
+                    value={`- ${formatCurrency(order.discount)}`}
+                  />
+                )}
+                {isCod && order.codFee > 0 && (
+                  <Row
+                    label="Cash on Delivery fee"
+                    value={formatCurrency(order.codFee)}
+                  />
+                )}
                 <div className="my-3 h-px bg-darkroom/12" />
                 <div className="flex items-center justify-between">
-                  <span className="text-lg font-bold text-darkroom">Total</span>
+                  <span className="text-lg font-bold text-darkroom">
+                    {isCod ? "Pay on delivery" : "Total"}
+                  </span>
                   <span className="text-2xl font-bold tabular-nums text-darkroom">
                     {formatCurrency(order.total)}
                   </span>
@@ -432,7 +460,18 @@ function SuccessContent() {
                 )}
               </Card>
 
-              {(paymentId ?? order.paymentId) && (
+              {isCod && (
+                <Card title="Payment">
+                  <p className="text-sm font-semibold text-darkroom">
+                    Cash on Delivery
+                  </p>
+                  <p className="mt-1 text-xs text-darkroom/55">
+                    {formatCurrency(order.total)} to be paid on delivery
+                  </p>
+                </Card>
+              )}
+
+              {!isCod && (paymentId ?? order.paymentId) && (
                 <Card title="Transaction ID">
                   <p className="break-all font-mono text-sm font-semibold text-darkroom">
                     {paymentId ?? order.paymentId}
@@ -469,7 +508,7 @@ function SuccessContent() {
 
 /** Builds a printable invoice and opens the browser print dialog (Save as PDF). */
 function downloadInvoice(order: Order) {
-  const shortId = order.orderId.replace(/^order_/, "").slice(-8).toUpperCase();
+  const shortId = displayOrderId(order.orderId);
   const placed = order.placedAt
     ? new Date(order.placedAt).toLocaleDateString("en-IN", {
         day: "numeric",
@@ -589,10 +628,14 @@ function downloadInvoice(order: Order) {
     </div>
     <div class="col">
       <h3>Payment</h3>
-      <div>Razorpay</div>
-      <div class="muted">Order: ${escapeHtml(order.orderId)}</div>
+      <div>${order.paymentMethod === "cod" ? "Cash on Delivery" : "Razorpay"}</div>
+      <div class="muted">Order: ${escapeHtml(shortId)}</div>
       ${order.paymentId ? `<div class="muted">Payment: ${escapeHtml(order.paymentId)}</div>` : ""}
-      <div style="margin-top:8px;color:#1a7f37;font-weight:600;">Paid</div>
+      ${
+        order.paymentMethod === "cod"
+          ? `<div style="margin-top:8px;color:#9a6700;font-weight:600;">To be collected on delivery</div>`
+          : `<div style="margin-top:8px;color:#1a7f37;font-weight:600;">Paid</div>`
+      }
     </div>
   </div>
 
@@ -616,6 +659,11 @@ function downloadInvoice(order: Order) {
         : ""
     }
     <div class="line"><span>Shipping</span><span>${order.shipping === 0 ? "Free" : formatCurrency(order.shipping, order.currency)}</span></div>
+    ${
+      order.codFee > 0
+        ? `<div class="line"><span>COD fee</span><span>${formatCurrency(order.codFee, order.currency)}</span></div>`
+        : ""
+    }
     ${
       isInr
         ? `<div class="line"><span>Taxable value</span><span>${formatCurrency(taxableValue, order.currency)}</span></div>

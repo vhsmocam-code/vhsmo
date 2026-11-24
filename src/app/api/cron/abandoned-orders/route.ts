@@ -65,6 +65,7 @@ const { data: orders, error } = await supabase
   .from(ORDERS_TABLE)
   .select("*")
   .eq("payment_status", "pending")
+  .eq("payment_method", "prepaid") // COD orders are never "abandoned"
   .eq("abandoned_email_sent", false)
   .gte("created_at", twentyMinutesAgo)
   .lte("created_at", now);
@@ -108,6 +109,7 @@ const { data: orders, error } = await supabase
             abandoned_email_sent: true,
           })
           .eq("email", order.email)
+          .eq("payment_method", "prepaid")
           .eq("payment_status", "pending");
 
         emailsSent++;

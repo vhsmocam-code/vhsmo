@@ -47,7 +47,11 @@ export async function enqueueEasyEcomOrder(order: OrderRow): Promise<"queued" | 
       return "error";
     }
     if (c.dryRun) {
-      console.log(`[easyecom][dry-run] would queue ${built.row.orderNumber}`);
+      const p = built.row.request_payload;
+      console.log(
+        `[easyecom][dry-run] would queue ${built.row.orderNumber} paymentMode=${built.row.paymentMode}` +
+          (p.shippingCost ? ` shippingCost=${p.shippingCost}` : ""),
+      );
       return "skipped";
     }
 
@@ -137,7 +141,12 @@ export async function reconcile(windowDays = 7) {
   const { data: paid } = await supabase
     .from(ORDERS_TABLE).select("id,razorpay_order_id,country")
     .eq("payment_status", "paid").gte("paid_at", since).lte("paid_at", grace);
-  const india = (paid ?? []).filter((o) => String(o.country ?? "").trim().toLowerCase() === "india");
+  // COD orders have no paid_at; they are confirmed when created.
+  const { data: cod } = await supabase
+    .from(ORDERS_TABLE).select("id,razorpay_order_id,country")
+    .eq("payment_status", "cod_confirmed").gte("created_at", since).lte("created_at", grace);
+  const india = [...(paid ?? []), ...(cod ?? [])]
+    .filter((o) => String(o.country ?? "").trim().toLowerCase() === "india");
   const { data: queued } = await supabase
     .from(TABLE).select("orderNumber").in("orderNumber", india.map((o) => o.razorpay_order_id));
   const have = new Set((queued ?? []).map((q) => q.orderNumber));
@@ -150,7 +159,7 @@ export async function reconcile(windowDays = 7) {
   if (missing.length || stuck?.length) {
     await sendAlert(
       `EasyEcom reconcile: ${missing.length} missing, ${stuck?.length ?? 0} stuck`,
-      [`Paid India orders not in queue (last ${windowDays}d):`, ...missing,
+      [`Paid/COD India orders not in queue (last ${windowDays}d):`, ...missing,
        "", "Pending/failed rows older than 30 min:",
        ...(stuck ?? []).map((s) => `${s.orderNumber} [${s.status}] ${s.error_message ?? ""}`)].join("\n"),
     );

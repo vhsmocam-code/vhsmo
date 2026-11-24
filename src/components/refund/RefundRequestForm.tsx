@@ -205,7 +205,7 @@ export function RefundRequestForm() {
           onBlur={() => blur("orderId")}
           disabled={sending}
           required
-          placeholder="order_XXXXXXXXXXXXXX"
+          placeholder="Your Order ID"
           autoComplete="off"
           autoCapitalize="none"
           spellCheck={false}
