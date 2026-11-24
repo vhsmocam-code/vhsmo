@@ -6,6 +6,7 @@ import {
   REFUND_FIELDS,
   validateRefundField,
 } from "@/lib/refund-validation";
+import { ORDERS_TABLE } from "@/lib/orders/table";
 
 /**
  * /refund-request form - the on-site replacement for the Google Form sent to
@@ -66,7 +67,7 @@ export async function POST(req: Request) {
 
     // Soft lookup - never blocks the request, just enriches the row.
     const { data: order } = await supabase
-      .from("orders")
+      .from(ORDERS_TABLE)
       .select("id, customer_name, email, total, currency, payment_status")
       .eq("razorpay_order_id", cleanOrderId)
       .maybeSingle();

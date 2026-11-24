@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { sendEmail } from "@/lib/email";
+import { ORDERS_TABLE } from "@/lib/orders/table";
 
 function abandonedCheckoutEmail({
   name,
@@ -61,7 +62,7 @@ const now = new Date().toISOString();
 
 
 const { data: orders, error } = await supabase
-  .from("orders")
+  .from(ORDERS_TABLE)
   .select("*")
   .eq("payment_status", "pending")
   .eq("abandoned_email_sent", false)
@@ -102,7 +103,7 @@ const { data: orders, error } = await supabase
 
         // Mark ALL pending orders of this email as emailed
         await supabase
-          .from("orders")
+          .from(ORDERS_TABLE)
           .update({
             abandoned_email_sent: true,
           })

@@ -7,6 +7,7 @@ import {
 } from "@/lib/recovery";
 import { sendEmail } from "@/lib/email";
 import { orderConfirmationEmail } from "@/lib/orders/finalizeOrder";
+import { ORDERS_TABLE } from "@/lib/orders/table";
 
 /**
  * POST /api/complete-order - the write side of the one-time order-recovery
@@ -122,7 +123,7 @@ export async function POST(req: Request) {
 
   // 5. Insert the real order.
  const { data: order, error: insertError } = await supabase
-   .from("orders")
+   .from(ORDERS_TABLE)
    .insert({
      razorpay_order_id: recovery.razorpay_order_id,
      razorpay_payment_id: recovery.razorpay_payment_id,

@@ -1,8 +1,11 @@
 import { revalidateTag } from "next/cache";
+import { after } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { sendEmail } from "@/lib/email";
 import { redeemCoupon } from "@/lib/coupons/redeemCoupon";
 import { DELIVERY_NOTE, DISPATCH_ETA } from "@/lib/shipping";
+import { enqueueEasyEcomOrder, processOrder } from "@/lib/easyecom";
+import { ORDERS_TABLE } from "@/lib/orders/table";
 
 /** Thrown when no order exists for a verified payment - lets the route map it
  *  to a 404 rather than a generic 500. */
@@ -187,7 +190,7 @@ export async function finalizeOrder({
  
   // 1. Load the pending order - the single source of truth.
   const { data: order, error } = await supabase
-    .from("orders")
+    .from(ORDERS_TABLE)
     .select("*")
     .eq("razorpay_order_id", razorpayOrderId)
     .maybeSingle();
@@ -203,7 +206,7 @@ export async function finalizeOrder({
   //    wins this compare-and-swap runs the side effects below, so concurrent
   //    verify + webhook calls can't double-process.
   const { data: claimed, error: claimError } = await supabase
-    .from("orders")
+    .from(ORDERS_TABLE)
     .update({
       payment_status: "paid",
       razorpay_payment_id: razorpayPaymentId,
@@ -219,6 +222,19 @@ export async function finalizeOrder({
   if (!claimed?.length) {
     // Another call finalized between our read and write - nothing left to do.
     return;
+  }
+
+  // 3b. Queue the order for EasyEcom. This runs first, right after the claim,
+  //     so a later failure (stock, email, coupon) can't stop a paid order from
+  //     being queued. It never throws and is a no-op unless EASYECOM_ENABLED.
+  //     The send itself happens after the response, and a cron sweep retries.
+  try {
+    const queued = await enqueueEasyEcomOrder(order);
+    if (queued === "queued") {
+      after(() => processOrder(razorpayOrderId));
+    }
+  } catch (easyEcomError) {
+    console.error(`EasyEcom enqueue failed for ${razorpayOrderId}:`, easyEcomError);
   }
 
   // 4. Reduce stock for each purchased line (from the stored, backend-priced
