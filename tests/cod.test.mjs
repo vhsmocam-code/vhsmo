@@ -330,7 +330,7 @@ test("both emails share the logo strip and help band; only the confirmation has 
   const otp = renderOtpEmail("482913", 10, ASSETS).html;
   const confirm = renderOrderConfirmation(confirmArgs()).html;
   for (const html of [otp, confirm]) {
-    assert.match(html, /<img src="https:\/\/res\.cloudinary\.com\/jyejt2p3\/[^"]+" alt="VHSMO"/);
+    assert.ok(html.includes(`<img src="${ASSETS}/email/logo.png" alt="VHSMO"`), "logo on its own dark card");
     assert.ok(html.includes("Questions? Write to <a href=\"mailto:team@vhsmo.com\""));
   }
   for (const t of TILES) {
@@ -375,4 +375,17 @@ test("OTP email: code in a tap-to-select box with a hint, plain text has the cod
   assert.ok(html.includes("Tap the code to select it, then copy."));
   assert.ok(html.includes("10 minutes"));
   assert.ok(text.split("\n").includes("482913"));
+});
+
+test("both emails ask mail apps to keep the light design (colour-scheme light only)", () => {
+  for (const html of [renderOtpEmail("482913", 10, ASSETS).html, renderOrderConfirmation(confirmArgs()).html]) {
+    assert.ok(html.includes('<meta name="color-scheme" content="light only">'));
+    assert.ok(html.includes('<meta name="supported-color-schemes" content="light only">'));
+    assert.match(html, /:root \{ color-scheme: light only; supported-color-schemes: light only; \}/);
+  }
+});
+
+test("the van sits in a rounded dark card cell, so it reads as a card even before it loads", () => {
+  const html = renderOrderConfirmation(confirmArgs()).html;
+  assert.match(html, /<td bgcolor="#2a2422" style="background:#2a2422;border-radius:12px;line-height:0;">\s*<img src="https:\/\/www\.vhsmo\.com\/email\/van\.gif"/);
 });

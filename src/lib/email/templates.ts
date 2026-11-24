@@ -7,6 +7,11 @@
  * Email-safe: tables and inline styles only. The only animation is an animated
  * GIF (the one thing Gmail and Outlook play). Images come from `${assetBase}/email/`
  * (built by scripts/build-email-assets.py into public/email/).
+ *
+ * Dark mode: Apple Mail, iOS Mail and some Outlook apps honour the "light only"
+ * colour-scheme tags and keep the light design. Gmail's phone apps ignore them and
+ * recolour backgrounds and text, so every image is self-contained (dark brand
+ * cards and badges, edge-to-edge photos) and looks the same on either page.
  */
 
 const INK = "#111111";
@@ -20,9 +25,6 @@ const DARK = "#2a2422";
 const FONT =
   "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif";
 const MONO = "ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
-
-const LOGO_URL =
-  "https://res.cloudinary.com/jyejt2p3/image/upload/v1784963870/Frame_58_jtqo1t.png";
 
 /** Sender for transactional mail (order confirmations, verification codes). */
 export const NO_REPLY_FROM = "VHSMO <no-reply@vhsmo.com>";
@@ -90,7 +92,7 @@ function emailShell({
 }): string {
   const tiles = TILES.map(
     (t) => `<div style="display:inline-block;width:25%;min-width:120px;vertical-align:top;text-align:center;padding:4px 0 8px;">
-<img src="${base(assetBase)}/email/${t.icon}" alt="" width="40" height="40" style="display:block;width:40px;height:40px;border:0;margin:0 auto 6px;">
+<img src="${base(assetBase)}/email/${t.icon}" alt="" width="44" height="44" style="display:block;width:44px;height:44px;border:0;margin:0 auto 8px;">
 <div style="font-family:${FONT};font-size:12px;line-height:1.4;color:${INK};padding:0 6px;">${esc(t.label)}</div>
 </div>`,
   ).join("");
@@ -100,15 +102,19 @@ function emailShell({
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light only">
+<meta name="supported-color-schemes" content="light only">
 <title>VHSMO</title>
+<style>
+:root { color-scheme: light only; supported-color-schemes: light only; }
+</style>
 </head>
 <body style="margin:0;padding:0;background:${PAGE};">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:${PAGE};">${esc(preheader)}</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${PAGE}" style="background:${PAGE};">
 <tr><td align="center" style="padding:24px 12px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="max-width:600px;background:#ffffff;font-family:${FONT};color:${INK};font-size:15px;line-height:1.6;">
-<tr><td align="center" bgcolor="${DARK}" style="background:${DARK};padding:28px 20px;"><img src="${LOGO_URL}" alt="VHSMO" width="150" style="display:block;width:150px;max-width:60%;height:auto;border:0;margin:0 auto;color:#ffffff;font-family:${FONT};font-size:16px;font-weight:700;letter-spacing:3px;"></td></tr>
+<tr><td align="center" bgcolor="${DARK}" style="background:${DARK};padding:28px 20px;"><img src="${base(assetBase)}/email/logo.png" alt="VHSMO" width="170" height="60" style="display:block;width:170px;max-width:60%;height:auto;border:0;margin:0 auto;color:#ffffff;font-family:${FONT};font-size:16px;font-weight:700;letter-spacing:3px;"></td></tr>
 <tr><td style="padding:36px 28px 32px;">
 ${body}
 </td></tr>
@@ -319,7 +325,11 @@ ${totals
   const body = `
 ${h1(heading)}
 <p style="margin:0 0 20px;text-align:center;color:${MUTE};">Thanks, ${esc(first)}! We're getting your VHSMO ready.</p>
-<img src="${assetBase}/email/van.gif" alt="" width="300" height="75" style="display:block;width:300px;max-width:100%;height:auto;border:0;margin:0 auto 24px;">
+<table role="presentation" align="center" cellpadding="0" cellspacing="0" style="margin:0 auto 24px;">
+<tr><td bgcolor="${DARK}" style="background:${DARK};border-radius:12px;line-height:0;">
+<img src="${assetBase}/email/van.gif" alt="" width="300" height="75" style="display:block;width:300px;max-width:100%;height:auto;border:0;border-radius:12px;">
+</td></tr>
+</table>
 <table role="presentation" align="center" cellpadding="0" cellspacing="0" style="margin:0 auto;">
 <tr><td align="center" bgcolor="${BLUE}" style="background:${BLUE};border-radius:6px;">
 <a href="${esc(a.orderUrl)}" style="display:inline-block;padding:14px 34px;font-family:${FONT};font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#ffffff;text-decoration:none;">View your order</a>
