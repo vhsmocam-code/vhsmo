@@ -260,50 +260,60 @@ test("refund form still rejects wrong IDs", () => {
   assert.ok(validateOrderId("has space inside 1234"));
 });
 
-// ── Minimal email design ────────────────────────────────────────────────────
+// ── Email design (shared layout, confirmation, OTP) ─────────────────────────
+import { formatOrderDate, productImageFor, TILES } from "../src/lib/email/templates.ts";
+
+const ASSETS = "https://www.vhsmo.com";
 const ship = { address1: "20 Aasmant Society", address2: "", city: "Pune", state: "Maharashtra", country: "India", postalCode: "411021" };
 const confirmArgs = (over = {}) => ({
   name: "Test User", orderId: "THk58ch0pfaSZ1", paymentId: "pay_ABC123", paymentMethod: "prepaid",
   items: [{ name: "VHSMO Vol. 1", variant: "Cosmic Black", quantity: 1, price: 6999 }],
   subtotal: 6999, discount: 0, total: 6999, orderUrl: "https://vhsmo.com/checkout/success?order=order_THk58ch0pfaSZ1",
-  shipping: ship, dispatchEta: "48–72 hours", deliveryNote: "2–7 business days", ...over,
+  orderDate: "2026-11-24T15:59:47Z", shipping: ship, dispatchEta: "48–72 hours", deliveryNote: "2–7 business days",
+  assetBase: ASSETS, ...over,
 });
 
-test("confirmation (online): full ID, payment id, items and total", () => {
+test("confirmation (online): headline, summary, full ID, date, photo, totals", () => {
   const { html, text } = renderOrderConfirmation(confirmArgs());
   for (const out of [html, text]) {
+    assert.ok(out.includes("Your order is confirmed."));
     assert.ok(out.includes("THk58ch0pfaSZ1"));
-    assert.ok(!out.includes("order_THk58ch0pfaSZ1") || out.includes("success?order=order_")); // only the link keeps order_
+    assert.ok(out.includes("24 November 2026"));
+    assert.ok(out.includes("Paid online"));
     assert.ok(out.includes("pay_ABC123"));
-    assert.ok(out.includes("VHSMO Vol. 1 · Cosmic Black"));
+    assert.ok(out.includes("Subtotal (1 item)"));
     assert.ok(out.includes("₹6,999"));
-    assert.ok(out.includes("Order confirmed"));
     assert.ok(out.includes("Pune, Maharashtra, 411021"));
     assert.ok(!/Cash on Delivery/.test(out));
   }
+  assert.ok(html.includes(`${ASSETS}/email/van.gif`), "animated van");
+  assert.ok(html.includes(`${ASSETS}/email/product-black.png`), "photo matched by colour");
+  assert.match(html, /<a href="https:\/\/vhsmo\.com\/checkout\/success\?order=order_THk58ch0pfaSZ1"[^>]*>View your order<\/a>/);
+  assert.ok(html.includes("Summary") && html.includes("Shipping address") && html.includes("Items ordered"));
 });
 
-test("confirmation (COD): fee, amount due, no payment id", () => {
+test("confirmation (COD): placed headline, fee, amount due, no payment id", () => {
   const { html, text } = renderOrderConfirmation(confirmArgs({
     orderId: "CODLJRAVJC6784C", paymentMethod: "cod", paymentId: "", codFee: 100, total: 7099,
   }));
   for (const out of [html, text]) {
-    assert.ok(out.includes("Order placed"));
+    assert.ok(out.includes("Your order is placed."));
     assert.ok(out.includes("Cash on Delivery"));
     assert.ok(out.includes("Due on delivery"));
-    assert.ok(out.includes("₹7,099"));
     assert.ok(out.includes("Cash on Delivery fee"));
-    assert.ok(out.includes("₹100"));
+    assert.ok(out.includes("₹100") && out.includes("₹7,099"));
     assert.ok(!/Payment ID/.test(out));
   }
 });
 
-test("confirmation shows a discount only when there is one, and copes with no items", () => {
+test("confirmation: discount only when present, item counts, copes with no items or date", () => {
   assert.ok(!/Discount/.test(renderOrderConfirmation(confirmArgs()).text));
   assert.ok(/Discount: − ₹500/.test(renderOrderConfirmation(confirmArgs({ discount: 500, total: 6499 })).text));
-  const bare = renderOrderConfirmation(confirmArgs({ items: undefined, subtotal: undefined }));
-  assert.ok(bare.text.includes("Total: ₹6,999"));
-  assert.ok(!/Subtotal/.test(bare.text));
+  const two = renderOrderConfirmation(confirmArgs({ items: [{ name: "VHSMO Vol. 1", variant: "Baby Pink", quantity: 2, price: 6999 }], subtotal: 13998, total: 13998 }));
+  assert.ok(two.text.includes("Subtotal (2 items)") && two.html.includes("product-pink.png"));
+  const bare = renderOrderConfirmation(confirmArgs({ items: undefined, subtotal: undefined, orderDate: null }));
+  assert.ok(bare.text.includes("Order total: ₹6,999"));
+  assert.ok(!/Subtotal|Order date|Items ordered/.test(bare.html));
 });
 
 test("confirmation escapes user-provided text", () => {
@@ -316,32 +326,53 @@ test("confirmation escapes user-provided text", () => {
   assert.equal(esc(`"'<&>`), "&quot;&#39;&lt;&amp;&gt;");
 });
 
-test("both emails stay minimal: only the logo strip has colour, no other images or backgrounds", () => {
-  const pages = [renderOtpEmail("123456").html, renderOrderConfirmation(confirmArgs()).html, renderOrderConfirmation(confirmArgs({ paymentMethod: "cod", codFee: 100 })).html];
-  const allowed = new Set(["#111111", "#6b6b6b", "#e6e6e6", "#ffffff", "#2a2422"]);
-  for (const html of pages) {
-    assert.equal((html.match(/<img/gi) ?? []).length, 1, "exactly one image: the logo");
+test("both emails share the logo strip and help band; only the confirmation has the four tiles", () => {
+  const otp = renderOtpEmail("482913", 10, ASSETS).html;
+  const confirm = renderOrderConfirmation(confirmArgs()).html;
+  for (const html of [otp, confirm]) {
     assert.match(html, /<img src="https:\/\/res\.cloudinary\.com\/jyejt2p3\/[^"]+" alt="VHSMO"/);
-    assert.ok(!/background(-image)?:\s*url/i.test(html), "no background images");
-    assert.equal((html.match(/#2a2422/gi) ?? []).length, 2, "brown only on the header strip (bgcolor + background)");
-    for (const hex of html.match(/#[0-9a-fA-F]{3,8}\b/g) ?? []) assert.ok(allowed.has(hex.toLowerCase()), `unexpected colour ${hex}`);
-    assert.ok(html.includes("team@vhsmo.com"));
+    assert.ok(html.includes("Questions? Write to <a href=\"mailto:team@vhsmo.com\""));
   }
+  for (const t of TILES) {
+    assert.ok(confirm.includes(`${ASSETS}/email/${t.icon}`) && confirm.includes(t.label));
+    assert.ok(!otp.includes(t.icon) && !otp.includes(t.label), `OTP email has no ${t.label} tile`);
+  }
+});
+
+test("every image is a full link to a non-WebP file, and the HTML stays under Gmail's clip size", () => {
+  const pages = [renderOtpEmail("482913", 10, ASSETS).html, renderOrderConfirmation(confirmArgs({ paymentMethod: "cod", codFee: 100 })).html];
+  for (const html of pages) {
+    const srcs = [...html.matchAll(/<img src="([^"]+)"/g)].map((m) => m[1]);
+    assert.ok(srcs.length >= 1);
+    for (const src of srcs) {
+      assert.ok(src.startsWith(`${ASSETS}/email/`) || src.startsWith("https://res.cloudinary.com/"), src);
+      assert.ok(!/\.webp$/i.test(src), src);
+    }
+    assert.ok(Buffer.byteLength(html) < 60_000, `HTML is ${Buffer.byteLength(html)} bytes`);
+  }
+});
+
+test("asset base trailing slash and default are handled", () => {
+  assert.ok(renderOrderConfirmation(confirmArgs({ assetBase: "http://localhost:3000/" })).html.includes("http://localhost:3000/email/van.gif"));
+  assert.ok(renderOrderConfirmation(confirmArgs({ assetBase: undefined })).html.includes("https://www.vhsmo.com/email/van.gif"));
+  assert.equal(productImageFor("Cherry Red", ASSETS), `${ASSETS}/email/product-red.png`);
+  assert.equal(productImageFor("Ocean Blue", ASSETS), null);
+  assert.equal(formatOrderDate("not a date"), "");
 });
 
 test("transactional mail comes from no-reply@, and the footer doesn't invite replies to it", () => {
   assert.equal(NO_REPLY_FROM, "VHSMO <no-reply@vhsmo.com>");
   assert.equal(OTP_FROM, NO_REPLY_FROM);
   assert.ok(!/reply to this email/i.test(FOOTER_TEXT));
-  assert.ok(FOOTER_TEXT.includes("team@vhsmo.com"));
   for (const out of [renderOtpEmail("123456"), renderOrderConfirmation(confirmArgs())]) {
     assert.ok(!/reply to this email/i.test(out.html) && !/reply to this email/i.test(out.text));
   }
 });
 
-test("OTP email makes the code easy to copy: one-click select and a hint", () => {
-  const { html, text } = renderOtpEmail("482913");
-  assert.match(html, /user-select:all[^>]*>482913</);
-  assert.ok(html.includes("select and copy"));
-  assert.ok(text.split("\n").includes("482913"), "plain-text version has the code on its own line");
+test("OTP email: code in a tap-to-select box with a hint, plain text has the code alone", () => {
+  const { html, text } = renderOtpEmail("482913", 10, ASSETS);
+  assert.match(html, /user-select:all;">482913<\/span>/);
+  assert.ok(html.includes("Tap the code to select it, then copy."));
+  assert.ok(html.includes("10 minutes"));
+  assert.ok(text.split("\n").includes("482913"));
 });
