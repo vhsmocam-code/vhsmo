@@ -8,6 +8,11 @@ Builds the images the transactional emails use, into public/email/:
 
 Run from the repo root:  python3 scripts/build-email-assets.py
 Everything is drawn at 3-4x and downsampled, so lines stay smooth.
+
+Dark mode: Gmail's phone apps recolour an email's backgrounds and text but not
+its images, so every image here is self-contained and looks the same on a light
+or a dark page: the van and the icons sit on the brand dark brown, and the
+photos fill their square (no white padding).
 """
 import math
 import os
@@ -16,8 +21,11 @@ from PIL import Image, ImageDraw
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "public", "email")
-INK = (42, 36, 34)  # brand darkroom #2a2422
-WHITE = (255, 255, 255)
+DARK = (42, 36, 34)       # brand darkroom #2a2422 (same as the email header strip)
+CREAM = (244, 239, 230)   # #f4efe6, line colour on the dark cards
+YELLOW = (250, 226, 52)   # brand yellow, accents
+INK = CREAM               # the van is drawn in cream on dark
+WHITE = DARK              # "paper" for the van drawing is the dark card
 
 os.makedirs(OUT, exist_ok=True)
 
@@ -68,10 +76,10 @@ def van_frame(i):
                         radius=s(6), fill=WHITE, outline=INK, width=s(3))
     # side logo: arrow in a box
     d.rounded_rectangle([s(vx - 34), s(88 + by), s(vx - 4), s(110 + by)],
-                        radius=s(3), outline=INK, width=s(2))
-    d.line([(s(vx - 27), s(99 + by)), (s(vx - 11), s(99 + by))], fill=INK, width=s(2))
+                        radius=s(3), outline=YELLOW, width=s(2))
+    d.line([(s(vx - 27), s(99 + by)), (s(vx - 11), s(99 + by))], fill=YELLOW, width=s(2))
     d.line([(s(vx - 16), s(94 + by)), (s(vx - 11), s(99 + by)), (s(vx - 16), s(104 + by))],
-           fill=INK, width=s(2), joint="curve")
+           fill=YELLOW, width=s(2), joint="curve")
     # cab
     cab = [(vx + 30, 90), (vx + 50, 90), (vx + 66, 106), (vx + 66, 120), (vx + 30, 120)]
     d.polygon([(s(x), s(y + by)) for x, y in cab], fill=WHITE, outline=INK, width=s(3))
@@ -89,17 +97,23 @@ def van_frame(i):
         dx, dy = math.cos(angle) * 6, math.sin(angle) * 6
         d.line([(s(cx - dx), s(cy - dy)), (s(cx + dx), s(cy + dy))], fill=INK, width=s(2))
 
-    return img.resize((W, H), Image.LANCZOS)
+    frame = img.resize((W, H), Image.LANCZOS)
+    # The drawing spans roughly y 78-142; lift it 30px so it sits centred in the card.
+    lift = 30
+    centred = Image.new("RGB", (W, H), WHITE)
+    centred.paste(frame.crop((0, lift, W, H)), (0, 0))
+    return centred
 
 
 def build_van():
     # one fixed palette (white → ink) for every frame, so nothing flickers
     levels = 16
     pal = []
-    for k in range(levels):
-        t = k / (levels - 1)
-        pal += [round(WHITE[c] + (INK[c] - WHITE[c]) * t) for c in range(3)]
-    pal += [0, 0, 0] * (256 - levels)
+    for target in (CREAM, YELLOW):
+        for k in range(levels):
+            t = k / (levels - 1)
+            pal += [round(DARK[c] + (target[c] - DARK[c]) * t) for c in range(3)]
+    pal += [0, 0, 0] * (256 - 2 * levels)
     pal_img = Image.new("P", (1, 1))
     pal_img.putpalette(pal)
 
@@ -110,13 +124,15 @@ def build_van():
     return path
 
 
-# ── Footer icons (96x96, shown at 48) ───────────────────────────────────────
+# ── Footer icons (96x96 dark round badges, shown at 44) ─────────────────────
 
-IS = 4  # supersampling
+IS = 4          # supersampling
+GLYPH = 0.6     # glyph size relative to the badge
 
 
 def icon_canvas():
-    img = Image.new("RGB", (96 * IS, 96 * IS), WHITE)
+    """A transparent canvas to draw one glyph on, in the old 96-unit coordinates."""
+    img = Image.new("RGBA", (96 * IS, 96 * IS), (0, 0, 0, 0))
     return img, ImageDraw.Draw(img)
 
 
@@ -124,64 +140,101 @@ def p(v):
     return int(round(v * IS))
 
 
-def finish(img, name):
+def finish(glyph, name):
+    """Dark circle + the glyph scaled into its middle; transparent outside the circle."""
+    size = 96 * IS
+    badge = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    ImageDraw.Draw(badge).ellipse([0, 0, size - 1, size - 1], fill=DARK + (255,))
+    g = glyph.resize((int(size * GLYPH), int(size * GLYPH)), Image.LANCZOS)
+    badge.alpha_composite(g, ((size - g.width) // 2, (size - g.height) // 2))
     path = os.path.join(OUT, name)
-    img.resize((96, 96), Image.LANCZOS).save(path, optimize=True)
+    badge.resize((96, 96), Image.LANCZOS).save(path, optimize=True)
     return path
+
+
+GL = YELLOW + (255,)
+HOLE = DARK + (255,)   # fills that must hide lines behind them (truck wheels)
 
 
 def icon_dispatch():  # clock
     img, d = icon_canvas()
-    d.ellipse([p(14), p(14), p(82), p(82)], outline=INK, width=p(5))
-    d.line([(p(48), p(48)), (p(48), p(28))], fill=INK, width=p(5))
-    d.line([(p(48), p(48)), (p(62), p(56))], fill=INK, width=p(5))
-    d.ellipse([p(45), p(45), p(51), p(51)], fill=INK)
+    d.ellipse([p(10), p(10), p(86), p(86)], outline=GL, width=p(7))
+    d.line([(p(48), p(48)), (p(48), p(26))], fill=GL, width=p(7))
+    d.line([(p(48), p(48)), (p(64), p(57))], fill=GL, width=p(7))
     return finish(img, "icon-dispatch.png")
 
 
 def icon_shipping():  # truck
     img, d = icon_canvas()
-    d.rounded_rectangle([p(10), p(28), p(58), p(64)], radius=p(4), outline=INK, width=p(5))
-    d.polygon([(p(58), p(40)), (p(72), p(40)), (p(86), p(54)), (p(86), p(64)), (p(58), p(64))],
-              outline=INK, width=p(5))
-    for cx in (28, 70):
-        d.ellipse([p(cx - 9), p(61), p(cx + 9), p(79)], fill=WHITE, outline=INK, width=p(5))
+    d.rounded_rectangle([p(6), p(24), p(56), p(64)], radius=p(4), outline=GL, width=p(7))
+    d.polygon([(p(56), p(38)), (p(72), p(38)), (p(90), p(54)), (p(90), p(64)), (p(56), p(64))],
+              outline=GL, width=p(7))
+    for cx in (26, 72):
+        d.ellipse([p(cx - 11), p(60), p(cx + 11), p(82)], fill=HOLE, outline=GL, width=p(7))
     return finish(img, "icon-shipping.png")
 
 
 def icon_warranty():  # shield with a tick
     img, d = icon_canvas()
-    shield = [(48, 10), (78, 21), (76, 50), (48, 84), (20, 50), (18, 21)]
-    d.polygon([(p(x), p(y)) for x, y in shield], outline=INK, width=p(5))
-    d.line([(p(34), p(47)), (p(45), p(58)), (p(63), p(37))], fill=INK, width=p(5), joint="curve")
+    shield = [(48, 6), (82, 18), (80, 50), (48, 90), (16, 50), (14, 18)]
+    d.polygon([(p(x), p(y)) for x, y in shield], outline=GL, width=p(7))
+    d.line([(p(32), p(48)), (p(45), p(61)), (p(65), p(36))], fill=GL, width=p(7), joint="curve")
     return finish(img, "icon-warranty.png")
 
 
 def icon_support():  # headset
     img, d = icon_canvas()
-    d.arc([p(16), p(16), p(80), p(80)], start=180, end=360, fill=INK, width=p(5))
-    d.rounded_rectangle([p(12), p(46), p(28), p(70)], radius=p(5), outline=INK, width=p(5))
-    d.rounded_rectangle([p(68), p(46), p(84), p(70)], radius=p(5), outline=INK, width=p(5))
-    d.line([(p(76), p(70)), (p(76), p(78)), (p(60), p(84))], fill=INK, width=p(5), joint="curve")
-    d.ellipse([p(52), p(80), p(60), p(88)], fill=INK)
+    d.arc([p(12), p(10), p(84), p(82)], start=180, end=360, fill=GL, width=p(7))
+    d.rounded_rectangle([p(8), p(44), p(26), p(72)], radius=p(6), outline=GL, width=p(7))
+    d.rounded_rectangle([p(70), p(44), p(88), p(72)], radius=p(6), outline=GL, width=p(7))
+    d.line([(p(79), p(72)), (p(79), p(80)), (p(60), p(88))], fill=GL, width=p(7), joint="curve")
+    d.ellipse([p(50), p(83), p(60), p(93)], fill=GL)
     return finish(img, "icon-support.png")
+
+
+# ── Header logo (dark rounded card, shown at 170x60) ─────────────────────────
+
+def build_logo():
+    """The yellow wordmark on its own dark rounded card.
+
+    Some mail apps (Gmail on iPhone) also lighten dark backgrounds in dark mode,
+    which would leave the yellow logo on a pale strip. With the dark baked into
+    the image, the logo always sits on dark.
+    """
+    src = Image.open(os.path.join(ROOT, "public", "yellowLogo.png")).convert("RGBA")
+    cw, ch = 340, 120                     # 2x of 170x60
+    logo_w = 300
+    logo = src.resize((logo_w, round(src.height * logo_w / src.width)), Image.LANCZOS)
+    ss = 4
+    mask = Image.new("L", (cw * ss, ch * ss), 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, cw * ss - 1, ch * ss - 1], radius=16 * ss, fill=255)
+    mask = mask.resize((cw, ch), Image.LANCZOS)
+    card = Image.new("RGBA", (cw, ch), DARK + (255,))
+    card.putalpha(mask)
+    card.alpha_composite(logo, ((cw - logo.width) // 2, (ch - logo.height) // 2))
+    path = os.path.join(OUT, "logo.png")
+    card.save(path, optimize=True)
+    return path
 
 
 # ── Product photos (240x240, shown at 64) ───────────────────────────────────
 
 def build_product(src_name, out_name):
-    src = Image.open(os.path.join(ROOT, "public", "buyproduct", src_name)).convert("RGBA")
-    src.thumbnail((220, 220), Image.LANCZOS)
-    canvas = Image.new("RGBA", (240, 240), WHITE + (255,))
-    canvas.alpha_composite(src, ((240 - src.width) // 2, (240 - src.height) // 2))
+    """Centre square crop of the studio photo, edge to edge (no white frame)."""
+    src = Image.open(os.path.join(ROOT, "public", "buyproduct", src_name)).convert("RGB")
+    side = min(src.size)
+    left = (src.width - side) // 2
+    top = (src.height - side) // 2
+    square = src.crop((left, top, left + side, top + side)).resize((240, 240), Image.LANCZOS)
     path = os.path.join(OUT, out_name)
-    canvas.convert("RGB").save(path, optimize=True)
+    square.save(path, optimize=True)
     return path
 
 
 if __name__ == "__main__":
     built = [
         build_van(),
+        build_logo(),
         icon_dispatch(), icon_shipping(), icon_warranty(), icon_support(),
         build_product("pinkFront.webp", "product-pink.png"),
         build_product("redFront.webp", "product-red.png"),
