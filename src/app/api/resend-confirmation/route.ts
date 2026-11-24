@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { sendEmail } from "@/lib/email";
 import { orderConfirmationEmail } from "@/lib/orders/finalizeOrder";
+import { ORDERS_TABLE } from "@/lib/orders/table";
 
 /**
  * Manually resend the REAL order-confirmation email for a single existing order.
@@ -45,14 +46,14 @@ async function handle(params: {
 
   // Look up by razorpay_order_id first, then fall back to the row id (uuid).
   let { data: order } = await supabase
-    .from("orders")
+    .from(ORDERS_TABLE)
     .select("*")
     .eq("razorpay_order_id", orderRef)
     .maybeSingle();
 
   if (!order) {
     const byId = await supabase
-      .from("orders")
+      .from(ORDERS_TABLE)
       .select("*")
       .eq("id", orderRef)
       .maybeSingle();

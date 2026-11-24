@@ -9,7 +9,7 @@
     "lint": "next lint",
     "easyecom:sync": "node scripts/easyecom-sync.mjs",
     "easyecom:reconcile-known": "node scripts/easyecom-reconcile-known.mjs",
-    "test:easyecom": "node --test tests/easyecom-sync.test.mjs"
+    "test:easyecom": "node --experimental-strip-types --no-warnings --test tests/easyecom-sync.test.mjs tests/easyecom-core.test.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-sesv2": "^3.1100.0",

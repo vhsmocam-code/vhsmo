@@ -3,6 +3,14 @@
     {
       "path": "/api/cron/abandoned-orders",
       "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/easyecom-sync",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/easyecom-reconcile",
+      "schedule": "30 3 * * *"
     }
   ]
 }

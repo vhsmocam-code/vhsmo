@@ -2,6 +2,7 @@
 
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { ORDERS_TABLE } from "@/lib/orders/table";
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -9,7 +10,7 @@ export async function GET(
   const { id } = await params;
 
   const { data, error } = await supabase
-    .from("orders")
+    .from(ORDERS_TABLE)
     .select("*")
     .eq("razorpay_order_id", id)
     .single();

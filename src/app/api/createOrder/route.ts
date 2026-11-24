@@ -3,6 +3,7 @@ import { calculateOrder } from "@/lib/orders/calculateOrder";
 import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
 import Razorpay from "razorpay";
+import { ORDERS_TABLE } from "@/lib/orders/table";
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID!,
@@ -71,7 +72,7 @@ export async function POST(req: Request) {
       currency: pricing.currency,
     });
 
-    const { error } = await supabase.from("orders").insert({
+    const { error } = await supabase.from(ORDERS_TABLE).insert({
       razorpay_order_id: order.id,
 
       customer_name: customer.name,
