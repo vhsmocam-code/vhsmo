@@ -3,7 +3,6 @@
 import { usePathname } from "next/navigation";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
-import { RestockBanner } from "@/components/landing/RestockBanner";
 
 /**
  * Renders the global navbar + footer around the page, but hides them on
@@ -20,7 +19,6 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      {pathname === "/" && <RestockBanner />}
       {!hideChrome && <Header />}
       <main id="main" className="relative">
         {children}
