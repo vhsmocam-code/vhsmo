@@ -11,7 +11,7 @@ export const COD_FEE = 100;
 export const COD_MAX_UNITS = 3;
 export const COD_MAX_ORDERS_PER_PHONE_24H = 2;
 export const COD_MAX_ORDERS_PER_EMAIL_24H = 2;
-export const COD_MAX_ORDERS_PER_IP_24H = 3;
+export const COD_MAX_ORDERS_PER_IP_24H = 5;
 
 /** OTP rules. */
 export const OTP_TTL_MINUTES = 10;

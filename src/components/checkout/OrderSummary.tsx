@@ -5,6 +5,7 @@ import {
   BadgeCheck,
   Clock,
   Headphones,
+  Info,
   Loader2,
   Lock,
   PackageX,
@@ -18,9 +19,7 @@ import { loadRazorpay } from "@/lib/load-razorpay";
 import type { CartItem } from "@/lib/cart-context";
 import type { Address } from "@/components/address/types";
 import { COD_FEE_DISPLAY } from "@/lib/cod/fee";
-import { otpChannel } from "@/lib/cod/config";
 import { CouponInput } from "./CouponInput";
-import { CodOtpDialog } from "./CodOtpDialog";
 import {
   PaymentMethodSelect,
   type CodAvailability,
@@ -55,6 +54,14 @@ type OrderSummaryProps = {
   soldOutIds: Set<string>;
   /** Whether Cash on Delivery can be offered; null hides the option entirely. */
   cod: CodAvailability | null;
+  /** Email ownership proven (both payment methods require it). */
+  emailVerified: boolean;
+  /** Signed token from the emailed code; sent with the order. */
+  emailToken: string | null;
+  /** Pay pressed before verifying: scroll to the email field and send a code. */
+  onRequireVerification: () => void;
+  /** The server rejected the token (expired / already used). */
+  onTokenRejected: (message?: string) => void;
   /** Fired once order creation begins - used to pause the reservation timer. */
   onOrderStart?: () => void;
   /** Fired if the shopper backs out (dismisses Razorpay / order fails). */
@@ -74,6 +81,10 @@ export function OrderSummary({
   address,
   soldOutIds,
   cod,
+  emailVerified,
+  emailToken,
+  onRequireVerification,
+  onTokenRejected,
   onOrderStart,
   onOrderCancelled,
   onSuccess,
@@ -82,7 +93,6 @@ export function OrderSummary({
   const router = useRouter();
   const [processing, setProcessing] = useState(false);
   const [method, setMethod] = useState<PaymentChoice>("prepaid");
-  const [otpOpen, setOtpOpen] = useState(false);
   const [codError, setCodError] = useState("");
   const isCod = method === "cod";
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -135,9 +145,16 @@ export function OrderSummary({
       return;
     }
 
+    // Both payment methods need a verified email. If it isn't yet, take the
+    // shopper to the field and send the code in one step.
+    if (!emailVerified || !emailToken) {
+      onRequireVerification();
+      return;
+    }
+
     if (isCod) {
       setCodError("");
-      setOtpOpen(true);
+      await placeCodOrder(emailToken);
       return;
     }
 
@@ -177,9 +194,18 @@ export function OrderSummary({
             quantity: item.quantity,
           })),
           couponCode: coupon?.code ?? null,
+          otpToken: emailToken,
         }),
       });
 
+      if (res.status === 401) {
+        // Verification expired or doesn't match this email - ask again.
+        const data = await res.json().catch(() => ({}));
+        setProcessing(false);
+        onOrderCancelled?.();
+        onTokenRejected(data.message);
+        return;
+      }
       if (!res.ok) throw new Error("Failed to create order");
 track("pay_securely_clicked", {
       source: "checkout",
@@ -287,7 +313,7 @@ track("pay_securely_clicked", {
     }
   };
 
-  /** Places the COD order once the phone OTP is verified. */
+  /** Places the COD order once the email is verified. */
   const placeCodOrder = async (otpToken: string) => {
     setProcessing(true);
     onOrderStart?.();
@@ -316,10 +342,13 @@ track("pay_securely_clicked", {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.id) {
-        setOtpOpen(false);
-        setCodError(data.message ?? "We couldn't place your order. Please try again.");
         setProcessing(false);
         onOrderCancelled?.();
+        if (res.status === 401) {
+          onTokenRejected(data.message);
+          return;
+        }
+        setCodError(data.message ?? "We couldn't place your order. Please try again.");
         return;
       }
 
@@ -359,7 +388,6 @@ track("pay_securely_clicked", {
       router.push(`/checkout/success?order=${encodeURIComponent(data.id)}&method=cod`);
     } catch (err) {
       console.error(err);
-      setOtpOpen(false);
       setCodError("We couldn't place your order. Please try again.");
       setProcessing(false);
       onOrderCancelled?.();
@@ -576,13 +604,23 @@ track("pay_securely_clicked", {
             {codError}
           </p>
         )}
+        {/* Accuracy notice */}
+        <p className="mt-5 flex items-start gap-2 rounded-xl bg-darkroom/[0.05] p-3 text-xs leading-relaxed text-darkroom/65">
+          <Info className="mt-0.5 size-3.5 shrink-0 text-darkroom/50" />
+          <span>
+            Please double-check your contact details and shipping address before
+            placing your order. VHSMO is not responsible for delays, missed
+            communications or failed deliveries resulting from incorrect or
+            incomplete information provided by you, subject to applicable law.
+          </span>
+        </p>
         {/* Checkout button */}
         <button
           ref={buttonRef}
           type="button"
           onClick={handleCheckout}
           disabled={processing || hasSoldOut}
-          className={`mt-5 flex w-full items-center justify-center gap-2 rounded-full px-8 py-4 text-base font-bold tracking-tight transition-all duration-300 ease-[var(--ease-out-expo)] disabled:cursor-not-allowed ${
+          className={`mt-3 flex w-full items-center justify-center gap-2 rounded-full px-8 py-4 text-base font-bold tracking-tight transition-all duration-300 ease-[var(--ease-out-expo)] disabled:cursor-not-allowed ${
             hasSoldOut
               ? "bg-darkroom/15 text-darkroom/45"
               : "bg-bluehour text-overexpose hover:shadow-[0_0_0_5px_rgba(16,147,255,0.25)] active:scale-[0.98] disabled:opacity-60 disabled:shadow-none disabled:hover:shadow-none disabled:active:scale-100"
@@ -595,6 +633,11 @@ track("pay_securely_clicked", {
             </>
           ) : hasSoldOut ? (
             "Item unavailable"
+          ) : canCheckout && !emailVerified ? (
+            <>
+              <ShieldCheck className="size-4" />
+              Verify email to continue
+            </>
           ) : isCod ? (
             <>
               <Truck className="size-4" />
@@ -609,14 +652,6 @@ track("pay_securely_clicked", {
             </>
           )}
         </button>
-        {otpOpen && (
-          <CodOtpDialog
-            contact={otpChannel() === "email" ? customer.email : customer.phone}
-            total={finalTotal}
-            onClose={() => setOtpOpen(false)}
-            onVerified={placeCodOrder}
-          />
-        )}
         <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-darkroom/55">
           <Lock className="size-3.5" /> Encrypted &amp; secure. Your data is
           safe with us.

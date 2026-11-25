@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import Razorpay from "razorpay";
 import { ORDERS_TABLE } from "@/lib/orders/table";
 import { confirmCodOrder } from "@/lib/orders/finalizeOrder";
-import { codEnabled, codSecret, otpChannel } from "@/lib/cod/config";
+import { codEnabled, codSecret } from "@/lib/cod/config";
 import {
   COD_MAX_ORDERS_PER_EMAIL_24H,
   COD_MAX_ORDERS_PER_IP_24H,
@@ -45,7 +45,7 @@ interface CreateOrderBody {
   couponCode?: string | null;
   /** "prepaid" (default, Razorpay) or "cod". */
   paymentMethod?: string;
-  /** COD only: the token /api/cod/otp/verify returned. */
+  /** Required for both methods: the token /api/checkout/email/verify returned. */
   otpToken?: string;
 }
 
@@ -83,6 +83,26 @@ export async function POST(req: Request) {
         { message: "Missing shipping details" },
         { status: 400 },
       );
+    }
+
+    // The checkout email must be proven (a signed token from the emailed
+    // code, bound to this exact address). Unlike COD the token is not spent
+    // here, so a cancelled or failed payment can be retried without verifying
+    // again; it still expires after OTP_TOKEN_TTL_MINUTES.
+    const secret = codSecret();
+    if (!secret) {
+      return NextResponse.json(
+        { message: "Email verification is unavailable right now" },
+        { status: 503 },
+      );
+    }
+    const contactCheck = parseContact("email", { email: customer.email });
+    if (!contactCheck.ok) {
+      return NextResponse.json({ message: contactCheck.message }, { status: 400 });
+    }
+    const token = verifyOtpToken(secret, body.otpToken, contactCheck.contact);
+    if (!token.ok) {
+      return NextResponse.json({ message: token.reason }, { status: 401 });
     }
 
     // Backend is the single source of truth for every number below.
@@ -156,7 +176,7 @@ const bad = (message: string, status = 400) =>
   NextResponse.json({ message }, { status });
 
 /**
- * Cash on Delivery. No Razorpay order: the phone is proven by a one-use OTP
+ * Cash on Delivery. No Razorpay order: the email is proven by a one-use OTP
  * token, the courier's COD coverage is re-checked here, and the order is
  * confirmed immediately (stock, email, EasyEcom with paymentMode 2).
  */
@@ -184,10 +204,9 @@ async function createCodOrder(req: Request, body: CreateOrderBody) {
   const phone = normalizeIndianMobile(customer.phone);
   if (!phone) return bad("Enter a valid 10-digit Indian mobile number");
 
-  // 1. Ownership: the OTP token must be valid, unexpired and for THIS contact
-  //    (the order's email by default, the phone on the SMS channel).
-  const channel = otpChannel();
-  const contactCheck = parseContact(channel, { email: customer.email, phone: customer.phone });
+  // 1. Ownership: the token must be valid, unexpired and for THIS email.
+  const channel = "email" as const;
+  const contactCheck = parseContact(channel, { email: customer.email });
   if (!contactCheck.ok) return bad(contactCheck.message);
   const contact = contactCheck.contact;
   const token = verifyOtpToken(secret, body.otpToken, contact);

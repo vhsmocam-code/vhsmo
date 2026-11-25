@@ -139,7 +139,7 @@ export function renderOtpEmail(
 ): { html: string; text: string } {
   const body = `
 ${h1("Your verification code")}
-<p style="margin:0 0 24px;text-align:center;color:${MUTE};">Use this code to place your Cash on Delivery order.</p>
+<p style="margin:0 0 24px;text-align:center;color:${MUTE};">Enter this code at checkout to confirm your email and complete your VHSMO order.</p>
 <table role="presentation" align="center" cellpadding="0" cellspacing="0" style="margin:0 auto;">
 <tr><td align="center" bgcolor="${PANEL}" style="background:${PANEL};border:1px solid ${LINE};border-radius:12px;padding:16px 28px;">
 <span style="font-family:${MONO};font-size:34px;line-height:1.2;font-weight:700;letter-spacing:8px;color:${INK};-webkit-user-select:all;user-select:all;">${esc(code)}</span>
@@ -158,7 +158,7 @@ ${h1("Your verification code")}
     "VHSMO",
     "",
     "Your verification code",
-    "Use this code to place your Cash on Delivery order.",
+    "Enter this code at checkout to confirm your email and complete your VHSMO order.",
     "",
     code,
     "",
@@ -217,7 +217,7 @@ export function renderOrderConfirmation(a: ConfirmationArgs): {
   const date = formatOrderDate(a.orderDate);
 
   // Summary (left column)
-  const summary: [string, string][] = [["Order #", a.orderId]];
+  const summary: [string, string][] = [["Order number", "#" + a.orderId]];
   if (date) summary.push(["Order date", date]);
   summary.push(["Order total", money(a.total)]);
   if (isCod) {
@@ -343,7 +343,7 @@ ${codNote}
 <p style="margin:28px 0 0;text-align:center;font-size:13px;color:${MUTE};">Ships within ${esc(a.dispatchEta)}. Delivery takes ${esc(a.deliveryNote)}.</p>`;
 
   const html = emailShell({
-    preheader: `${heading} Order ${a.orderId}.`,
+    preheader: `${heading} Order #${a.orderId}.`,
     body,
     assetBase,
   });

@@ -51,8 +51,27 @@ export default function CheckoutPage() {
     isHydrated && items.length > 0 && !hasSoldOut,
   );
 
-  // Checkout is open to everyone. Email is validated for format only.
-  const { email, setEmail } = useEmailVerification();
+  // Email ownership is proven once, under the email field, for online and COD
+  // orders alike. Editing the address drops the verification.
+  const verification = useEmailVerification();
+  const { email, setEmail } = verification;
+
+  const focusEmail = () => {
+    const el = document.querySelector<HTMLInputElement>('input[name="email"]');
+    el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    return el;
+  };
+  /** Pay button pressed before verifying: take them to the field, send the code. */
+  const requireVerification = () => {
+    const el = focusEmail();
+    if (verification.formatOk && verification.status === "idle") void verification.send();
+    else el?.focus();
+  };
+  /** The server refused our token (expired or already used). */
+  const tokenRejected = (message?: string) => {
+    verification.invalidate(message);
+    focusEmail();
+  };
 
   const [firstName, setFirstName] = usePersistedState("checkout:firstName", "");
   const [lastName, setLastName] = usePersistedState("checkout:lastName", "");
@@ -168,15 +187,16 @@ export default function CheckoutPage() {
 
       <form
         onSubmit={onSubmit}
-        className="container-px mx-auto grid w-full max-w-[90rem] flex-1 gap-10 py-10 lg:grid-cols-[1fr_minmax(360px,26rem)] lg:gap-14 lg:py-12"
+        className="container-px mx-auto grid w-full max-w-[90rem] flex-1 grid-cols-[minmax(0,1fr)] gap-10 py-10 lg:grid-cols-[1fr_minmax(360px,26rem)] lg:gap-14 lg:py-12"
       >
         {/* ---------- Left: details ---------- */}
-        <div className="space-y-9">
+        <div className="min-w-0 space-y-9">
           <ContactSection
             email={email}
             phone={phone}
             onPhoneChange={setPhone}
             onEmailChange={setEmail}
+            verification={verification}
             errors={visibleErrors}
             onBlurField={handleBlur}
           />
@@ -207,6 +227,10 @@ export default function CheckoutPage() {
           address={address}
           soldOutIds={soldOutIds}
           cod={cod}
+          emailVerified={verification.isVerified}
+          emailToken={verification.token}
+          onRequireVerification={requireVerification}
+          onTokenRejected={tokenRejected}
           onOrderStart={reservation.pause}
           onOrderCancelled={reservation.resume}
           onSuccess={handleSuccess}

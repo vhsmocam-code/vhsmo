@@ -6,11 +6,6 @@
 
 const flag = (v: string | undefined) => /^(1|true|yes|on)$/i.test((v ?? "").trim());
 
-/** How COD buyers are verified: an emailed code (default) or an SMS code. */
-export function otpChannel(): "email" | "sms" {
-  return process.env.NEXT_PUBLIC_COD_OTP_CHANNEL?.trim().toLowerCase() === "sms" ? "sms" : "email";
-}
-
 export const codEnabled = () => flag(process.env.NEXT_PUBLIC_COD_ENABLED);
 
 const isProd = () => process.env.NODE_ENV === "production";

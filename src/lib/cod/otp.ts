@@ -44,7 +44,7 @@ export async function issueOtp(args: {
   const { channel, contact, ip } = args;
   const col = column(channel);
   const secret = codSecret();
-  if (!secret) return { ok: false, status: 503, message: "Cash on Delivery is unavailable right now" };
+  if (!secret) return { ok: false, status: 503, message: "Email verification is unavailable right now" };
 
   const now = Date.now();
   const hourAgo = new Date(now - 3_600_000).toISOString();
@@ -129,7 +129,7 @@ export async function issueOtp(args: {
   }
 
   console.error("[cod] MESSAGECENTRAL_CUSTOMER_ID / MESSAGECENTRAL_PASSWORD missing - cannot send OTP");
-  return { ok: false, status: 503, message: "Cash on Delivery is unavailable right now" };
+  return { ok: false, status: 503, message: "Email verification is unavailable right now" };
 }
 
 export type VerifyResult =
@@ -144,7 +144,7 @@ export async function verifyOtp(args: {
 }): Promise<VerifyResult> {
   const { channel, contact, code } = args;
   const secret = codSecret();
-  if (!secret) return { ok: false, status: 503, message: "Cash on Delivery is unavailable right now" };
+  if (!secret) return { ok: false, status: 503, message: "Email verification is unavailable right now" };
   if (!/^\d{4,8}$/.test(code)) return { ok: false, status: 400, message: "Enter the code we sent you" };
 
   const { data: row, error } = await supabase
