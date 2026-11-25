@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { useProducts } from "@/lib/products-context";
 import { usePersistedState } from "@/components/checkout/usePersistedState";
@@ -158,7 +159,13 @@ export default function CheckoutPage() {
 
   // On a completed order, empty the cart and wipe the persisted draft so the
   // next visit starts clean.
+  // Once an order is placed the cart empties while the confirmation page is
+  // still loading. Without this the empty-cart screen flashes for seconds, so
+  // hold a loader (same wording as the confirmation page's own) until the
+  // navigation lands.
+  const [redirecting, setRedirecting] = useState(false);
   const handleSuccess = () => {
+    setRedirecting(true);
     reservation.stop();
     clear();
     setEmail("");
@@ -167,6 +174,15 @@ export default function CheckoutPage() {
     setPhone("");
     setAddress(emptyAddress);
   };
+
+  if (redirecting) {
+    return (
+      <div className="paper flex min-h-dvh flex-col items-center justify-center gap-3 text-darkroom/50">
+        <Loader2 className="size-6 animate-spin" />
+        <p className="text-sm">Fetching your order details…</p>
+      </div>
+    );
+  }
 
   if (isHydrated && items.length === 0) {
     return (
