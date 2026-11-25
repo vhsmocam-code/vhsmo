@@ -14,20 +14,24 @@ import { formatCurrency } from "@/lib/utils";
  * coupon expires), so it never nags.
  */
 
-// Straight from the coupons table. `value`/`minimum_order` arrive as strings.
+// Display copy only - the coupons table is what the server actually enforces
+// (value, minimum order, expiry), so keep this in step with the EARLY500 row.
 const COUPON = {
-  code: "QC3R8Y",
+  code: "EARLY500",
   type: "fixed" as "fixed" | "percent",
-  value: 1000,
-  minimumOrder: 5999,
-  // 23  Aug 2026, 12:00 AM (local midnight).
-  expiry : "false",
-  expiresAt: "2026-01-23 06:00:00",
+  value: 500,
+  /** 0 = no minimum; the line under the amount is then generic. */
+  minimumOrder: 0,
+  /** Shows the live "Ends in" countdown (otherwise "Till the stock lasts"). */
+  showCountdown: true,
+  // 1 day from 25 Nov 2026, 6:30 PM IST. An explicit offset so every visitor
+  // sees the same moment, whatever their timezone.
+  expiresAt: "2026-11-26T18:30:00+05:30",
 };
 
 // Persisted across sessions so the modal auto-opens only on the very first
 // visit. After that it stays collapsed as the tab until the user re-opens it.
-const SEEN_KEY = "vhsmo-coupon-NK7X4Y-seen";
+const SEEN_KEY = "vhsmo-coupon-EARLY500-seen";
 const REVEAL_DELAY = 2000; // ms before it opens on first visit
 
 type TimeLeft = {
@@ -191,7 +195,9 @@ export function CouponPopup() {
                   {valueLabel} <span className="text-darkroom/70">OFF</span>
                 </p>
                 <p className="mt-1 text-sm text-darkroom/65">
-                  on orders over {formatCurrency(COUPON.minimumOrder)}
+                  {COUPON.minimumOrder > 0
+                    ? `on orders over ${formatCurrency(COUPON.minimumOrder)}`
+                    : "on your order"}
                 </p>
 
                 {/* Code - a torn ticket stub */}
@@ -224,7 +230,7 @@ export function CouponPopup() {
 
                 {/* Countdown */}
                 {
-false ? (
+COUPON.showCountdown ? (
                <div className="mt-4">
                   <p className="mb-2 flex items-center justify-center gap-1.5 text-center text-[0.7rem] uppercase tracking-[0.18em] text-darkroom/50">
                     <Clock className="size-3.5" strokeWidth={2.25} />
