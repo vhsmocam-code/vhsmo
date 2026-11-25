@@ -240,7 +240,7 @@ export type Story = {
   /** Instagram handle without the @, or undefined when we don't have one. */
   handle?: string;
   /** Finish name exactly as the shop lists it. */
-  finish: "Baby Pink" | "Black" | "Cherry Red";
+  finish: "Baby Pink" | "Cosmic Black" | "Cherry Red";
   type: "photo" | "video";
   /** A line from their message, rendered as text under the media (DM cards). */
   quote?: string;
@@ -257,21 +257,12 @@ export const reviews = {
   instagram: "https://www.instagram.com/vhsmo.cam_/",
   cta: "Join the club",
   stories: [
-    { src: "/reviews/asadd06.jpg", w: 724, h: 1304, handle: "__asadd06", finish: "Black", type: "photo" },
+    { src: "/reviews/asadd06.jpg", w: 724, h: 1304, handle: "__asadd06", finish: "Cosmic Black", type: "photo" },
     { src: "/reviews/mahajan-eeshaan.jpg", w: 900, h: 1598, handle: "mahajan.eeshaan", finish: "Baby Pink", type: "photo" },
     { src: "/reviews/cherry-unboxing.jpg", w: 1206, h: 1608, finish: "Cherry Red", type: "photo", focus: "60% 50%" },
     { src: "/reviews/teh-27.jpg", w: 920, h: 1587, handle: "teh._.27", finish: "Cherry Red", type: "photo" },
-    {
-      src: "/reviews/melhehena.jpg",
-      w: 364,
-      h: 566,
-      handle: "melhehena",
-      finish: "Cherry Red",
-      type: "photo",
-      quote:
-        "THE CAMERA IS AMAZING! It's super cool, handy and honestly, everything I expected it to be. It was absolutely worth the wait!",
-    },
-    { src: "/reviews/zahrabeingher.jpg", w: 900, h: 1598, handle: "zahrabeingher", finish: "Black", type: "photo" },
+    { src: "/reviews/melhehena-dm.jpg", w: 471, h: 848, handle: "melhehena", finish: "Cherry Red", type: "photo" },
+    { src: "/reviews/zahrabeingher.jpg", w: 900, h: 1598, handle: "zahrabeingher", finish: "Cosmic Black", type: "photo" },
     { src: "/reviews/photamora-frames.jpg", w: 920, h: 1587, handle: "photamora.frames", finish: "Cherry Red", type: "photo" },
     { src: "/reviews/two-seats-left.jpg", w: 724, h: 1302, handle: "two.seats.left", finish: "Cherry Red", type: "photo" },
     { src: "/reviews/shruthi-23.jpg", w: 724, h: 1308, handle: "shruthi.23_", finish: "Cherry Red", type: "photo" },

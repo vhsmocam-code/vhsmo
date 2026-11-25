@@ -5,7 +5,14 @@ import Image from "next/image";
 import Link from "next/link";
 import * as Dialog from "@radix-ui/react-dialog";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { X } from "lucide-react";
+import { Volume2, VolumeX, X } from "lucide-react";
+import {
+  isStoryMusicMuted,
+  pauseStoryMusic,
+  resumeStoryMusic,
+  setStoryMusicMuted,
+  stopStoryMusic,
+} from "@/lib/story-music";
 import type { Story } from "@/lib/landing";
 import { RESERVE_HREF } from "@/lib/landing";
 import { useDefaultProduct } from "@/lib/products-context";
@@ -92,6 +99,28 @@ export function StoryViewer({ stories, index, onIndexChange, onClose }: StoryVie
     else void v.play().catch(() => {});
   }, [paused]);
 
+  // Soundtrack: it starts from the tap on the card (Reviews.tsx); here it
+  // follows the viewer - fades out when it closes, and freezes while the tab
+  // is hidden so it never plays to nobody.
+  useEffect(() => {
+    if (!open) {
+      stopStoryMusic();
+      return;
+    }
+    const onVisibility = () => {
+      if (document.hidden) pauseStoryMusic();
+      else if (!musicHeld.current) resumeStoryMusic();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, [open]);
+
+  const [muted, setMuted] = useState(isStoryMusicMuted);
+  function toggleMuted() {
+    setStoryMusicMuted(!muted);
+    setMuted(!muted);
+  }
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -107,9 +136,25 @@ export function StoryViewer({ stories, index, onIndexChange, onClose }: StoryVie
   const press = useRef<{ t: number; x: number; y: number } | null>(null);
   const [dragY, setDragY] = useState(0);
 
+  // The music only freezes on a real hold (same threshold as a tap), so quick
+  // taps between stories don't make it stutter.
+  const holdTimer = useRef(0);
+  const musicHeld = useRef(false);
+  function releaseMusic() {
+    window.clearTimeout(holdTimer.current);
+    if (musicHeld.current) {
+      musicHeld.current = false;
+      resumeStoryMusic();
+    }
+  }
+
   function onPointerDown(e: React.PointerEvent<HTMLDivElement>) {
     press.current = { t: performance.now(), x: e.clientX, y: e.clientY };
     setPaused(true);
+    holdTimer.current = window.setTimeout(() => {
+      musicHeld.current = true;
+      pauseStoryMusic();
+    }, TAP_MS);
   }
   function onPointerMove(e: React.PointerEvent<HTMLDivElement>) {
     if (!press.current) return;
@@ -119,6 +164,7 @@ export function StoryViewer({ stories, index, onIndexChange, onClose }: StoryVie
     const p = press.current;
     press.current = null;
     setPaused(false);
+    releaseMusic();
     const dy = e.clientY - (p?.y ?? e.clientY);
     setDragY(0);
     if (!p) return;
@@ -155,7 +201,13 @@ export function StoryViewer({ stories, index, onIndexChange, onClose }: StoryVie
                 {story.handle ? `Unboxing story from @${story.handle}` : "Unboxing story"}
               </Dialog.Title>
 
-              <div className="relative flex h-full w-full max-w-[min(100vw,calc((100dvh-6.5rem)*9/16))] flex-col sm:h-auto sm:py-6">
+              <div className="relative flex h-full w-full max-w-[min(100vw,calc((100dvh-10rem)*9/16))] flex-col sm:h-auto sm:py-6">
+                <StoryHeader
+                  stories={stories}
+                  index={index}
+                  progress={progress}
+                  story={story}
+                />
                 <motion.div
                   style={{ y: dragY, opacity: 1 - Math.min(dragY / 400, 0.5) }}
                   className="relative flex min-h-0 flex-1 touch-none select-none flex-col overflow-hidden bg-darkroom-deep sm:aspect-[9/16] sm:flex-none sm:rounded-[1.5rem] sm:ring-1 sm:ring-halide/15"
@@ -165,6 +217,7 @@ export function StoryViewer({ stories, index, onIndexChange, onClose }: StoryVie
                   onPointerCancel={() => {
                     press.current = null;
                     setPaused(false);
+                    releaseMusic();
                     setDragY(0);
                   }}
                 >
@@ -186,32 +239,12 @@ export function StoryViewer({ stories, index, onIndexChange, onClose }: StoryVie
                       />
                     </motion.div>
                   </AnimatePresence>
-
-                  {/* Segmented progress + handle, over the top of the frame */}
-                  <div className="pointer-events-none absolute inset-x-0 top-0 bg-gradient-to-b from-darkroom-deep/70 to-transparent px-3 pb-8 pt-3">
-                    <div className="flex gap-1" aria-hidden>
-                      {stories.map((s, i) => (
-                        <span key={s.src} className="h-[3px] flex-1 overflow-hidden rounded-full bg-halide/30">
-                          <span
-                            className="block h-full bg-overexpose"
-                            style={{
-                              width: `${i < index ? 100 : i > index ? 0 : Math.round(progress * 1000) / 10}%`,
-                            }}
-                          />
-                        </span>
-                      ))}
-                    </div>
-                  </div>
                 </motion.div>
 
                 {/* Persistent conversion bar */}
                 <div className="relative z-10 flex items-center justify-between gap-3 px-4 py-4 sm:px-0 sm:pb-0">
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-overexpose">
-                      {story.handle ? `@${story.handle}` : "A VHSMO buyer"}
-                      <span className="font-normal text-overexpose/60"> · {story.finish}</span>
-                    </p>
-                    <p className="font-marker mt-0.5 text-sm leading-tight text-kodak sm:text-base">
+                    <p className="font-marker text-sm leading-tight text-kodak sm:text-base">
                       Want this in your hands?
                     </p>
                   </div>
@@ -225,9 +258,19 @@ export function StoryViewer({ stories, index, onIndexChange, onClose }: StoryVie
                 </div>
               </div>
 
+              <button
+                type="button"
+                onClick={toggleMuted}
+                aria-label={muted ? "Turn music on" : "Mute music"}
+                aria-pressed={muted}
+                className="absolute right-[4rem] top-[0.95rem] z-20 grid size-11 place-items-center rounded-full bg-darkroom-deep/60 text-overexpose transition-colors hover:bg-darkroom-deep sm:right-[4.75rem] sm:top-6"
+              >
+                {muted ? <VolumeX className="size-5" /> : <Volume2 className="size-5" />}
+              </button>
+
               <Dialog.Close
                 aria-label="Close story"
-                className="absolute right-3 top-3 z-20 grid size-11 place-items-center rounded-full bg-darkroom-deep/60 text-overexpose transition-colors hover:bg-darkroom-deep sm:right-6 sm:top-6"
+                className="absolute right-3 top-[0.95rem] z-20 grid size-11 place-items-center rounded-full bg-darkroom-deep/60 text-overexpose transition-colors hover:bg-darkroom-deep sm:right-6 sm:top-6"
               >
                 <X className="size-5" />
               </Dialog.Close>
@@ -303,7 +346,7 @@ export function StoryMedia({
         sizes={sizes}
         priority={priority}
         draggable={false}
-        className="object-cover"
+        className={story.quote ? "object-contain" : "object-cover"}
         style={story.focus ? { objectPosition: story.focus } : undefined}
       />
     );
@@ -312,7 +355,7 @@ export function StoryMedia({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-[#1c1c1e]">
-      <div className="relative mx-3 mt-14 min-h-0 flex-1 overflow-hidden rounded-2xl">{media}</div>
+      <div className="relative mx-3 mt-3 min-h-0 flex-1 overflow-hidden rounded-2xl">{media}</div>
       <blockquote
         className={`mx-3 mb-4 mt-2 rounded-2xl bg-[#2c2c2e] px-4 py-3 text-[0.95rem] leading-snug text-overexpose ${
           quoteClamp ? "mb-12 line-clamp-3 text-sm" : ""
@@ -320,6 +363,42 @@ export function StoryMedia({
       >
         {story.quote}
       </blockquote>
+    </div>
+  );
+}
+
+/**
+ * Progress segments + who posted it, as their own strip above the frame (not
+ * over the photo). On phones the mute / close buttons sit in the right of the
+ * name row - the h-11 row reserves their space.
+ */
+function StoryHeader({
+  stories,
+  index,
+  progress,
+  story,
+}: {
+  stories: Story[];
+  index: number;
+  progress: number;
+  story: Story;
+}) {
+  return (
+    <div className="px-4 pt-3 sm:px-0 sm:pt-0">
+      <div className="flex gap-1" aria-hidden>
+        {stories.map((s, i) => (
+          <span key={s.src} className="h-[3px] flex-1 overflow-hidden rounded-full bg-halide/25">
+            <span
+              className="block h-full bg-overexpose"
+              style={{ width: `${i < index ? 100 : i > index ? 0 : Math.round(progress * 1000) / 10}%` }}
+            />
+          </span>
+        ))}
+      </div>
+      <p className="flex h-11 items-center truncate pr-24 text-sm font-semibold text-overexpose sm:pr-0">
+        {story.handle ? `@${story.handle}` : "A VHSMO buyer"}
+        <span className="ml-1.5 font-normal text-overexpose/60">· {story.finish}</span>
+      </p>
     </div>
   );
 }

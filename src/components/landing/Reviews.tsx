@@ -7,6 +7,7 @@ import { Sticker } from "@/components/brand/Sticker";
 import { MagneticButton } from "@/components/brand/MagneticButton";
 import { RESERVE_HREF, reviews, type Story } from "@/lib/landing";
 import { seededRotation } from "@/lib/random";
+import { startStoryMusic } from "@/lib/story-music";
 import { StoryMedia, StoryViewer } from "./StoryViewer";
 
 /**
@@ -119,7 +120,11 @@ export function Reviews() {
           className="no-scrollbar -mx-3 -mr-[calc(1.375rem+0.75rem)] flex snap-x snap-mandatory gap-4 overflow-x-auto px-3 py-6 [scroll-padding-inline:0.75rem] sm:-mr-3 sm:gap-5"
         >
           {stories.map((story, i) => (
-            <StoryCard key={story.src} story={story} index={i} onOpen={() => setOpen(i)} />
+            <StoryCard key={story.src} story={story} index={i} onOpen={() => {
+              // Must start inside the tap itself or mobile browsers block it.
+              if (open === null) startStoryMusic();
+              setOpen(i);
+            }} />
           ))}
         </ul>
       </div>

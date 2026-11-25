@@ -25,7 +25,7 @@ function getTimeLeft(target: number): TimeLeft {
 
 export function RestockBanner() {
   const reduceMotion = useReducedMotion();
-  const target = useMemo(() => new Date(2026, 10, 26, 0, 0, 0, 0).getTime(), []);
+  const target = useMemo(() => new Date("2026-11-25T18:00:00+05:30").getTime(), []);
   const [time, setTime] = useState<TimeLeft>(() => getTimeLeft(target));
 
   useEffect(() => {
@@ -56,7 +56,7 @@ export function RestockBanner() {
           </span>
           <span className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
             <span className="text-xs font-semibold leading-tight tracking-tight sm:whitespace-nowrap sm:text-base">
-              New stock lands <span className="font-marker text-base sm:text-xl">25 Nov 2026</span>
+              New stock lands <span className="font-marker text-base sm:text-xl">25 Nov 2026, 6 PM IST</span>
             </span>
             <span
               className="whitespace-nowrap border-l-2 border-darkroom pl-2 font-marker text-sm leading-none sm:pl-3 sm:text-lg"
