@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Loader2, MailCheck } from "lucide-react";
-import { maskEmail } from "@/lib/cod/format";
 
 const LENGTH = 6;
 
@@ -90,7 +89,7 @@ export function EmailVerifyPanel({
             ) : (
               <>
                 We sent it to{" "}
-                <span className="font-semibold text-darkroom">{maskEmail(email)}</span>. It can take a
+                <span className="break-all font-semibold text-darkroom">{email.trim()}</span>. It can take a
                 minute; check spam if you don&apos;t see it.
               </>
             )}
