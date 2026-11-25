@@ -230,36 +230,52 @@ export const shotOn = {
   marquee: "now rolling",
 };
 
-export const community = {
-  kicker: "The corkboard",
-  headline: "People keep sending us their nights.",
-  scraps: [
+/** A buyer's unboxing story, as they posted it. type "video" is supported by
+ *  the viewer (muted autoplay, advances on end) - add clips as entries only. */
+export type Story = {
+  src: string;
+  /** Intrinsic size of the file - keeps next/image's aspect box honest. */
+  w: number;
+  h: number;
+  /** Instagram handle without the @, or undefined when we don't have one. */
+  handle?: string;
+  /** Finish name exactly as the shop lists it. */
+  finish: "Baby Pink" | "Black" | "Cherry Red";
+  type: "photo" | "video";
+  /** A line from their message, rendered as text under the media (DM cards). */
+  quote?: string;
+  /** object-position for photos that aren't 9:16. */
+  focus?: string;
+};
+
+export const reviews = {
+  eyebrow: "REC — straight from your stories",
+  headline: "Unboxed.",
+  highlight: "Unfiltered.",
+  sub: "Real stories from people who got theirs. We didn't stage, edit or pay for a single one.",
+  signOff: "Got yours? Tag @vhsmo.cam_ — you might end up here.",
+  instagram: "https://www.instagram.com/vhsmo.cam_/",
+  cta: "Join the club",
+  stories: [
+    { src: "/reviews/asadd06.jpg", w: 724, h: 1304, handle: "__asadd06", finish: "Black", type: "photo" },
+    { src: "/reviews/mahajan-eeshaan.jpg", w: 900, h: 1598, handle: "mahajan.eeshaan", finish: "Baby Pink", type: "photo" },
+    { src: "/reviews/cherry-unboxing.jpg", w: 1206, h: 1608, finish: "Cherry Red", type: "photo", focus: "60% 50%" },
+    { src: "/reviews/teh-27.jpg", w: 920, h: 1587, handle: "teh._.27", finish: "Cherry Red", type: "photo" },
     {
-      handle: "@mars.jpg",
-      text: "took it to a wedding instead of my phone. best decision. everyone kept grabbing it",
+      src: "/reviews/melhehena.jpg",
+      w: 364,
+      h: 566,
+      handle: "melhehena",
+      finish: "Cherry Red",
+      type: "photo",
+      quote:
+        "THE CAMERA IS AMAZING! It's super cool, handy and honestly, everything I expected it to be. It was absolutely worth the wait!",
     },
-    {
-      handle: "@felixshoots",
-      text: "the photos look like my childhood and i can't explain it better than that",
-    },
-    {
-      handle: "@notlaura",
-      text: "my friends fight over who holds the vhsmo now",
-    },
-    {
-      handle: "@dev.rolls",
-      text: "shot our whole road trip on it. 300 photos, zero edits, all keepers",
-    },
-    {
-      handle: "@kira_kira",
-      text: "it was on my phone before we left the parking lot. HOW",
-    },
-  ],
-  photos: [
-    { src: "/vhsmoclicks/six.jpg", alt: "Community photo shot on VHSMO" },
-    { src: "/vhsmoclicks/two.JPEG", alt: "Community photo shot on VHSMO" },
-    { src: "/vhsmoclicks/seven.jpg", alt: "Community photo shot on VHSMO" },
-  ],
+    { src: "/reviews/zahrabeingher.jpg", w: 900, h: 1598, handle: "zahrabeingher", finish: "Black", type: "photo" },
+    { src: "/reviews/photamora-frames.jpg", w: 920, h: 1587, handle: "photamora.frames", finish: "Cherry Red", type: "photo" },
+    { src: "/reviews/two-seats-left.jpg", w: 724, h: 1302, handle: "two.seats.left", finish: "Cherry Red", type: "photo" },
+    { src: "/reviews/shruthi-23.jpg", w: 724, h: 1308, handle: "shruthi.23_", finish: "Cherry Red", type: "photo" },
+  ] satisfies Story[] as Story[],
 };
 
 export const showcase = {

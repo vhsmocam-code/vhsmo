@@ -17,7 +17,7 @@ const navLinks = [
 
   { label: "Story", href: "/#story" },
   { label: "Shot on VHSMO", href: "/#photos" },
-  { label: "Community", href: "/#community" },
+  { label: "Reviews", href: "/#reviews" },
   { label: "FAQ", href: "/#faq" },
 ];
 

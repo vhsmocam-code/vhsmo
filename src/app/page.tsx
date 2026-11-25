@@ -3,7 +3,7 @@ import { Story } from "@/components/landing/Story";
 import { Showcase } from "@/components/landing/Showcase";
 import { InstantTransfer } from "@/components/landing/InstantTransfer";
 import { ShotOn } from "@/components/landing/ShotOn";
-import { Community } from "@/components/landing/Community";
+import { Reviews } from "@/components/landing/Reviews";
 import { LandingFaq } from "@/components/landing/Faq";
 import { FinalCta } from "@/components/landing/FinalCta";
 import { Gallery } from "@/components/product/Gallery";
@@ -56,7 +56,7 @@ export default function HomePage() {
         </section>
         <ProductFeatures />
       </div>
-      <Community />
+      <Reviews />
 
       <LandingFaq />
       <FinalCta />
