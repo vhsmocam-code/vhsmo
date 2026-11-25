@@ -5,18 +5,33 @@ import Image from "next/image";
 import Link from "next/link";
 import * as Dialog from "@radix-ui/react-dialog";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Volume2, VolumeX, X } from "lucide-react";
-import {
-  isStoryMusicMuted,
-  pauseStoryMusic,
-  resumeStoryMusic,
-  setStoryMusicMuted,
-  stopStoryMusic,
-} from "@/lib/story-music";
+import { X } from "lucide-react";
 import type { Story } from "@/lib/landing";
 import { RESERVE_HREF } from "@/lib/landing";
 import { useDefaultProduct } from "@/lib/products-context";
 import { formatCurrency } from "@/lib/utils";
+
+/** `sizes` for the full-size story image. The viewer and the preloader must
+ *  share it so a warmed image is the exact URL the viewer then asks for. */
+export const VIEWER_SIZES = "(min-width: 640px) 420px, 100vw";
+
+/**
+ * Fetches stories' viewer-size images into the browser cache ahead of time
+ * (hidden, eager, low priority) so opening or swiping never shows an empty
+ * frame. Renders nothing visible; videos are skipped.
+ */
+export function StoryPreload({ stories }: { stories: Story[] }) {
+  return (
+    <div aria-hidden className="pointer-events-none absolute size-px overflow-hidden opacity-0">
+      {stories.map(
+        (s) =>
+          s.type === "photo" && (
+            <Image key={s.src} src={s.src} alt="" fill sizes={VIEWER_SIZES} loading="eager" fetchPriority="low" />
+          ),
+      )}
+    </div>
+  );
+}
 
 /** How long a photo stays up before the reel moves on. */
 const PHOTO_MS = 5000;
@@ -24,6 +39,11 @@ const PHOTO_MS = 5000;
 const TAP_MS = 220;
 /** Drag this far down to dismiss, like closing a story. */
 const DISMISS_PX = 90;
+/** Movement before a press is read as a swipe/drag rather than a tap. */
+const AXIS_PX = 10;
+/** Horizontal distance (or speed, px/ms) that counts as a swipe. */
+const SWIPE_PX = 50;
+const SWIPE_SPEED = 0.4;
 
 type StoryViewerProps = {
   stories: Story[];
@@ -99,28 +119,6 @@ export function StoryViewer({ stories, index, onIndexChange, onClose }: StoryVie
     else void v.play().catch(() => {});
   }, [paused]);
 
-  // Soundtrack: it starts from the tap on the card (Reviews.tsx); here it
-  // follows the viewer - fades out when it closes, and freezes while the tab
-  // is hidden so it never plays to nobody.
-  useEffect(() => {
-    if (!open) {
-      stopStoryMusic();
-      return;
-    }
-    const onVisibility = () => {
-      if (document.hidden) pauseStoryMusic();
-      else if (!musicHeld.current) resumeStoryMusic();
-    };
-    document.addEventListener("visibilitychange", onVisibility);
-    return () => document.removeEventListener("visibilitychange", onVisibility);
-  }, [open]);
-
-  const [muted, setMuted] = useState(isStoryMusicMuted);
-  function toggleMuted() {
-    setStoryMusicMuted(!muted);
-    setMuted(!muted);
-  }
-
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -133,43 +131,66 @@ export function StoryViewer({ stories, index, onIndexChange, onClose }: StoryVie
 
   // Pointer gestures on the media: tap halves to navigate, hold to pause,
   // drag down to dismiss.
-  const press = useRef<{ t: number; x: number; y: number } | null>(null);
+  // axis is decided once per gesture, a few px in: "x" = swipe between stories,
+  // "y" = drag down to dismiss, null = still a tap / hold.
+  const press = useRef<{ t: number; x: number; y: number; axis: "x" | "y" | null } | null>(null);
   const [dragY, setDragY] = useState(0);
+  const [dragX, setDragX] = useState(0);
+  const [dragging, setDragging] = useState(false);
 
-  // The music only freezes on a real hold (same threshold as a tap), so quick
-  // taps between stories don't make it stutter.
-  const holdTimer = useRef(0);
-  const musicHeld = useRef(false);
-  function releaseMusic() {
-    window.clearTimeout(holdTimer.current);
-    if (musicHeld.current) {
-      musicHeld.current = false;
-      resumeStoryMusic();
-    }
+  function resetDrag() {
+    setDragX(0);
+    setDragY(0);
+    setDragging(false);
   }
 
   function onPointerDown(e: React.PointerEvent<HTMLDivElement>) {
-    press.current = { t: performance.now(), x: e.clientX, y: e.clientY };
+    // Keep receiving moves if a mouse drag leaves the frame.
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      /* not an active pointer (e.g. synthetic) - capture is only a nicety */
+    }
+    press.current = { t: performance.now(), x: e.clientX, y: e.clientY, axis: null };
     setPaused(true);
-    holdTimer.current = window.setTimeout(() => {
-      musicHeld.current = true;
-      pauseStoryMusic();
-    }, TAP_MS);
   }
   function onPointerMove(e: React.PointerEvent<HTMLDivElement>) {
-    if (!press.current) return;
-    setDragY(Math.max(0, e.clientY - press.current.y));
+    const p = press.current;
+    if (!p) return;
+    const dx = e.clientX - p.x;
+    const dy = e.clientY - p.y;
+    if (!p.axis && Math.max(Math.abs(dx), Math.abs(dy)) > AXIS_PX) {
+      p.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+      setDragging(true);
+    }
+    if (p.axis === "x") setDragX(dx);
+    else if (p.axis === "y") setDragY(Math.max(0, dy));
   }
   function onPointerUp(e: React.PointerEvent<HTMLDivElement>) {
     const p = press.current;
     press.current = null;
     setPaused(false);
-    releaseMusic();
-    const dy = e.clientY - (p?.y ?? e.clientY);
-    setDragY(0);
-    if (!p) return;
-    if (dy > DISMISS_PX) return onClose();
-    if (performance.now() - p.t > TAP_MS || Math.abs(e.clientX - p.x) > 12) return;
+    resetDrag();
+    if (!p || index === null) return;
+
+    const dx = e.clientX - p.x;
+    const dy = e.clientY - p.y;
+    const ms = Math.max(1, performance.now() - p.t);
+
+    if (p.axis === "y") {
+      if (dy > DISMISS_PX) onClose();
+      return;
+    }
+    if (p.axis === "x") {
+      // A real swipe: far enough, or quick and decisive. At either end of the
+      // reel it just springs back - it never closes the viewer.
+      const swiped = Math.abs(dx) >= SWIPE_PX || (Math.abs(dx) > 25 && Math.abs(dx) / ms > SWIPE_SPEED);
+      if (!swiped) return;
+      if (dx < 0 && index < stories.length - 1) next();
+      else if (dx > 0 && index > 0) prev();
+      return;
+    }
+    if (ms > TAP_MS) return;
     const rect = e.currentTarget.getBoundingClientRect();
     if (e.clientX - rect.left < rect.width * 0.33) prev();
     else next();
@@ -187,15 +208,18 @@ export function StoryViewer({ stories, index, onIndexChange, onClose }: StoryVie
             <>
               {/* IG-style ambient backdrop: the same frame, blurred and dimmed */}
               <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-                <Image
+                <div
                   key={`bg-${story.src}`}
-                  src={story.src}
-                  alt=""
-                  fill
-                  sizes="40vw"
-                  className="scale-110 object-cover opacity-35 blur-3xl"
+                  className="absolute inset-0 scale-125 bg-cover bg-center opacity-40 blur-3xl"
+                  style={story.blur ? { backgroundImage: `url("${story.blur}")` } : undefined}
                 />
               </div>
+
+              <StoryPreload
+                stories={[stories[index + 1], stories[index + 2], stories[index - 1]].filter(
+                  (x): x is Story => !!x,
+                )}
+              />
 
               <Dialog.Title className="sr-only">
                 {story.handle ? `Unboxing story from @${story.handle}` : "Unboxing story"}
@@ -209,7 +233,12 @@ export function StoryViewer({ stories, index, onIndexChange, onClose }: StoryVie
                   story={story}
                 />
                 <motion.div
-                  style={{ y: dragY, opacity: 1 - Math.min(dragY / 400, 0.5) }}
+                  animate={{
+                    x: reduceMotion ? 0 : dragX * 0.6,
+                    y: dragY,
+                    opacity: 1 - Math.min(dragY / 400, 0.5) - Math.min(Math.abs(dragX) / 600, 0.25),
+                  }}
+                  transition={dragging ? { duration: 0 } : { type: "spring", stiffness: 380, damping: 32 }}
                   className="relative flex min-h-0 flex-1 touch-none select-none flex-col overflow-hidden bg-darkroom-deep sm:aspect-[9/16] sm:flex-none sm:rounded-[1.5rem] sm:ring-1 sm:ring-halide/15"
                   onPointerDown={onPointerDown}
                   onPointerMove={onPointerMove}
@@ -217,8 +246,7 @@ export function StoryViewer({ stories, index, onIndexChange, onClose }: StoryVie
                   onPointerCancel={() => {
                     press.current = null;
                     setPaused(false);
-                    releaseMusic();
-                    setDragY(0);
+                                    resetDrag();
                   }}
                 >
                   <AnimatePresence initial={false} mode="popLayout">
@@ -257,16 +285,6 @@ export function StoryViewer({ stories, index, onIndexChange, onClose }: StoryVie
                   </Link>
                 </div>
               </div>
-
-              <button
-                type="button"
-                onClick={toggleMuted}
-                aria-label={muted ? "Turn music on" : "Mute music"}
-                aria-pressed={muted}
-                className="absolute right-[4rem] top-[0.95rem] z-20 grid size-11 place-items-center rounded-full bg-darkroom-deep/60 text-overexpose transition-colors hover:bg-darkroom-deep sm:right-[4.75rem] sm:top-6"
-              >
-                {muted ? <VolumeX className="size-5" /> : <Volume2 className="size-5" />}
-              </button>
 
               <Dialog.Close
                 aria-label="Close story"
@@ -311,7 +329,8 @@ export function StoryMedia({
   onVideoProgress,
   onVideoEnd,
   priority,
-  sizes = "(min-width: 640px) 420px, 100vw",
+  eager,
+  sizes = VIEWER_SIZES,
   quoteClamp,
 }: {
   story: Story;
@@ -319,6 +338,8 @@ export function StoryMedia({
   onVideoProgress?: (p: number) => void;
   onVideoEnd?: () => void;
   priority?: boolean;
+  /** Load now rather than when scrolled near (reel cards once the section is close). */
+  eager?: boolean;
   sizes?: string;
   /** Truncate the DM text (reel cards); the viewer shows it whole. */
   quoteClamp?: boolean;
@@ -345,6 +366,9 @@ export function StoryMedia({
         fill
         sizes={sizes}
         priority={priority}
+        loading={priority || eager ? "eager" : "lazy"}
+        placeholder={story.blur ? "blur" : "empty"}
+        blurDataURL={story.blur}
         draggable={false}
         className={story.quote ? "object-contain" : "object-cover"}
         style={story.focus ? { objectPosition: story.focus } : undefined}

@@ -1,14 +1,13 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Reveal } from "@/components/brand/Reveal";
 import { Sticker } from "@/components/brand/Sticker";
 import { MagneticButton } from "@/components/brand/MagneticButton";
 import { RESERVE_HREF, reviews, type Story } from "@/lib/landing";
 import { seededRotation } from "@/lib/random";
-import { startStoryMusic } from "@/lib/story-music";
-import { StoryMedia, StoryViewer } from "./StoryViewer";
+import { StoryMedia, StoryPreload, StoryViewer } from "./StoryViewer";
 
 /**
  * Reviews = the unboxing stories buyers actually posted. No star ratings, no
@@ -19,7 +18,7 @@ import { StoryMedia, StoryViewer } from "./StoryViewer";
  * the headline and the sign-off row; extra cards scroll in via the arrows.
  */
 
-function StoryCard({ story, index, onOpen }: { story: Story; index: number; onOpen: () => void }) {
+function StoryCard({ story, index, eager, onOpen, onWarm }: { story: Story; index: number; eager: boolean; onOpen: () => void; onWarm: () => void }) {
   const reduceMotion = useReducedMotion();
   const rot = seededRotation(index + 41, 2);
 
@@ -31,6 +30,9 @@ function StoryCard({ story, index, onOpen }: { story: Story; index: number; onOp
       <motion.button
         type="button"
         onClick={onOpen}
+        onPointerEnter={onWarm}
+        onFocus={onWarm}
+        onTouchStart={onWarm}
         aria-label={`Open ${story.handle ? `@${story.handle}'s` : "a buyer's"} unboxing story (${story.finish})`}
         initial={reduceMotion ? false : { opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -39,7 +41,7 @@ function StoryCard({ story, index, onOpen }: { story: Story; index: number; onOp
         transition={{ type: "spring", stiffness: 240, damping: 22 }}
         className="group relative flex aspect-[9/16] w-full flex-col overflow-hidden rounded-[1.5rem] bg-darkroom-deep text-left shadow-[0.4rem_0.8rem_1.8rem_rgba(0,0,0,0.45)] ring-1 ring-halide/15 transition-shadow duration-300 hover:shadow-[0.5rem_1rem_2.4rem_rgba(0,0,0,0.6)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-kodak"
       >
-        <StoryMedia story={story} sizes="(min-width: 640px) 272px, 72vw" quoteClamp />
+        <StoryMedia story={story} eager={eager} sizes="(min-width: 640px) 272px, 72vw" quoteClamp />
 
         {/* Play affordance */}
         <span
@@ -67,6 +69,34 @@ export function Reviews() {
   const { stories } = reviews;
   const [open, setOpen] = useState<number | null>(null);
   const reel = useRef<HTMLUListElement>(null);
+  const section = useRef<HTMLElement>(null);
+
+  // Once the section is within ~a screen of the viewport, load every reel card
+  // (so scrolling the row never shows empty cards) and warm the viewer-size
+  // image of the first few stories (so the first tap opens instantly).
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    const el = section.current;
+    if (!el || near) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setNear(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "1000px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [near]);
+
+  // Hover / focus / touch-start on a card warms that story and the next one.
+  const [warm, setWarm] = useState<number | null>(null);
+  const preload = [
+    ...(near ? stories.slice(0, 3) : []),
+    ...(warm !== null ? stories.slice(warm, warm + 2) : []),
+  ].filter((s, i, all) => all.indexOf(s) === i);
 
   function scrollReel(dir: 1 | -1) {
     const el = reel.current;
@@ -76,7 +106,7 @@ export function Reviews() {
   }
 
   return (
-    <section id="reviews" aria-label="Reviews" className="section relative scroll-mt-20 overflow-hidden bg-darkroom text-halide">
+    <section ref={section} id="reviews" aria-label="Reviews" className="section relative scroll-mt-20 overflow-hidden bg-darkroom text-halide">
       <div className="shell">
         <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
           <Reveal className="min-w-0">
@@ -120,11 +150,7 @@ export function Reviews() {
           className="no-scrollbar -mx-3 -mr-[calc(1.375rem+0.75rem)] flex snap-x snap-mandatory gap-4 overflow-x-auto px-3 py-6 [scroll-padding-inline:0.75rem] sm:-mr-3 sm:gap-5"
         >
           {stories.map((story, i) => (
-            <StoryCard key={story.src} story={story} index={i} onOpen={() => {
-              // Must start inside the tap itself or mobile browsers block it.
-              if (open === null) startStoryMusic();
-              setOpen(i);
-            }} />
+            <StoryCard key={story.src} story={story} index={i} eager={near} onWarm={() => setWarm(i)} onOpen={() => setOpen(i)} />
           ))}
         </ul>
       </div>
@@ -143,6 +169,7 @@ export function Reviews() {
         </Reveal>
       </div>
 
+      {open === null && <StoryPreload stories={preload} />}
       <StoryViewer stories={stories} index={open} onIndexChange={setOpen} onClose={() => setOpen(null)} />
     </section>
   );
