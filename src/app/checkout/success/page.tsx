@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import {
-  Check,
   Download,
   Home,
   Loader2,
@@ -13,13 +12,11 @@ import {
   Mail,
   Package,
   PackageX,
-  ShieldCheck,
-  ShoppingBag,
-  Truck,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { variantAssets } from "@/lib/products";
 import { displayOrderId } from "@/lib/order-id";
-import { DELIVERY_ETA, DELIVERY_NOTE, DISPATCH_ETA } from "@/lib/shipping";
+import { DELIVERY_ETA, DELIVERY_ETA_REMOTE, DISPATCH_ETA } from "@/lib/shipping";
 
 type OrderItem = {
   id?: string;
@@ -129,6 +126,25 @@ function mergeStashImages(order: Order, orderId: string | null): Order {
   } catch {
     return order;
   }
+}
+
+/**
+ * The order row has no product photo (the checkout only stashes one in this
+ * tab's sessionStorage), so a reopened link, another device or a private
+ * window would show a blank box. Fall back to the finish's own front shot,
+ * matched on the colour name the order stores ("Baby Pink", "Cherry Red",
+ * "Cosmic Black").
+ */
+function imageForVariant(variant?: string): string | undefined {
+  const v = (variant ?? "").toLowerCase();
+  const sku = v.includes("pink")
+    ? "VHSMO-BPK"
+    : v.includes("red")
+      ? "VHSMO-CHR"
+      : v.includes("black")
+        ? "VHSMO-BLK"
+        : undefined;
+  return sku ? variantAssets[sku]?.images[0]?.src : undefined;
 }
 
 function SuccessContent() {
@@ -281,166 +297,55 @@ function SuccessContent() {
     );
   }
 
+  const txnId = paymentId ?? order?.paymentId ?? "";
+
   return (
     <div className="paper min-h-dvh">
-      <div className="container-px mx-auto w-full max-w-[70rem] pt-28 pb-24 sm:pt-32">
-        {/* ---------- Hero ---------- */}
-        <div className="flex flex-col items-center text-center">
-          <span className="flex size-16 items-center justify-center rounded-full bg-kodak shadow-[0.25rem_0.5rem_1.1rem_rgba(31,26,24,0.28)]">
-            <Check className="size-8 text-darkroom" strokeWidth={3} />
+      <div className="container-px mx-auto w-full max-w-5xl pt-24 pb-14 sm:pt-28">
+        {/* ---------- Statement ---------- */}
+        <h1 className="display text-center text-[clamp(1.5rem,3.4vw,2.5rem)] uppercase leading-[1.1] text-darkroom">
+          Thank you, your order has been{" "}
+          <span className="font-marker mt-1 inline-block -rotate-2 bg-kodak px-2.5 leading-none shadow-[0.12rem_0.2rem_0_rgba(31,26,24,0.25)]">
+            placed.
           </span>
+        </h1>
 
-          <span className="mt-6 inline-flex items-center gap-2 rounded-full border-2 border-darkroom/12 bg-overexpose px-4 py-1.5 text-xs font-bold text-darkroom">
-            <span className="flex size-4 items-center justify-center rounded-full bg-kodak">
-              <Check className="size-2.5 text-darkroom" strokeWidth={4} />
+        {/* ---------- Key facts ---------- */}
+        <dl className="mt-6 grid divide-y divide-darkroom/15 rounded-xl border border-darkroom/15 bg-overexpose/50 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+          <Fact label="Order number">
+            <span className="break-all font-mono">#{shortId || "VHSMO"}</span>
+          </Fact>
+          <Fact label="Ships in">
+            <Hl>{DISPATCH_ETA}</Hl>
+            <span className="mt-0.5 block text-xs font-normal text-darkroom/50">
+              Then {DELIVERY_ETA} to reach you
             </span>
-            {isCod ? "Order placed · Cash on Delivery" : "Payment Successful"}
-          </span>
+          </Fact>
+          <Fact label="Confirmation sent to">
+            <span className="break-all">
+              {order?.customer.email || "your email"}
+            </span>
+          </Fact>
+        </dl>
 
-          <h1 className="display mt-6 text-[clamp(2.25rem,6vw,4rem)] text-darkroom">
-            Thank you for your order!
-          </h1>
-          <p className="mt-4 max-w-xl text-base leading-relaxed text-darkroom/60">
-            Order{" "}
-            <span className="font-bold text-darkroom">
-              #{shortId || "VHSMO"}
-            </span>{" "}
-            is confirmed. We&apos;ve emailed your receipt
-            {order?.customer.email ? (
-              <>
-                {" "}
-                to{" "}
-                <span className="font-semibold text-darkroom">
-                  {order.customer.email}
-                </span>
-              </>
-            ) : null}
-            .
+        {isCod && order && (
+          <p className="mt-3 rounded-xl bg-kodak/40 px-4 py-2.5 text-center text-sm font-semibold text-darkroom">
+            Please keep {formatCurrency(order.total)} ready in cash or UPI for
+            the delivery partner (includes {formatCurrency(order.codFee)} COD
+            fee).
           </p>
-          {isCod && order && (
-            <p className="mt-4 rounded-xl bg-kodak/40 px-4 py-3 text-sm font-semibold text-darkroom">
-              Please keep {formatCurrency(order.total)} ready in cash or UPI
-              for the delivery partner (includes{" "}
-              {formatCurrency(order.codFee)} COD fee).
-            </p>
-          )}
-        </div>
+        )}
 
-        {/* ---------- What happens next ---------- */}
-        <div className="mx-auto mt-12 grid max-w-3xl gap-4 sm:grid-cols-3">
-          <Notice
-            icon={Mail}
-            title="Confirmation sent"
-            body="A confirmation email with your order details is on its way to your inbox."
-          />
-          <Notice
-            icon={Truck}
-            title="Getting your VHSMO ready"
-            body={`We're packing your camera and it ships within ${DISPATCH_ETA}. Delivery takes ${DELIVERY_NOTE}.`}
-          />
-          <Notice
-            icon={ShieldCheck}
-            title="Problem caused by us?"
-            body="Manufacturing defects are covered under our 12-month limited warranty. We'll repair or replace your VHSMO for completely free. Just reach out and we'll make it right."
-          />
-        </div>
-
-        {/* ---------- Details ---------- */}
         {order && (
-          <div className="mt-12 grid gap-6 lg:grid-cols-[1fr_22rem]">
-            {/* Left - order items */}
-            <section className="overflow-hidden rounded-2xl border-2 border-darkroom/12 bg-overexpose shadow-[0_10px_40px_-24px_rgba(31,26,24,0.4)]">
-              <header className="border-b border-darkroom/10 px-6 py-5">
-                <h2 className="flex items-center gap-2.5 text-lg font-bold text-darkroom">
-                  <ShoppingBag className="size-5 text-darkroom/70" />
-                  Order Items
-                </h2>
-              </header>
-
-              <ul className="divide-y divide-darkroom/10 px-6">
-                {order.items.map((item, i) => (
-                  <li
-                    key={`${item.id ?? i}-${item.variant ?? ""}`}
-                    className="flex items-center gap-4 py-5"
-                  >
-                    <div className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-halide">
-                      {item.image ? (
-                        <Image
-                          src={item.image}
-                          alt={item.name}
-                          fill
-                          sizes="64px"
-                          className="object-cover"
-                        />
-                      ) : (
-                        <Package className="size-6 text-darkroom/35" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold text-darkroom">
-                        {item.name}
-                      </p>
-                      {item.variant && (
-                        <p className="mt-0.5 text-xs text-darkroom/55">
-                          {item.variant}
-                        </p>
-                      )}
-                      <p className="mt-0.5 text-xs text-darkroom/45">
-                        Qty: {item.quantity}
-                      </p>
-                    </div>
-                    <span className="text-sm font-bold tabular-nums text-darkroom">
-                      {formatCurrency(item.price * item.quantity)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-
-              {/* Totals */}
-              <div className="space-y-2.5 border-t border-darkroom/10 px-6 py-5 text-sm">
-                <Row label="Subtotal" value={formatCurrency(order.subtotal)} />
-                <Row
-                  label="Shipping"
-                  value={
-                    order.shipping === 0
-                      ? "Free"
-                      : formatCurrency(order.shipping)
-                  }
-                />
-                {order.tax > 0 && (
-                  <Row label="Taxes" value={formatCurrency(order.tax)} />
-                )}
-                {order.discount > 0 && (
-                  <Row
-                    label={`Discount${order.couponCode ? ` (${order.couponCode})` : ""}`}
-                    value={`- ${formatCurrency(order.discount)}`}
-                  />
-                )}
-                {isCod && order.codFee > 0 && (
-                  <Row
-                    label="Cash on Delivery fee"
-                    value={formatCurrency(order.codFee)}
-                  />
-                )}
-                <div className="my-3 h-px bg-darkroom/12" />
-                <div className="flex items-center justify-between">
-                  <span className="text-lg font-bold text-darkroom">
-                    {isCod ? "Pay on delivery" : "Total"}
-                  </span>
-                  <span className="text-2xl font-bold tabular-nums text-darkroom">
-                    {formatCurrency(order.total)}
-                  </span>
-                </div>
-              </div>
-            </section>
-
-            {/* Right - address, payment, actions */}
-            <aside className="space-y-6">
-              <Card title="Shipping Address">
-                <p className="text-sm font-semibold text-darkroom">
-                  {order.customer.name}
-                </p>
-                <div className="mt-2 space-y-0.5 text-sm leading-relaxed text-darkroom/70">
+          <>
+            {/* ---------- Details ---------- */}
+            <div className="mt-6 grid gap-x-10 gap-y-7 lg:grid-cols-3">
+              <section className="border-t border-darkroom/15 pt-4">
+                <ColTitle>Shipping address</ColTitle>
+                <div className="space-y-0.5 text-sm leading-relaxed text-darkroom/70">
+                  <p className="font-semibold text-darkroom">
+                    {order.customer.name}
+                  </p>
                   {order.address.line1 && <p>{order.address.line1}</p>}
                   {order.address.line2 && <p>{order.address.line2}</p>}
                   <p>
@@ -452,52 +357,153 @@ function SuccessContent() {
                       : ""}
                   </p>
                   {order.address.country && <p>{order.address.country}</p>}
+                  {order.customer.phone && <p>{order.customer.phone}</p>}
                 </div>
-                {order.customer.phone && (
-                  <p className="mt-3 border-t border-darkroom/10 pt-3 text-xs text-darkroom/55">
-                    {order.customer.phone}
+                <p className="mt-3 text-xs text-darkroom/50">
+                  Standard delivery · remote locations can take{" "}
+                  {DELIVERY_ETA_REMOTE}
+                </p>
+              </section>
+
+              <section className="border-t border-darkroom/15 pt-4">
+                <ColTitle>Payment</ColTitle>
+                <div className="space-y-0.5 text-sm leading-relaxed text-darkroom/70">
+                  <p className="font-semibold text-darkroom">
+                    {isCod ? "Cash on Delivery" : "Razorpay"}
                   </p>
+                  <p>
+                    {isCod
+                      ? `${formatCurrency(order.total)} to be paid on delivery`
+                      : "Paid"}
+                  </p>
+                </div>
+                {!isCod && txnId && (
+                  <div className="mt-3">
+                    <p className="text-xs font-bold uppercase tracking-[0.12em] text-darkroom/50">
+                      Transaction ID
+                    </p>
+                    <p className="mt-0.5 break-all font-mono text-[13px] text-darkroom">
+                      {txnId}
+                    </p>
+                  </div>
                 )}
-              </Card>
+                <p className="mt-3 text-xs text-darkroom/50">
+                  Billing address: same as shipping address
+                </p>
+              </section>
 
-              {isCod && (
-                <Card title="Payment">
-                  <p className="text-sm font-semibold text-darkroom">
-                    Cash on Delivery
-                  </p>
-                  <p className="mt-1 text-xs text-darkroom/55">
-                    {formatCurrency(order.total)} to be paid on delivery
-                  </p>
-                </Card>
-              )}
+              <section className="border-t border-darkroom/15 pt-4">
+                <ColTitle>Order summary</ColTitle>
+                <ul className="divide-y divide-darkroom/10">
+                  {order.items.map((item, i) => (
+                    <li
+                      key={`${item.id ?? i}-${item.variant ?? ""}`}
+                      className="flex items-center gap-3 py-2.5 first:pt-0"
+                    >
+                      <div className="relative flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border-2 border-bluehour bg-halide">
+                        {(item.image ?? imageForVariant(item.variant)) ? (
+                          <Image
+                            src={(item.image ?? imageForVariant(item.variant))!}
+                            alt={`${item.name}${item.variant ? ` in ${item.variant}` : ""}`}
+                            fill
+                            sizes="56px"
+                            className="object-cover"
+                          />
+                        ) : (
+                          <Package className="size-5 text-darkroom/35" />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold text-darkroom">
+                          {item.name}
+                        </p>
+                        <p className="truncate text-xs text-darkroom/55">
+                          {[item.variant, `Qty ${item.quantity}`]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </p>
+                      </div>
+                      <span className="text-sm font-bold tabular-nums text-darkroom">
+                        {formatCurrency(item.price * item.quantity)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
 
-              {!isCod && (paymentId ?? order.paymentId) && (
-                <Card title="Transaction ID">
-                  <p className="break-all font-mono text-sm font-semibold text-darkroom">
-                    {paymentId ?? order.paymentId}
-                  </p>
-                </Card>
-              )}
+                <div className="mt-2 space-y-1.5 border-t border-darkroom/10 pt-3 text-[13px]">
+                  <Row
+                    label="Subtotal"
+                    value={formatCurrency(order.subtotal)}
+                  />
+                  <Row
+                    label="Shipping"
+                    value={
+                      order.shipping === 0
+                        ? "Free"
+                        : formatCurrency(order.shipping)
+                    }
+                  />
+                  {order.tax > 0 && (
+                    <Row label="Taxes" value={formatCurrency(order.tax)} />
+                  )}
+                  {order.discount > 0 && (
+                    <Row
+                      label={`Discount${order.couponCode ? ` (${order.couponCode})` : ""}`}
+                      value={`- ${formatCurrency(order.discount)}`}
+                    />
+                  )}
+                  {isCod && order.codFee > 0 && (
+                    <Row
+                      label="Cash on Delivery fee"
+                      value={formatCurrency(order.codFee)}
+                    />
+                  )}
+                  <div className="flex items-center justify-between border-t border-darkroom/15 pt-2.5">
+                    <span className="text-sm font-bold text-darkroom">
+                      {isCod ? "Pay on delivery" : "Total"}
+                    </span>
+                    <span className="text-xl font-bold tabular-nums text-darkroom">
+                      {formatCurrency(order.total)}
+                    </span>
+                  </div>
+                </div>
+              </section>
+            </div>
 
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <Link
-                  href="/"
-                  className="flex flex-1 items-center justify-center gap-2 rounded-full border-2 border-darkroom/15 bg-overexpose px-7 py-4 text-sm font-bold text-darkroom transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            {/* ---------- Actions + help ---------- */}
+            <div className="mt-7 flex flex-col-reverse items-center gap-4 border-t border-darkroom/15 pt-5 sm:flex-row sm:justify-between">
+              <p className="max-w-xl text-center text-xs leading-relaxed text-darkroom/55 sm:text-left">
+                Need help?{" "}
+                <a
+                  href={`mailto:team@vhsmo.com?subject=${encodeURIComponent(
+                    `Help with order ${shortId}`,
+                  )}`}
+                  className="font-semibold text-darkroom underline decoration-kodak decoration-2 underline-offset-4"
                 >
-                  <Home className="size-4" />
-                  Go to home
-                </Link>
+                  Contact us
+                </a>
+                . We&apos;ll email you when it&apos;s dispatched. Manufacturing
+                defects are covered by our 12-month warranty.
+              </p>
+              <div className="flex w-full shrink-0 flex-col gap-2.5 sm:w-auto sm:flex-row">
                 <button
                   type="button"
                   onClick={() => downloadInvoice(order)}
-                  className="flex flex-1 items-center justify-center gap-2 rounded-full bg-darkroom px-7 py-4 text-sm font-bold text-halide transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                  className="flex items-center justify-center gap-2 whitespace-nowrap rounded-full bg-darkroom px-6 py-3 text-sm font-bold text-halide transition-transform hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <Download className="size-4" />
                   Download invoice
                 </button>
+                <Link
+                  href="/"
+                  className="flex items-center justify-center gap-2 whitespace-nowrap rounded-full border-2 border-darkroom/20 px-6 py-3 text-sm font-bold text-darkroom transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  <Home className="size-4" />
+                  Back to home
+                </Link>
               </div>
-            </aside>
-          </div>
+            </div>
+          </>
         )}
       </div>
     </div>
@@ -699,39 +705,36 @@ function escapeHtml(s: string) {
     .replace(/"/g, "&quot;");
 }
 
-function Notice({
-  icon: Icon,
-  title,
-  body,
-}: {
-  icon: typeof Mail;
-  title: string;
-  body: string;
-}) {
+/** Kodak-underlined emphasis for dates and the email address. */
+function Hl({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border-2 border-darkroom/12 bg-overexpose p-5 shadow-[0_10px_40px_-24px_rgba(31,26,24,0.4)]">
-      <span className="flex size-10 items-center justify-center rounded-full bg-kodak/50 text-darkroom">
-        <Icon className="size-5" />
-      </span>
-      <p className="mt-3 text-sm font-bold text-darkroom">{title}</p>
-      <p className="mt-1 text-xs leading-relaxed text-darkroom/60">{body}</p>
-    </div>
+    <span className="font-semibold text-darkroom underline decoration-kodak decoration-2 underline-offset-4">
+      {children}
+    </span>
   );
 }
 
-function Card({
-  title,
+function ColTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-darkroom">
+      {children}
+    </h2>
+  );
+}
+
+function Fact({
+  label,
   children,
 }: {
-  title: string;
+  label: string;
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border-2 border-darkroom/12 bg-overexpose p-5 shadow-[0_10px_40px_-24px_rgba(31,26,24,0.4)]">
-      <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-darkroom/70">
-        {title}
-      </h3>
-      {children}
+    <div className="px-5 py-3.5 text-center sm:text-left">
+      <dt className="text-[11px] font-bold uppercase tracking-[0.16em] text-darkroom/50">
+        {label}
+      </dt>
+      <dd className="mt-1 text-sm font-semibold text-darkroom">{children}</dd>
     </div>
   );
 }
