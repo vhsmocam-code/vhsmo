@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import * as Dialog from "@radix-ui/react-dialog";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { X } from "lucide-react";
+import { Volume2, VolumeX, X } from "lucide-react";
 import type { Story } from "@/lib/landing";
 import { RESERVE_HREF } from "@/lib/landing";
 import { useDefaultProduct } from "@/lib/products-context";
@@ -118,6 +118,38 @@ export function StoryViewer({ stories, index, onIndexChange, onClose }: StoryVie
     if (paused) v.pause();
     else void v.play().catch(() => {});
   }, [paused]);
+
+  // Sound for video stories. Videos always start muted (the only way browsers
+  // allow autoplay); tapping the speaker unmutes the playing clip, and the
+  // choice sticks for the rest of the session and for later videos. Set on the
+  // element directly - React doesn't keep a <video muted> prop in sync.
+  const [soundOn, setSoundOn] = useState(false);
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem("vhsmo:story-sound") === "1") setSoundOn(true);
+    } catch {
+      /* storage unavailable - sound just starts off */
+    }
+  }, []);
+  useEffect(() => {
+    const v = videoRef.current;
+    if (v) v.muted = !soundOn;
+  }, [soundOn, index]);
+  function toggleSound() {
+    const next = !soundOn;
+    setSoundOn(next);
+    try {
+      sessionStorage.setItem("vhsmo:story-sound", next ? "1" : "0");
+    } catch {
+      /* ignore */
+    }
+    // Inside the tap, so the browser lets sound start.
+    const v = videoRef.current;
+    if (v) {
+      v.muted = !next;
+      if (next && v.paused && !paused) void v.play().catch(() => {});
+    }
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -286,6 +318,18 @@ export function StoryViewer({ stories, index, onIndexChange, onClose }: StoryVie
                 </div>
               </div>
 
+              {story.type === "video" && (
+                <button
+                  type="button"
+                  onClick={toggleSound}
+                  aria-label={soundOn ? "Mute sound" : "Turn sound on"}
+                  aria-pressed={soundOn}
+                  className="absolute right-[4rem] top-[0.95rem] z-20 grid size-11 place-items-center rounded-full bg-darkroom-deep/60 text-overexpose transition-colors hover:bg-darkroom-deep sm:right-[4.75rem] sm:top-6"
+                >
+                  {soundOn ? <Volume2 className="size-5" /> : <VolumeX className="size-5" />}
+                </button>
+              )}
+
               <Dialog.Close
                 aria-label="Close story"
                 className="absolute right-3 top-[0.95rem] z-20 grid size-11 place-items-center rounded-full bg-darkroom-deep/60 text-overexpose transition-colors hover:bg-darkroom-deep sm:right-6 sm:top-6"
@@ -349,15 +393,25 @@ export function StoryMedia({
       <video
         ref={videoRef}
         src={story.src}
+        poster={story.poster}
         muted
         playsInline
+        // Cards only show the poster; the viewer fetches and plays the clip.
+        preload={onVideoEnd ? "auto" : "none"}
         autoPlay={!!onVideoEnd}
         loop={!onVideoEnd}
+        aria-label={`${story.handle ? `@${story.handle}'s` : "A buyer's"} VHSMO in ${story.finish}, unboxing video`}
+        // Capped just under 1 so reaching the end never also trips the
+        // "progress complete" advance on top of onEnded (that skipped a story).
         onTimeUpdate={(e) =>
-          onVideoProgress?.(e.currentTarget.currentTime / (e.currentTarget.duration || 1))
+          onVideoProgress?.(
+            Math.min(0.999, e.currentTarget.currentTime / (e.currentTarget.duration || 1)),
+          )
         }
         onEnded={onVideoEnd}
-        className="absolute inset-0 h-full w-full object-cover"
+        // contain: the whole frame is always visible (a phone viewer frame is a
+        // touch taller than 9:16 and cover would trim the sides).
+        className="absolute inset-0 h-full w-full object-contain"
       />
     ) : (
       <Image

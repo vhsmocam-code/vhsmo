@@ -46,7 +46,9 @@ function StoryCard({ story, index, eager, onOpen, onWarm }: { story: Story; inde
         {/* Play affordance */}
         <span
           aria-hidden
-          className="pointer-events-none absolute left-1/2 top-1/2 grid size-14 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-darkroom-deep/55 text-overexpose opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
+          className={`pointer-events-none absolute left-1/2 top-1/2 grid size-14 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-darkroom-deep/55 text-overexpose backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 ${
+            story.type === "video" ? "opacity-100" : "opacity-0"
+          }`}
         >
           <svg viewBox="0 0 24 24" className="ml-0.5 size-6 fill-current"><path d="M8 5.5v13l11-6.5z" /></svg>
         </span>
