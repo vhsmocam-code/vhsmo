@@ -203,7 +203,15 @@ export function isCodOrderId(id: unknown): boolean {
 
 // ── Pricing ─────────────────────────────────────────────────────────────────
 
-/** Total for a COD order: full price (no coupon) plus the COD fee. */
-export function codTotal(p: { subtotal: number; shippingCost: number; tax: number }): number {
-  return Math.max(0, p.subtotal + p.shippingCost + p.tax) + COD_FEE;
+/**
+ * Total for a COD order: the cart after any coupon, plus the COD fee. The fee
+ * is added after the discount, so a coupon can never reduce it.
+ */
+export function codTotal(p: {
+  subtotal: number;
+  shippingCost: number;
+  tax: number;
+  discount?: number;
+}): number {
+  return Math.max(0, p.subtotal + p.shippingCost + p.tax - (p.discount ?? 0)) + COD_FEE;
 }

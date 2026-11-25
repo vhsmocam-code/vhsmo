@@ -212,7 +212,7 @@ async function createCodOrder(req: Request, body: CreateOrderBody) {
   const token = verifyOtpToken(secret, body.otpToken, contact);
   if (!token.ok) return bad(token.reason, 401);
 
-  // 2. Price on the server: full price + COD fee, no coupon, stock checked.
+  // 2. Price on the server: cart (less any valid coupon) + COD fee, stock checked.
   const result = await calculateOrder({
     items: items ?? [],
     couponCode: body.couponCode ?? null,
@@ -284,8 +284,8 @@ async function createCodOrder(req: Request, body: CreateOrderBody) {
     subtotal: pricing.subtotal,
     shipping_cost: pricing.shippingCost,
     tax: pricing.tax,
-    discount: 0,
-    coupon_code: null,
+    discount: pricing.discount,
+    coupon_code: pricing.couponCode,
     cod_fee: pricing.codFee,
     total: pricing.total,
     amount: pricing.total,

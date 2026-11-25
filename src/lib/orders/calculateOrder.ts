@@ -56,15 +56,6 @@ export async function calculateOrder({
   couponCode?: string | null;
   paymentMethod?: PaymentMethod;
 }): Promise<CalculateOrderResult> {
-  // Coupons are an online-payment perk; COD is always full price + COD fee.
-  if (paymentMethod === "cod" && couponCode) {
-    return {
-      ok: false,
-      status: 400,
-      message: "Coupons apply to online payment only",
-    };
-  }
-
   // 1. Normalise the requested lines - keep only id + a sane quantity.
   const requested = (Array.isArray(items) ? items : [])
     .map((item) => ({
@@ -161,7 +152,7 @@ export async function calculateOrder({
   const codFee = paymentMethod === "cod" ? COD_FEE : 0;
   const total =
     paymentMethod === "cod"
-      ? codTotal({ subtotal, shippingCost, tax })
+      ? codTotal({ subtotal, shippingCost, tax, discount })
       : Math.max(0, subtotal + shippingCost + tax - discount);
 
   return {

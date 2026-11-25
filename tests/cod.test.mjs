@@ -18,6 +18,14 @@ test("COD fee is ₹100 and the browser copy matches the server value", () => {
   assert.equal(COD_FEE_DISPLAY, COD_FEE);
 });
 
+test("a coupon reduces the cart, never the COD fee", () => {
+  assert.equal(codTotal({ subtotal: 6999, shippingCost: 0, tax: 0, discount: 500 }), 6599);
+  // Even a coupon worth the whole cart leaves the fee to pay.
+  assert.equal(codTotal({ subtotal: 999, shippingCost: 0, tax: 0, discount: 5000 }), COD_FEE);
+  // No discount passed = unchanged behaviour.
+  assert.equal(codTotal({ subtotal: 6999, shippingCost: 0, tax: 0 }), 6999 + COD_FEE);
+});
+
 test("COD total = subtotal + shipping + tax + fee", () => {
   assert.equal(codTotal({ subtotal: 4999, shippingCost: 0, tax: 0 }), 5099);
   assert.equal(codTotal({ subtotal: 9998, shippingCost: 100, tax: 10 }), 10208);

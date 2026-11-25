@@ -121,9 +121,6 @@ export function OrderSummary({
     setCodError("");
     if (next === "cod") {
       track("cod_selected", { source: "checkout" });
-      // Coupons are online-only - drop any applied one.
-      setCoupon(null);
-      setCouponError("");
     }
     setMethod(next);
   };
@@ -335,6 +332,7 @@ track("pay_securely_clicked", {
         body: JSON.stringify({
           paymentMethod: "cod",
           otpToken,
+          couponCode: coupon?.code ?? null,
           customer: { name: fullName, email: customer.email, phone: customer.phone },
           shipping: shippingInfo,
           items: items.map((item) => ({ productId: item.id, quantity: item.quantity })),
@@ -374,8 +372,8 @@ track("pay_securely_clicked", {
             subtotal,
             shipping,
             tax,
-            discount: 0,
-            couponCode: null,
+            discount: coupon?.discount ?? 0,
+            couponCode: coupon?.code ?? null,
             codFee: data.codFee,
             total: data.total,
           }),
@@ -438,8 +436,9 @@ track("pay_securely_clicked", {
     }
   };
   // Display only - the server recomputes every rupee.
-  const codTotal = total + COD_FEE_DISPLAY;
-  const finalTotal = isCod ? codTotal : total - (coupon?.discount ?? 0);
+  const discount = coupon?.discount ?? 0;
+  const codTotal = total - discount + COD_FEE_DISPLAY;
+  const finalTotal = isCod ? codTotal : total - discount;
 
   return (
     <aside className="space-y-4 lg:sticky lg:top-8 lg:h-fit">
@@ -491,11 +490,7 @@ track("pay_securely_clicked", {
             );
           })}
         </ul>
-        {isCod ? (
-          <p className="mt-4 rounded-xl bg-darkroom/[0.04] p-3 text-xs text-darkroom/60">
-            Coupons apply to online payment only.
-          </p>
-        ) : coupon ? (
+        {coupon ? (
           <div className="mt-4 flex items-center gap-3 rounded-xl border-2 border-green-600/25 bg-green-600/[0.06] p-3.5">
             <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-green-600/15 text-green-700">
               <BadgeCheck className="size-5" />
@@ -527,14 +522,14 @@ track("pay_securely_clicked", {
             error={couponError}
           />
         )}
-        {coupon && !isCod && (
+        {coupon && (
           <CouponCountdown expiresAt={coupon.expiresAt} />
         )}
         {/* Totals */}
         <div className="space-y-2.5 pt-4 text-sm">
           <Row label="Subtotal" value={formatCurrency(subtotal)} />
 
-          {coupon && !isCod && (
+          {coupon && (
             <Row
               label={`Coupon (${coupon.code})`}
               value={`- ${formatCurrency(coupon.discount)}`}
