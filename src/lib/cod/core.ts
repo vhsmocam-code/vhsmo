@@ -5,7 +5,7 @@
 import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
 
 /** Flat fee added to every COD order, in rupees. */
-export const COD_FEE = 100;
+export const COD_FEE = 200;
 
 /** Abuse limits for COD orders. */
 export const COD_MAX_UNITS = 3;

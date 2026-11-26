@@ -13,13 +13,13 @@ import {
 
 const SECRET = "test-secret-0123456789abcdef";
 
-test("COD fee is ₹100 and the browser copy matches the server value", () => {
-  assert.equal(COD_FEE, 100);
+test("COD fee is ₹200 and the browser copy matches the server value", () => {
+  assert.equal(COD_FEE, 200);
   assert.equal(COD_FEE_DISPLAY, COD_FEE);
 });
 
 test("a coupon reduces the cart, never the COD fee", () => {
-  assert.equal(codTotal({ subtotal: 6999, shippingCost: 0, tax: 0, discount: 500 }), 6599);
+  assert.equal(codTotal({ subtotal: 6999, shippingCost: 0, tax: 0, discount: 500 }), 6699);
   // Even a coupon worth the whole cart leaves the fee to pay.
   assert.equal(codTotal({ subtotal: 999, shippingCost: 0, tax: 0, discount: 5000 }), COD_FEE);
   // No discount passed = unchanged behaviour.
@@ -27,8 +27,8 @@ test("a coupon reduces the cart, never the COD fee", () => {
 });
 
 test("COD total = subtotal + shipping + tax + fee", () => {
-  assert.equal(codTotal({ subtotal: 4999, shippingCost: 0, tax: 0 }), 5099);
-  assert.equal(codTotal({ subtotal: 9998, shippingCost: 100, tax: 10 }), 10208);
+  assert.equal(codTotal({ subtotal: 4999, shippingCost: 0, tax: 0 }), 5199);
+  assert.equal(codTotal({ subtotal: 9998, shippingCost: 100, tax: 10 }), 10308);
 });
 
 test("Indian mobile normalisation", () => {
@@ -83,26 +83,26 @@ const order = (over = {}) => ({
   customer_name: "Test User", email: "t@example.com", phone: "9999999999",
   address_line1: "1 Street", address_line2: null, city: "Pune", state: "Maharashtra",
   country: "India", postal_code: "411021", discount: 0,
-  payment_method: "cod", cod_fee: 100,
+  payment_method: "cod", cod_fee: 200,
   items: [{ productId: "x", name: "VHSMO Vol. 1", variant: "Cherry Red", quantity: 1, price: 4999, total: 4999 }],
   ...over,
 });
 
-test("EasyEcom: COD order → paymentMode 2 with the ₹100 fee as shippingCost", () => {
+test("EasyEcom: COD order → paymentMode 2 with the ₹200 fee as shippingCost", () => {
   const r = buildQueueRow(order());
   assert.ok(r.ok);
   assert.equal(r.row.paymentMode, PAYMENT_MODE_COD);
   assert.equal(r.row.request_payload.paymentMode, 2);
-  assert.equal(r.row.request_payload.shippingCost, 100);
+  assert.equal(r.row.request_payload.shippingCost, 200);
   assert.deepEqual(validateRow(r.row), []);
 
   const out = buildOutboundPayload({ ...r.row, id: 1, status: "processing", attempts: 1 }, new Date("2026-11-24T00:00:00Z"));
   assert.equal(out.paymentMode, 2);
-  assert.equal(out.shippingCost, 100);
+  assert.equal(out.shippingCost, 200);
   assert.equal(out.orderNumber, "VHSMO-CODABCDEFGH2345");
   // Collectable = items - discounts + fee = what the customer was shown.
   const collect = out.items.reduce((s, it) => s + it.Price * it.Quantity - it.itemDiscount, 0) + out.shippingCost;
-  assert.equal(collect, 5099);
+  assert.equal(collect, 5199);
 });
 
 test("EasyEcom: prepaid order is unchanged (paymentMode 5, no shippingCost)", () => {
@@ -302,14 +302,14 @@ test("confirmation (online): headline, summary, full ID, date, photo, totals", (
 
 test("confirmation (COD): placed headline, fee, amount due, no payment id", () => {
   const { html, text } = renderOrderConfirmation(confirmArgs({
-    orderId: "CODLJRAVJC6784C", paymentMethod: "cod", paymentId: "", codFee: 100, total: 7099,
+    orderId: "CODLJRAVJC6784C", paymentMethod: "cod", paymentId: "", codFee: 200, total: 7199,
   }));
   for (const out of [html, text]) {
     assert.ok(out.includes("Your order is placed."));
     assert.ok(out.includes("Cash on Delivery"));
     assert.ok(out.includes("Due on delivery"));
     assert.ok(out.includes("Cash on Delivery fee"));
-    assert.ok(out.includes("₹100") && out.includes("₹7,099"));
+    assert.ok(out.includes("₹200") && out.includes("₹7,199"));
     assert.ok(!/Payment ID/.test(out));
   }
 });
@@ -348,7 +348,7 @@ test("both emails share the logo strip and help band; only the confirmation has 
 });
 
 test("every image is a full link to a non-WebP file, and the HTML stays under Gmail's clip size", () => {
-  const pages = [renderOtpEmail("482913", 10, ASSETS).html, renderOrderConfirmation(confirmArgs({ paymentMethod: "cod", codFee: 100 })).html];
+  const pages = [renderOtpEmail("482913", 10, ASSETS).html, renderOrderConfirmation(confirmArgs({ paymentMethod: "cod", codFee: 200 })).html];
   for (const html of pages) {
     const srcs = [...html.matchAll(/<img src="([^"]+)"/g)].map((m) => m[1]);
     assert.ok(srcs.length >= 1);

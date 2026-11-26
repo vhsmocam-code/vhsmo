@@ -137,7 +137,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
           "We do not directly store your complete card, UPI or banking credentials. Payment providers may process your information under their own terms and privacy policies.",
           "You confirm that you are authorized to use the payment method submitted with your order.",
           "If a payment is declined, reversed, disputed or identified as unauthorized, we may pause or cancel the associated order.",
-          "Cash on Delivery (COD) is offered on eligible PIN codes within India. A COD fee of ₹100 is added to COD orders and is shown at checkout before you place the order. COD orders require verification of your email address by one-time password.",
+          "Cash on Delivery (COD) is offered on eligible PIN codes within India. A COD fee of ₹200 is added to COD orders and is shown at checkout before you place the order. COD orders require verification of your email address by one-time password.",
           "The full COD amount, including the COD fee, is payable to the delivery partner in cash or UPI when the order is delivered. We may limit the number or value of COD orders, and may decline COD for future orders where previous COD deliveries were refused.",
         ],
       },
@@ -156,7 +156,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
         body: [
           "Cancellations, returns and refunds are governed by the Refund Policy displayed on our website.",
           "Approved refunds will generally be sent to the original payment method. Processing times after approval may depend on your bank, card issuer or payment provider.",
-          "For Cash on Delivery orders, approved refunds are sent by bank transfer or UPI to an account you provide. The ₹100 COD fee is non-refundable except where the order is cancelled by VHSMO or the product is defective, damaged or incorrectly supplied.",
+          "For Cash on Delivery orders, approved refunds are sent by bank transfer or UPI to an account you provide. The ₹200 COD fee is non-refundable except where the order is cancelled by VHSMO or the product is defective, damaged or incorrectly supplied.",
           "Nothing in these Terms excludes any refund, replacement or other remedy that must be provided under applicable Indian consumer law.",
         ],
       },
@@ -532,7 +532,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
         heading: "4. Refund processing",
         body: [
           "Approved refunds will be processed to the original payment method. Once initiated, refunds typically take 5–10 business days to reflect in your account, depending on your bank or payment provider.",
-          "Cash on Delivery orders are refunded by bank transfer or UPI to an account you provide. The ₹100 COD fee is non-refundable except where VHSMO cancels the order or the product is defective, damaged or incorrectly supplied.",
+          "Cash on Delivery orders are refunded by bank transfer or UPI to an account you provide. The ₹200 COD fee is non-refundable except where VHSMO cancels the order or the product is defective, damaged or incorrectly supplied.",
           `For assistance, contact ${LEGAL_CONTACT} with your order number.`,
           "Nothing in this policy limits any refund, replacement, repair or other remedy available under applicable Indian consumer law.",
         ],

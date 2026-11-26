@@ -17,7 +17,7 @@ type Props = {
   disabled?: boolean;
 };
 
-/** Two radio cards: pay online, or Cash on Delivery (+₹100). */
+/** Two radio cards: pay online, or Cash on Delivery (+₹200). */
 export function PaymentMethodSelect({ value, onChange, cod, codTotal, disabled }: Props) {
   return (
     <fieldset className="mt-5" disabled={disabled}>

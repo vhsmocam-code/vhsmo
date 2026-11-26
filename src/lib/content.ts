@@ -208,7 +208,7 @@ export const faqs: FaqItem[] = [
   {
     question: "Do you offer Cash on Delivery?",
     answer:
-      "Yes, on PIN codes where our courier supports it. A ₹100 COD fee is added and shown at checkout, and we verify your email address with a one-time code. Pay the full amount in cash or UPI when your VHSMO arrives. Coupons apply to online payment only.",
+      "Yes, on PIN codes where our courier supports it. A ₹200 COD fee is added and shown at checkout, and we verify your email address with a one-time code. Pay the full amount in cash or UPI when your VHSMO arrives. Coupons apply to online payment only.",
   },
   {
     question: "What's covered by the warranty?",
