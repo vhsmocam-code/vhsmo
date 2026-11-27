@@ -41,7 +41,7 @@ export function CouponInput({ onApply, loading, error }: Props) {
               submit();
             }
           }}
-          placeholder="EARLY500"
+          placeholder="C9R3L6"
           aria-invalid={Boolean(error)}
           autoCapitalize="characters"
           spellCheck={false}

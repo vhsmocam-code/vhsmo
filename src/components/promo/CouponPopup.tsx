@@ -15,23 +15,23 @@ import { formatCurrency } from "@/lib/utils";
  */
 
 // Display copy only - the coupons table is what the server actually enforces
-// (value, minimum order, expiry), so keep this in step with the EARLY500 row.
+// (value, minimum order, expiry), so keep this in step with the C9R3L6 row.
 const COUPON = {
-  code: "EARLY500",
+  code: "C9R3L6",
   type: "fixed" as "fixed" | "percent",
-  value: 500,
+  value: 1000,
   /** 0 = no minimum; the line under the amount is then generic. */
   minimumOrder: 0,
   /** Shows the live "Ends in" countdown (otherwise "Till the stock lasts"). */
-  showCountdown: true,
-  // 1 day from 25 Nov 2026, 6:30 PM IST. An explicit offset so every visitor
+  showCountdown: false,
+  // Matches the coupons row (31 Dec 2027). An explicit offset so every visitor
   // sees the same moment, whatever their timezone.
-  expiresAt: "2026-11-26T18:30:00+05:30",
+  expiresAt: "2027-12-31T23:59:59+00:00",
 };
 
 // Persisted across sessions so the modal auto-opens only on the very first
 // visit. After that it stays collapsed as the tab until the user re-opens it.
-const SEEN_KEY = "vhsmo-coupon-EARLY500-seen";
+const SEEN_KEY = "vhsmo-coupon-C9R3L6-seen";
 const REVEAL_DELAY = 2000; // ms before it opens on first visit
 
 type TimeLeft = {
