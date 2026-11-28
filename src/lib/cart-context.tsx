@@ -10,6 +10,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { buildContents, pixel } from "@/lib/meta-pixel";
 
 export interface CartItem {
   id: string;
@@ -156,6 +157,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     (item: Omit<CartItem, "quantity">, quantity = 1) => {
       dispatch({ type: "add", item, quantity });
       setIsOpen(true);
+      // Meta Pixel: every add-to-cart path (Reserve button, header, drawer) lands here.
+      pixel("AddToCart", {
+        ...buildContents([{ id: item.id, quantity, price: item.price }]),
+        content_name: item.name,
+      });
     },
     [],
   );

@@ -16,6 +16,7 @@ import {
 import { formatCurrency } from "@/lib/utils";
 import { variantAssets } from "@/lib/products";
 import { displayOrderId } from "@/lib/order-id";
+import { buildContents, pixel } from "@/lib/meta-pixel";
 import { DELIVERY_ETA, DELIVERY_ETA_REMOTE, DISPATCH_ETA } from "@/lib/shipping";
 
 type OrderItem = {
@@ -182,6 +183,29 @@ function SuccessContent() {
       active = false;
     };
   }, [orderId]);
+
+  // Meta Pixel: Purchase, only for a confirmed order (paid, or COD placed) - never
+  // the "payment pending" screen. This page is re-openable from the confirmation
+  // email, so a per-order localStorage flag keeps it to one Purchase per order.
+  useEffect(() => {
+    if (!order) return;
+    const confirmed =
+      order.paymentStatus === "paid" ||
+      (order.paymentMethod === "cod" && order.paymentStatus === "cod_confirmed");
+    if (!confirmed || !order.orderId) return;
+    const key = `vhsmo:meta-purchase:${order.orderId}`;
+    try {
+      if (localStorage.getItem(key)) return;
+      localStorage.setItem(key, "1");
+    } catch {
+      /* storage blocked - fire anyway; eventID still lets Meta dedupe */
+    }
+    pixel(
+      "Purchase",
+      { ...buildContents(order.items, order.total), currency: order.currency || "INR" },
+      order.orderId,
+    );
+  }, [order]);
 
   const shortId = displayOrderId(orderId ?? order?.orderId ?? "");
 

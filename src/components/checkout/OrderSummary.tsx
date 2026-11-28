@@ -16,6 +16,7 @@ import {
 import { track } from "@vercel/analytics";
 import { formatCurrency } from "@/lib/utils";
 import { loadRazorpay } from "@/lib/load-razorpay";
+import { buildContents, pixel } from "@/lib/meta-pixel";
 import type { CartItem } from "@/lib/cart-context";
 import type { Address } from "@/components/address/types";
 import { COD_FEE_DISPLAY } from "@/lib/cod/fee";
@@ -148,6 +149,15 @@ export function OrderSummary({
       onRequireVerification();
       return;
     }
+
+    // Meta Pixel: details are valid and verified - the shopper is moving on to pay.
+    pixel(
+      "AddPaymentInfo",
+      buildContents(
+        items,
+        total - (coupon?.discount ?? 0) + (isCod ? COD_FEE_DISPLAY : 0),
+      ),
+    );
 
     if (isCod) {
       setCodError("");

@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
+import { buildContents, pixel } from "@/lib/meta-pixel";
 import { useProducts } from "@/lib/products-context";
 import { usePersistedState } from "@/components/checkout/usePersistedState";
 import { emptyAddress, type Address } from "@/components/address/types";
@@ -43,6 +44,15 @@ export default function CheckoutPage() {
     return out;
   }, [products, items]);
   const hasSoldOut = soldOutIds.size > 0;
+
+  // Meta Pixel: the shopper reached checkout with items in the cart. Once per
+  // visit - the ref stops cart edits from re-firing it. Direct visits count too.
+  const checkoutTracked = useRef(false);
+  useEffect(() => {
+    if (checkoutTracked.current || !isHydrated || items.length === 0) return;
+    checkoutTracked.current = true;
+    pixel("InitiateCheckout", buildContents(items));
+  }, [isHydrated, items]);
 
   // Static 10-minute "reservation" countdown to nudge the shopper along. It
   // runs while the cart has items and redirects home if it lapses; `stop()`

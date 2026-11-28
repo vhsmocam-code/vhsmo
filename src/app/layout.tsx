@@ -8,6 +8,7 @@ import { FilmGrain } from "@/components/brand/FilmGrain";
 import { SiteChrome } from "@/components/layout/SiteChrome";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { Analytics } from "@vercel/analytics/next";
+import { MetaPixel } from "@/components/analytics/MetaPixel";
 
 import { getProducts } from "@/lib/get-products";
 import { ProductsProvider } from "@/lib/products-context";
@@ -121,6 +122,7 @@ export default async function RootLayout({
         <CartProvider>
           <SmoothScroll />
           <Analytics />
+          <MetaPixel />
 
           <a
             href="#main"
