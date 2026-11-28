@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
 import { variantFor, type ProductVariant } from "@/lib/products";
 import { useProducts } from "@/lib/products-context";
 
@@ -24,10 +24,39 @@ const ColorContext = createContext<ColorContextValue | null>(null);
  * The finishes themselves are the Supabase rows - the first one still in stock
  * opens selected, so nobody lands on a sold-out colour.
  */
-export function ColorProvider({ children }: { children: React.ReactNode }) {
+export function ColorProvider({
+  children,
+  initialId,
+  onChange,
+}: {
+  children: React.ReactNode;
+  /** Open on this row instead of the first in-stock one - the product page
+   *  passes the finish its URL names, even when that finish is sold out. */
+  initialId?: string;
+  /** Called after a swatch pick (not on first render). */
+  onChange?: (variant: ProductVariant) => void;
+}) {
   const variants = useProducts();
-  const initial = variants.find((v) => v.stock > 0) ?? variants[0];
-  const [color, setColor] = useState<string>(initial?.id ?? "");
+  const initial =
+    (initialId && variants.find((v) => v.id === initialId)) ||
+    variants.find((v) => v.stock > 0) ||
+    variants[0];
+  const [color, setColorState] = useState<string>(initial?.id ?? "");
+
+  // Read through a ref so a parent passing an inline callback doesn't
+  // rebuild the context value (and re-render every consumer) each render.
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+
+  const setColor = useCallback(
+    (id: string) => {
+      setColorState(id);
+      const next = variants.find((v) => v.id === id);
+      if (next) onChangeRef.current?.(next);
+    },
+    [variants],
+  );
+
   const value = useMemo(
     () => ({
       color,
@@ -35,7 +64,7 @@ export function ColorProvider({ children }: { children: React.ReactNode }) {
       variants,
       variant: variantFor(variants, color),
     }),
-    [color, variants],
+    [color, setColor, variants],
   );
   return <ColorContext.Provider value={value}>{children}</ColorContext.Provider>;
 }

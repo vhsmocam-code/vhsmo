@@ -5,7 +5,10 @@
 
 import { DELIVERY_NOTE, DISPATCH_ETA } from "./shipping";
 
+/** The buy section on the homepage - for CTAs that scroll within it. */
 export const RESERVE_HREF = "/#reserve";
+/** The product page - where shop links from anywhere else on the site go. */
+export const SHOP_HREF = "/products/vhsmo-camera";
 export const YEAR_MARK = "/2026";
 export const TAGLINE = ["Point.", "Shoot.", "Share."];
 

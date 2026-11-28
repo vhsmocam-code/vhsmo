@@ -6,8 +6,7 @@ import { Bell, Check, ShieldCheck, Truck } from "lucide-react";
 import { productCopy } from "@/lib/products";
 import { useColor } from "@/lib/color-context";
 import { formatCurrency } from "@/lib/utils";
-import { useCart } from "@/lib/cart-context";
-import { flyToCart } from "@/lib/fly-to-cart";
+import { useOrderNow } from "@/components/product/useOrderNow";
 import { Scribble } from "@/components/brand/Scribble";
 import dynamic from "next/dynamic";
 import { instantTransfer } from "@/lib/landing";
@@ -41,10 +40,18 @@ function PlayLogo() {
   );
 }
 
-export function PurchasePanel() {
-  const { addItem } = useCart();
+export function PurchasePanel({
+  source = "product_page",
+  specsHref,
+}: {
+  /** Analytics `source` on the panel's events. The homepage keeps the
+   *  historical "product_page" value so its event series stays continuous. */
+  source?: string;
+  /** When set, a "See full specs" link under the highlights points here. */
+  specsHref?: string;
+} = {}) {
   const { color, setColor, variants, variant } = useColor();
-  const [adding, setAdding] = useState(false);
+  const { orderNow, adding } = useOrderNow(variant, source);
   const [notifyOpen, setNotifyOpen] = useState(false);
   // Stays true once opened, so the modal can animate out when closed.
   const [notifyUsed, setNotifyUsed] = useState(false);
@@ -64,27 +71,8 @@ export function PurchasePanel() {
     );
   }
 
-  // Whatever finish is on the stage is what flies to the cart.
-  const hero = variant.images[0]!;
   const soldOut = variant.stock <= 0;
   const lowStock = !soldOut && variant.stock <= productCopy.lowStockThreshold;
-
-  // Fly the product image to the cart icon, then land the item in the cart
-  // (addItem opens the drawer once the flight ends). The cart line carries
-  // the row id, so checkout resolves back to this exact SKU.
-  const reserve = async (button: HTMLElement) => {
-    if (adding || soldOut) return;
-    setAdding(true);
-    await flyToCart(button, hero.src);
-    addItem({
-      id: variant.id,
-      name: variant.name,
-      variant: variant.color,
-      price: variant.price,
-      image: hero.src,
-    });
-    setAdding(false);
-  };
 
   return (
     <div className="lg:sticky lg:top-28">
@@ -139,6 +127,14 @@ export function PurchasePanel() {
           </li>
         ))}
       </ul>
+      {specsHref && (
+        <a
+          href={specsHref}
+          className="mt-4 inline-block text-sm font-semibold text-bluehour underline underline-offset-4 hover:text-darkroom"
+        >
+          See full specs ↓
+        </a>
+      )}
 
       <div className="my-6 h-px bg-darkroom/15" />
 
@@ -216,13 +212,14 @@ export function PurchasePanel() {
           <div className="flex flex-col gap-3">
             <button
               disabled
+              data-order-now
               className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-full bg-darkroom/15 px-8 py-4 text-base font-bold tracking-tight text-darkroom/50"
             >
               Sold out
             </button>
             <button
               onClick={() => {
-                track("notify_me_clicked", { source: "product_page" });
+                track("notify_me_clicked", { source });
                 setNotifyUsed(true);
                 setNotifyOpen(true);
               }}
@@ -234,13 +231,8 @@ export function PurchasePanel() {
           </div>
         ) : (
           <button
-            onClick={(e) => {
-              track("reserve_clicked", {
-                source: "product_page",
-              });
-
-              void reserve(e.currentTarget);
-            }}
+            data-order-now
+            onClick={(e) => void orderNow(e.currentTarget)}
             disabled={adding}
             className="flex w-full items-center justify-center gap-2 rounded-full bg-kodak px-8 py-4 text-base font-bold tracking-tight text-darkroom transition-all duration-300 ease-[var(--ease-out-expo)] hover:shadow-[0_0_0_5px_rgba(253,241,0,0.25)] active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-darkroom/15 disabled:text-darkroom/50 disabled:shadow-none"
           >

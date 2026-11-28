@@ -10,7 +10,7 @@ import { SetupProgress } from "@/components/setup/SetupProgress";
 import { SetupStep } from "@/components/setup/SetupStep";
 import { SetupTips } from "@/components/setup/SetupTips";
 import { SetupTroubleshooting } from "@/components/setup/SetupTroubleshooting";
-import { RESERVE_HREF } from "@/lib/landing";
+import { SHOP_HREF } from "@/lib/landing";
 import { progressSteps, setupSteps } from "@/lib/setup";
 
 const description =
@@ -62,7 +62,7 @@ export default function SetupPage() {
             <span className="text-kodak">Relive it later.</span>
           </p>
           <div className="mt-10 flex justify-center">
-            <MagneticButton href={RESERVE_HREF}>
+            <MagneticButton href={SHOP_HREF}>
               Get your VHSMO
               <span aria-hidden>→</span>
             </MagneticButton>

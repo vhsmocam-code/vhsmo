@@ -17,7 +17,7 @@ export default function NotFound() {
           <Link href="/">Back home</Link>
         </Button>
         <Button asChild variant="outline" size="lg">
-          <Link href="/#reserve">View the camera</Link>
+          <Link href="/products/vhsmo-camera">View the camera</Link>
         </Button>
       </div>
     </section>

@@ -1,88 +1,123 @@
+"use client";
+
 import Image from "next/image";
-import { Aperture, ArrowLeftRight, BatteryCharging, BookOpen, Cable, MousePointerClick, Link2 } from "lucide-react";
+import Link from "next/link";
+import { RotateCcw, ShieldCheck, Truck } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { DEFAULT_PRODUCT_IMAGE } from "@/lib/products";
+import { boxContents, DEFAULT_PRODUCT_IMAGE } from "@/lib/products";
+import { useColor } from "@/lib/color-context";
 import { Reveal } from "@/components/brand/Reveal";
-import { YEAR_MARK } from "@/lib/landing";
+import { boxIcons } from "@/components/product/ProductAccordion";
+import { DELIVERY_ETA, DISPATCH_ETA } from "@/lib/shipping";
 
-const boxItems: { label: string; image?: string; icon?: LucideIcon }[] = [
-  { label: "VHSMO Camera", image: DEFAULT_PRODUCT_IMAGE.src },
-  { label: "USB-C cable", icon: Cable },
-  { label: "Wrist strap", icon: Link2 },
-  { label: "Quick-start zine", icon: BookOpen },
+const promises: { icon: LucideIcon; title: string; sub: string; href?: string }[] = [
+  {
+    icon: Truck,
+    title: "Free shipping across India",
+    sub: `Ships within ${DISPATCH_ETA}, arrives in ${DELIVERY_ETA}.`,
+    href: "/legal/shipping",
+  },
+  {
+    icon: ShieldCheck,
+    title: "12-month warranty",
+    sub: "Manufacturing defects and hardware faults, covered.",
+  },
+  {
+    icon: RotateCcw,
+    title: "Refund policy",
+    sub: "Read how refunds and replacements work.",
+    href: "/legal/refund",
+  },
 ];
 
-const specs: { icon: LucideIcon; title: string; sub: string }[] = [
-  { icon: Aperture, title: "True 2000s optics", sub: "The warm bloom, kept - no filters." },
-  { icon: MousePointerClick, title: "One button", sub: "No menus, no modes, no learning curve." },
-  { icon: ArrowLeftRight, title: "Wireless transfer", sub: "On your phone in seconds - iOS & Android." },
-  { icon: BatteryCharging, title: "All-day battery", sub: "A weekend of shooting. Tops up on USB-C." },
-];
-
+/** What ships in the box, plus the shipping and warranty promises. */
 export function WhatsInBox() {
+  const { variant } = useColor();
+  // The camera tile shows the finish on the stage, so it matches the pick.
+  const camera = variant?.images[0] ?? DEFAULT_PRODUCT_IMAGE;
+
   return (
-    <section id="whats-in-box" className="scroll-mt-24">
-      <Reveal>
-        <div className="eyebrow flex justify-between border-b border-darkroom/20 pb-4 text-darkroom/55">
-          <span>In the box</span>
-          <span className="hidden sm:inline">one object · built to last</span>
-          <span>{YEAR_MARK}</span>
-        </div>
-      </Reveal>
-
-      <Reveal>
-        <h2 className="display mt-8 text-[clamp(1.9rem,3.6vw,2.9rem)] text-darkroom">
-          Everything you need,
-          <br className="hidden sm:block" /> nothing you don&apos;t.
-        </h2>
-      </Reveal>
-
-      <div className="mt-10 grid gap-6 lg:grid-cols-2 lg:gap-12">
-        {/* Items */}
-        <div className="grid grid-cols-2 gap-4">
-          {boxItems.map((item) => (
-            <Reveal key={item.label}>
-              <div className="flex flex-col items-center gap-3 bg-overexpose p-5 text-center shadow-[0.2rem_0.4rem_1rem_rgba(31,26,24,0.12)]">
-                <div className="relative flex aspect-square w-full items-center justify-center overflow-hidden bg-halide">
-                  {item.image ? (
-                    <Image
-                      src={item.image}
-                      alt={item.label}
-                      fill
-                      sizes="200px"
-                      className="object-cover"
-                    />
-                  ) : (
-                    item.icon && (
-                      <item.icon className="size-9 text-darkroom/70" strokeWidth={1.4} />
-                    )
-                  )}
-                </div>
-                <span className="text-sm font-semibold text-darkroom">{item.label}</span>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-
-        {/* Specs */}
+    <section id="whats-in-box" aria-label="What's in the box" className="section scroll-mt-20 bg-overexpose">
+      <div className="shell">
         <Reveal>
-          <ul className="h-full border-y border-darkroom/15">
-            {specs.map((spec) => (
-              <li
-                key={spec.title}
-                className="flex items-center gap-4 border-t border-darkroom/10 py-5 first:border-t-0"
-              >
-                <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-kodak text-darkroom">
-                  <spec.icon className="size-5" strokeWidth={1.7} />
-                </span>
-                <span>
-                  <span className="block font-bold text-darkroom">{spec.title}</span>
-                  <span className="block text-sm text-darkroom/65">{spec.sub}</span>
-                </span>
-              </li>
-            ))}
-          </ul>
+          <p className="eyebrow text-darkroom/55">In the box</p>
+          <h2 className="display mt-4 text-[clamp(2rem,4vw,3.5rem)] text-darkroom">
+            Everything you need,
+            <br className="hidden sm:block" /> nothing you don&apos;t.
+          </h2>
         </Reveal>
+
+        <div className="mt-12 grid gap-10 lg:grid-cols-2 lg:gap-16">
+          <ul className="grid grid-cols-2 gap-4">
+            {boxContents.map((entry, i) => {
+              const Icon = boxIcons[entry.icon];
+              return (
+                <Reveal key={entry.item} delay={i * 0.05}>
+                  <li className="flex h-full flex-col items-center gap-3 bg-halide/50 p-4 text-center sm:p-5">
+                    <div className="relative flex aspect-square w-full items-center justify-center overflow-hidden bg-overexpose">
+                      {entry.icon === "camera" ? (
+                        <Image
+                          src={camera.src}
+                          alt={camera.alt}
+                          fill
+                          sizes="(max-width: 1024px) 45vw, 280px"
+                          className="object-contain"
+                        />
+                      ) : (
+                        <span className="flex size-16 items-center justify-center rounded-full bg-kodak">
+                          <Icon className="size-7 text-darkroom" strokeWidth={1.6} />
+                        </span>
+                      )}
+                    </div>
+                    <span>
+                      <span className="block text-sm font-bold text-darkroom sm:text-base">
+                        {entry.item}
+                      </span>
+                      <span className="mt-0.5 block text-xs text-darkroom/60 sm:text-sm">
+                        {entry.detail}
+                      </span>
+                    </span>
+                  </li>
+                </Reveal>
+              );
+            })}
+          </ul>
+
+          <Reveal>
+            <ul className="border-y border-darkroom/15">
+              {promises.map((p) => {
+                const body = (
+                  <>
+                    <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-kodak text-darkroom">
+                      <p.icon className="size-5" strokeWidth={1.7} />
+                    </span>
+                    <span>
+                      <span className="block font-bold text-darkroom">{p.title}</span>
+                      <span className="block text-sm text-darkroom/65">{p.sub}</span>
+                    </span>
+                  </>
+                );
+                return (
+                  <li key={p.title} className="border-t border-darkroom/10 first:border-t-0">
+                    {p.href ? (
+                      <Link
+                        href={p.href}
+                        className="flex items-center gap-4 py-6 transition-colors hover:text-bluehour"
+                      >
+                        {body}
+                      </Link>
+                    ) : (
+                      <div className="flex items-center gap-4 py-6">{body}</div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+            <p className="font-marker mt-6 rotate-[-1.5deg] text-xl text-darkroom">
+              Charge it. Turn it on. Start shooting.
+            </p>
+          </Reveal>
+        </div>
       </div>
     </section>
   );

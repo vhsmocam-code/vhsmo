@@ -20,7 +20,7 @@ export function EmptyCart() {
         Add your VHSMO, then check out here.
       </p>
       <Link
-        href="/#reserve"
+        href="/products/vhsmo-camera"
         className="mt-8 inline-flex items-center gap-2 rounded-full bg-kodak px-7 py-3.5 text-sm font-bold text-darkroom transition-transform hover:scale-[1.02]"
       >
         {product ? `Order Now - ${formatCurrency(product.price)}` : "Order Now"}

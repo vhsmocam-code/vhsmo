@@ -7,8 +7,8 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Volume2, VolumeX, X } from "lucide-react";
 import type { Story } from "@/lib/landing";
-import { RESERVE_HREF } from "@/lib/landing";
-import { useDefaultProduct } from "@/lib/products-context";
+import { productHrefForColor } from "@/lib/products";
+import { useDefaultProduct, useProducts } from "@/lib/products-context";
 import { formatCurrency } from "@/lib/utils";
 
 /** `sizes` for the full-size story image. The viewer and the preloader must
@@ -63,9 +63,14 @@ type StoryViewerProps = {
  */
 export function StoryViewer({ stories, index, onIndexChange, onClose }: StoryViewerProps) {
   const reduceMotion = useReducedMotion();
-  const product = useDefaultProduct();
+  const products = useProducts();
+  const fallbackProduct = useDefaultProduct();
   const open = index !== null;
   const story = index !== null ? stories[index] : undefined;
+  // The CTA sells the finish in the story on screen, at that finish's price.
+  const product =
+    (story && products.find((p) => p.color === story.finish)) || fallbackProduct;
+  const ctaHref = productHrefForColor(products, story?.finish ?? "");
 
   const [progress, setProgress] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -309,7 +314,7 @@ export function StoryViewer({ stories, index, onIndexChange, onClose }: StoryVie
                     </p>
                   </div>
                   <Link
-                    href={RESERVE_HREF}
+                    href={ctaHref}
                     onClick={onClose}
                     className="inline-flex shrink-0 items-center gap-2 rounded-full bg-kodak px-5 py-3 text-sm font-bold text-darkroom transition-shadow hover:shadow-[0_0_0_5px_rgba(253,241,0,0.25)] sm:text-base"
                   >

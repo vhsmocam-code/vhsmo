@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-// The product now lives on the landing page - keep old links working.
+// The product page moved to /products/<slug> - keep old links working.
 export default function ProductPage() {
-  redirect("/#reserve");
+  redirect("/products/vhsmo-camera");
 }

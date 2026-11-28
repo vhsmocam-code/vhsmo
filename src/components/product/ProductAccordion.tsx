@@ -4,6 +4,15 @@ import * as Accordion from "@radix-ui/react-accordion";
 import { Cable, Camera, Gift, MemoryStick, Plus } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { DELIVERY_NOTE, DISPATCH_ETA } from "@/lib/shipping";
+import { boxContents, keySpecs } from "@/lib/products";
+
+/** Glyph for each box item - the names are fixed in boxContents. */
+export const boxIcons: Record<(typeof boxContents)[number]["icon"], LucideIcon> = {
+  camera: Camera,
+  cable: Cable,
+  card: MemoryStick,
+  lanyard: Gift,
+};
 
 type Item = {
   title: string;
@@ -85,12 +94,11 @@ const items: Item[] = [
             Included with every camera:
           </p>
           <ul className="mt-2.5 space-y-2">
-            <BoxItem icon={Camera}>VHSMO Camera</BoxItem>
-            <BoxItem icon={Cable}>USB-C charging and data cable</BoxItem>
-            <BoxItem icon={MemoryStick}>
-              4GB microSD card, pre-installed
-            </BoxItem>
-            <BoxItem icon={Gift}>VHSMO lanyard</BoxItem>
+            {boxContents.map((b) => (
+              <BoxItem key={b.item} icon={boxIcons[b.icon]}>
+                {b.item}
+              </BoxItem>
+            ))}
           </ul>
         </div>
         <p className="font-marker text-darkroom">
@@ -108,16 +116,7 @@ const items: Item[] = [
           distractions.
         </p>
         <dl className="grid gap-x-8 gap-y-2 sm:grid-cols-2">
-          {[
-            ["Sensor", "5MP CMOS sensor"],
-            ["Lens", "Fixed-focus retro lens with a 71° field of view"],
-            ["Shooting", "Automatic exposure and white balance"],
-            ["Transfer", "Direct wireless transfer through the VHSMO app"],
-            ["USB-C", "Rechargeable battery and wired photo transfer"],
-            ["Viewfinder", "Classic 35MM optical viewfinder"],
-            ["Flash", "Built-in 2W LED flash"],
-            ["Storage", "4GB microSD card included"],
-          ].map(([label, value]) => (
+          {keySpecs.map(({ label, value }) => (
             <div key={label} className="flex flex-col">
               <dt className="text-xs font-semibold uppercase tracking-wide text-darkroom/50">
                 {label}
@@ -171,10 +170,11 @@ const items: Item[] = [
 
 /** The fine print, ruled like the FAQ - same hairlines, blue hover,
  *  same open/close motion. */
-export function ProductAccordion() {
+export function ProductAccordion({ only }: { only?: string[] } = {}) {
+  const shown = only ? items.filter((i) => only.includes(i.title)) : items;
   return (
     <Accordion.Root type="single" collapsible className="border-t border-darkroom/25">
-      {items.map((item) => (
+      {shown.map((item) => (
         <Accordion.Item
           key={item.title}
           value={item.title}

@@ -9,11 +9,11 @@ import { Menu, ShoppingBag, X } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { flyToCart } from "@/lib/fly-to-cart";
 import { cn } from "@/lib/utils";
-import { RESERVE_HREF } from "@/lib/landing";
+import { SHOP_HREF } from "@/lib/landing";
 import { useDefaultProduct } from "@/lib/products-context";
 
 const navLinks = [
-  { label: "Shop", href: RESERVE_HREF },
+  { label: "Shop", href: SHOP_HREF },
 
   { label: "Story", href: "/#story" },
   { label: "Shot on VHSMO", href: "/#photos" },

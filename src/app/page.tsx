@@ -13,12 +13,44 @@ import { ProductFeatures } from "@/components/product/ProductFeatures";
 import { ProductAccordion } from "@/components/product/ProductAccordion";
 import AnalyticsTracker from "@/components/layout/AnalyticsTracker";
 import { CouponPopup } from "@/components/promo/CouponPopup";
+import { getProducts } from "@/lib/get-products";
+import { productCopy } from "@/lib/products";
+import { SITE_URL } from "@/lib/site";
+import { SHOP_HREF } from "@/lib/landing";
 
 
 
-export default function HomePage() {
+export default async function HomePage() {
+  // Live price and stock for the search snippet; each finish's own page
+  // carries a per-finish Product schema of its own.
+  const products = await getProducts();
+  const lead = products.find((p) => p.stock > 0) ?? products[0];
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: "VHSMO Pocket Camera",
+    description:
+      "VHSMO is a screen-free pocket retro camera built to keep you in the moment. No screen. No filters. Just real authentic memories -transferred wirelessly to your phone in seconds, completely offline.",
+    brand: { "@type": "Brand", name: "VHSMO" },
+    ...(lead && {
+      offers: {
+        "@type": "Offer",
+        availability: products.some((p) => p.stock > 0)
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
+        url: `${SITE_URL}${SHOP_HREF}`,
+        priceCurrency: productCopy.currency,
+        price: String(lead.price),
+      },
+    }),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       <AnalyticsTracker />
       <Hero />
       <Story />

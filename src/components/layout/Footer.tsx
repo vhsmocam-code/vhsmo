@@ -11,7 +11,7 @@ import {
 import { Scribble } from "@/components/brand/Scribble";
 import { RazorpayLogo } from "@/components/checkout/PartnerLogos";
 import { LEGAL_DOCS } from "@/lib/legal";
-import { RESERVE_HREF } from "@/lib/landing";
+import { SHOP_HREF } from "@/lib/landing";
 import { FooterNewsletter } from "./FooterNewsletter";
 
 /** Link columns - only destinations that actually exist on the site. */
@@ -20,7 +20,7 @@ const columns = [
     title: "Shop",
     Icon: ShoppingBag,
     links: [
-      { label: "Order Now", href: RESERVE_HREF },
+      { label: "Order Now", href: SHOP_HREF },
       { label: "International Orders", href: "/international-order" },
     ],
   },

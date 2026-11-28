@@ -146,7 +146,7 @@ export default function LaunchPage() {
             <Sticker size="lg" rotate={seededRotation(11, 4)}>
               We&apos;re live.
             </Sticker>
-            <MagneticButton href="/#reserve">
+            <MagneticButton href="/products/vhsmo-camera">
               Reserve yours
               <span aria-hidden>→</span>
             </MagneticButton>

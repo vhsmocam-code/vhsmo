@@ -3,6 +3,7 @@ import { supabase } from "@/lib/supabase";
 import {
   variantAssets,
   DEFAULT_PRODUCT_IMAGE,
+  slugForColor,
   type ProductVariant,
 } from "@/lib/products";
 
@@ -28,12 +29,15 @@ function joinAssets(row: ProductRow): ProductVariant {
   return {
     id: row.id,
     sku: row.sku,
-    name: row.name,
-    color: row.color,
+    // Trimmed: the live rows carry a stray trailing newline in `name`, which
+    // leaked into titles and the Product schema.
+    name: row.name.trim(),
+    color: row.color.trim(),
     description: row.description ?? "",
     price: row.selling_price,
     mrp: row.mrp ?? 0,
     stock: row.stock ?? 0,
+    slug: assets?.slug ?? slugForColor(row.color),
     swatch: assets?.swatch ?? "#d9d5d0",
     body: assets?.body ?? "#d9d5d0",
     lightScale: assets?.lightScale ?? 1,

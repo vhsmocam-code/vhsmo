@@ -86,22 +86,6 @@ export const viewport: Viewport = {
   interactiveWidget: "resizes-content",
 };
 
-const productJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Product",
-  name: "VHSMO Pocket Camera",
-  description:
-    "VHSMO is a screen-free pocket retro camera built to keep you in the moment. No screen. No filters. Just real authentic memories -transferred wirelessly to your phone in seconds, completely offline.",
-  brand: { "@type": "Brand", name: "VHSMO" },
-  offers: {
-    "@type": "Offer",
-    availability: "https://schema.org/InStock",
-    url: `${SITE_URL}/product`,
-    priceCurrency: "INR",
-    price: "6999",
-  },
-};
-
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -113,10 +97,6 @@ export default async function RootLayout({
     <html lang="en" className={`${sequel.variable} ${kids.variable}`}>
       <body className="min-h-dvh antialiased">
     
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
-        />
         <ProductsProvider products={products}>
         <CartProvider>
           <SmoothScroll />

@@ -5,7 +5,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Reveal } from "@/components/brand/Reveal";
 import { Sticker } from "@/components/brand/Sticker";
 import { MagneticButton } from "@/components/brand/MagneticButton";
-import { RESERVE_HREF, reviews, type Story } from "@/lib/landing";
+import { SHOP_HREF, reviews, type Story } from "@/lib/landing";
 import { seededRotation } from "@/lib/random";
 import { StoryMedia, StoryPreload, StoryViewer } from "./StoryViewer";
 
@@ -167,7 +167,7 @@ export function Reviews() {
           >
             {reviews.signOff}
           </a>
-          <MagneticButton href={RESERVE_HREF}>{reviews.cta} →</MagneticButton>
+          <MagneticButton href={SHOP_HREF}>{reviews.cta} →</MagneticButton>
         </Reveal>
       </div>
 

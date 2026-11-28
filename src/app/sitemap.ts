@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { LEGAL_DOCS } from "@/lib/legal";
 import { SITE_URL } from "@/lib/site";
+import { productSlugs } from "@/lib/products";
 
 const BASE = SITE_URL;
 
@@ -13,6 +14,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 1,
     },
+    ...productSlugs.map((slug) => ({
+      url: `${BASE}/products/${slug}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.9,
+    })),
     {
       url: `${BASE}/international-order`,
       lastModified: now,

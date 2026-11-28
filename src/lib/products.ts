@@ -13,6 +13,9 @@ export interface ProductImage {
  * to the default finish's photos.
  */
 export interface VariantAssets {
+  /** The finish's product page: /products/<slug>. Stable - shared links,
+   *  ads and the sitemap point here, so never rename one in place. */
+  slug: string;
   /** Hex shown in the swatch row on the purchase panel. */
   swatch: string;
   /**
@@ -53,6 +56,8 @@ export interface ProductVariant {
   /** `mrp` - struck through next to the price when it is higher. */
   mrp: number;
   stock: number;
+  /** URL segment of this finish's product page. */
+  slug: string;
   swatch: string;
   body: string;
   lightScale: number;
@@ -62,6 +67,7 @@ export interface ProductVariant {
 /** Local artwork per SKU. Order here is the order the swatches render in. */
 export const variantAssets: Record<string, VariantAssets> = {
   "VHSMO-BPK": {
+    slug: "vhsmo-baby-pink",
     swatch: "#f2a8bd",
     body: "#ffc9d2",
     images: [
@@ -80,6 +86,7 @@ export const variantAssets: Record<string, VariantAssets> = {
     ],
   },
   "VHSMO-BLK": {
+    slug: "vhsmo-cosmic-black",
     swatch: "#1c1a19",
     body: "#222222",
     images: [
@@ -98,6 +105,7 @@ export const variantAssets: Record<string, VariantAssets> = {
     ],
   },
   "VHSMO-CHR": {
+    slug: "vhsmo-cherry-red",
     swatch: "#c02b25",
     body: "#950606",
     lightScale: 0.7,
@@ -145,6 +153,40 @@ export function variantFor(
   return variants.find((v) => v.id === id) ?? variants[0];
 }
 
+/** The product-level page - opens on the first finish still in stock. */
+export const PRODUCT_SLUG = "vhsmo-camera";
+
+/** Every slug that has a product page, the product-level one first. */
+export const productSlugs = [
+  PRODUCT_SLUG,
+  ...Object.values(variantAssets).map((a) => a.slug),
+];
+
+/** A finish's page, or the product-level page when no finish is given. */
+export function productHref(variant?: Pick<ProductVariant, "slug">): string {
+  return `/products/${variant?.slug ?? PRODUCT_SLUG}`;
+}
+
+/** Slug for a finish name as the shop lists it ("Cherry Red" -> the Cherry
+ *  Red page). Falls back to the product page for names it doesn't know. */
+export function productHrefForColor(
+  variants: ProductVariant[],
+  color: string,
+): string {
+  return productHref(
+    variants.find((v) => v.color.toLowerCase() === color.toLowerCase()),
+  );
+}
+
+/** "Cherry Red" -> "vhsmo-cherry-red" - only for rows with no artwork entry. */
+export function slugForColor(color: string): string {
+  const s = color
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  return `vhsmo-${s || "camera"}`;
+}
+
 export interface SpecGroup {
   group: string;
   items: { label: string; value: string }[];
@@ -160,52 +202,99 @@ export interface Accessory {
   comingSoon?: boolean;
 }
 
+/** The camera's real specifications. The homepage accordion and the product
+ *  page's spec sheet both render this list, so they can't drift apart. */
 export const specifications: SpecGroup[] = [
   {
-    group: "Sensor & Image",
+    group: "Image",
     items: [
-      { label: "Sensor", value: "61MP full-frame BSI CMOS" },
-      { label: "ISO range", value: "64 – 102,400" },
-      { label: "Dynamic range", value: "15 stops" },
-      { label: "Colour science", value: "Aperture Warm Profile" },
+      { label: "Sensor", value: "5MP CMOS sensor" },
+      { label: "Lens", value: "Fixed-focus retro lens, 71° field of view" },
+      { label: "Shooting", value: "Automatic exposure and white balance" },
+      { label: "Flash", value: "Built-in 2W LED flash" },
     ],
   },
   {
-    group: "Body & Controls",
+    group: "Design",
     items: [
-      { label: "Construction", value: "CNC aluminium, full-grain leather" },
-      { label: "Weight", value: "498 g (body only)" },
-      { label: "Controls", value: "Mechanical shutter, ISO & aperture dials" },
-      { label: "Weather sealing", value: "IP53 dust & splash resistant" },
+      { label: "Viewfinder", value: "Classic 35mm optical viewfinder" },
+      { label: "Screen", value: "None - by design" },
+      { label: "Controls", value: "One shutter button, one Wi-Fi button" },
+      { label: "Mode", value: "Stills only - no video" },
     ],
   },
   {
-    group: "Performance",
+    group: "Transfer & storage",
     items: [
-      { label: "Stabilisation", value: "8-stop 5-axis in-body" },
-      { label: "Shutter", value: "1/8000s – 60s, silent electronic" },
-      { label: "Viewfinder", value: "5.76M-dot OLED, 0.9× magnification" },
-      { label: "Storage", value: "Dual UHS-II SD" },
+      { label: "Wireless", value: "Direct Wi-Fi transfer to the VHSMO app" },
+      { label: "Internet", value: "Not needed - local, cloud-free" },
+      { label: "Wired", value: "USB-C photo transfer to a computer" },
+      { label: "Storage", value: "4GB microSD included, 3,000+ photos" },
     ],
   },
   {
-    group: "Connectivity & Power",
+    group: "Power",
     items: [
-      { label: "Battery", value: "Up to 540 frames per charge" },
-      { label: "Charging", value: "USB-C PD, full charge in 90 min" },
-      { label: "Wireless", value: "Wi-Fi 6 + Bluetooth 5.2" },
-      { label: "Ports", value: "USB-C, micro-HDMI, 3.5mm" },
+      { label: "Battery", value: "1000mAh rechargeable" },
+      { label: "Charging", value: "USB-C, up to 8 hours for a full charge" },
+      { label: "App", value: "VHSMO for iOS and Android" },
+      { label: "Warranty", value: "12-month limited warranty" },
     ],
   },
 ];
 
-export const boxContents: { item: string; detail: string }[] = [
-  { item: "Aperture Field One body", detail: "In Graphite or Sand finish" },
-  { item: "USB-C charging cable", detail: "Braided, 1.5m" },
-  { item: "Leather wrist strap", detail: "Full-grain, hand-stitched" },
-  { item: "Lens cap & body cap", detail: "Machined aluminium" },
-  { item: "Quick-start guide", detail: "Letterpress printed" },
-  { item: "Lifetime membership", detail: "Aperture Field Notes community" },
+/** The short spec list the homepage accordion shows. */
+export const keySpecs: { label: string; value: string }[] = [
+  { label: "Sensor", value: "5MP CMOS sensor" },
+  { label: "Lens", value: "Fixed-focus retro lens with a 71° field of view" },
+  { label: "Shooting", value: "Automatic exposure and white balance" },
+  { label: "Transfer", value: "Direct wireless transfer through the VHSMO app" },
+  { label: "USB-C", value: "Rechargeable battery and wired photo transfer" },
+  { label: "Viewfinder", value: "Classic 35MM optical viewfinder" },
+  { label: "Flash", value: "Built-in 2W LED flash" },
+  { label: "Storage", value: "4GB microSD card included" },
+];
+
+/** What ships in every box. `icon` is a lucide name the UI maps to a glyph. */
+export const boxContents: {
+  item: string;
+  detail: string;
+  icon: "camera" | "cable" | "card" | "lanyard";
+}[] = [
+  { item: "VHSMO Camera", detail: "In the finish you picked", icon: "camera" },
+  { item: "USB-C cable", detail: "Charging and photo transfer", icon: "cable" },
+  { item: "4GB microSD card", detail: "Pre-installed, 3,000+ photos", icon: "card" },
+  { item: "VHSMO lanyard", detail: "Keeps it on you, not in a drawer", icon: "lanyard" },
+];
+
+/** The three steps on the product page's How it works section. */
+export const howItWorks: {
+  step: string;
+  title: string;
+  detail: string;
+  illustration: "ready-to-shoot" | "wifi-on" | "app-connect";
+}[] = [
+  {
+    step: "01",
+    title: "Point & shoot",
+    detail:
+      "Frame it through the viewfinder and press the shutter. No menus, no modes, no screen to check.",
+    illustration: "ready-to-shoot",
+  },
+  {
+    step: "02",
+    title: "Press the Wi-Fi button",
+    detail:
+      "When you're ready to see them, press the Wi-Fi button on the back. The camera makes its own direct connection - no internet needed.",
+    illustration: "wifi-on",
+  },
+  {
+    step: "03",
+    title: "In your app in seconds",
+    detail:
+      "Open the VHSMO app and your photos land on your phone, ready to keep or share. Nothing goes through a cloud.",
+    illustration: "app-connect",
+  },
 ];
 
 /** A feature callout in the 3D inspect section. Selecting one glides the
